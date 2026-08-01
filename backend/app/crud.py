@@ -89,7 +89,40 @@ def profile_to_read(profile: models.UserProfile) -> schemas.ProfileRead:
         created_at=profile.created_at,
         injuries=[schemas.InjuryRead.model_validate(i) for i in profile.injuries],
         excluded_exercises=[schemas.ExerciseSummary.model_validate(e) for e in profile.excluded_exercises],
+        exercise_weights=[
+            schemas.ExerciseWeightRead(exercise_id=w.exercise_id, exercise_name=w.exercise.name, weight_kg=w.weight_kg)
+            for w in profile.exercise_weights
+        ],
     )
+
+
+# --- Personal exercise weights ---
+
+
+def set_exercise_weight(db: Session, profile: models.UserProfile, exercise_id: int, weight_kg: float) -> models.ProfileExerciseWeight:
+    exercise = db.get(models.Exercise, exercise_id)
+    if not exercise:
+        raise ValueError("Oefening niet gevonden")
+    existing = db.query(models.ProfileExerciseWeight).filter_by(profile_id=profile.id, exercise_id=exercise_id).first()
+    if existing:
+        existing.weight_kg = weight_kg
+        db.commit()
+        db.refresh(existing)
+        return existing
+    weight = models.ProfileExerciseWeight(profile_id=profile.id, exercise_id=exercise_id, weight_kg=weight_kg)
+    db.add(weight)
+    db.commit()
+    db.refresh(weight)
+    return weight
+
+
+def remove_exercise_weight(db: Session, profile: models.UserProfile, exercise_id: int) -> bool:
+    existing = db.query(models.ProfileExerciseWeight).filter_by(profile_id=profile.id, exercise_id=exercise_id).first()
+    if not existing:
+        return False
+    db.delete(existing)
+    db.commit()
+    return True
 
 
 # --- Injuries ---

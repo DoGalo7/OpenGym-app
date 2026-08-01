@@ -76,7 +76,8 @@ export default function ManualWodBuilder({ profile, location, trainingType, setT
   );
 
   const addExercise = (exercise) => {
-    setPicked((prev) => [...prev, { exercise, own_weight_kg: null, ...defaultFieldsFor(exercise) }]);
+    const saved = (profile.exercise_weights ?? []).find((w) => w.exercise_id === exercise.id);
+    setPicked((prev) => [...prev, { exercise, own_weight_kg: saved?.weight_kg ?? null, ...defaultFieldsFor(exercise) }]);
   };
 
   const removeExercise = (id) => {

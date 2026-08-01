@@ -189,6 +189,10 @@ def build_stretch_wod(db: Session, profile: UserProfile, request) -> GeneratedWo
 def generate_wod(db: Session, profile: UserProfile, request: WodGenerateRequest) -> GeneratedWod:
     all_exercises = db.query(Exercise).all()
     filtered = _apply_profile_filters(all_exercises, profile, request)
+    # Personal saved weight (see ProfileExerciseWeight) is the default own_weight_kg for a
+    # freshly generated WOD - still editable per-WOD via ExerciseRow same as before, and an
+    # explicit request.own_weights entry (if the frontend ever sends one) wins over it.
+    saved_weights = {w.exercise_id: w.weight_kg for w in profile.exercise_weights}
     # A manually chosen exercise is a deliberate, informed choice (the picker warns about
     # injury conflicts but doesn't block them) - so validate explicit picks against a pool
     # that skips the injury filter, while auto-filled slots still stay injury-safe.
@@ -244,7 +248,7 @@ def generate_wod(db: Session, profile: UserProfile, request: WodGenerateRequest)
     used_ids = {e.id for e in chosen}
 
     main_exercises = [
-        _to_exercise_in_wod(e, effective_level, request, main_pool, used_ids)
+        _to_exercise_in_wod(e, effective_level, request, main_pool, used_ids, saved_weights)
         for e in chosen
     ]
 
@@ -299,6 +303,7 @@ def load_predefined_wod(db: Session, profile: UserProfile, predefined_wod: Prede
     all_exercises = db.query(Exercise).all()
     exercises_by_id = {e.id: e for e in all_exercises}
     movements = sorted(predefined_wod.movements, key=lambda m: m.position)
+    saved_weights = {w.exercise_id: w.weight_kg for w in profile.exercise_weights}
 
     main_exercises: list[ExerciseInWod] = []
     used_ids: set[int] = set()
@@ -313,6 +318,7 @@ def load_predefined_wod(db: Session, profile: UserProfile, predefined_wod: Prede
             distance_meters=movement.distance_meters,
             calories=movement.calories,
             cardio_type=exercise.cardio_type if exercise.is_cardio else None,
+            own_weight_kg=saved_weights.get(exercise.id),
             suggested_weight_male_kg=exercise.rx_weight_male_kg,
             suggested_weight_female_kg=exercise.rx_weight_female_kg,
             alternatives=_alternatives_for(exercise, all_exercises, used_ids | {exercise.id}),
@@ -551,7 +557,8 @@ def _alternatives_for(exercise: Exercise, pool: list[Exercise], exclude_ids: set
 
 
 def _to_exercise_in_wod(
-    exercise: Exercise, effective_level: str | None, request: WodGenerateRequest, pool: list[Exercise], exclude_ids: set[int]
+    exercise: Exercise, effective_level: str | None, request: WodGenerateRequest, pool: list[Exercise],
+    exclude_ids: set[int], saved_weights: dict[int, float] | None = None,
 ) -> ExerciseInWod:
     is_carry = _is_carry(exercise)
     return ExerciseInWod(
@@ -561,7 +568,7 @@ def _to_exercise_in_wod(
         category=exercise.category,
         reps=None if is_carry else _reps_for(exercise, effective_level),
         distance_meters=CARRY_DISTANCE_METERS.get(effective_level, DEFAULT_CARRY_DISTANCE_METERS) if is_carry else None,
-        own_weight_kg=request.own_weights.get(exercise.id),
+        own_weight_kg=request.own_weights.get(exercise.id) or (saved_weights or {}).get(exercise.id),
         suggested_weight_male_kg=exercise.rx_weight_male_kg,
         suggested_weight_female_kg=exercise.rx_weight_female_kg,
         alternatives=_alternatives_for(exercise, pool, exclude_ids),

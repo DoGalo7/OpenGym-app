@@ -44,6 +44,10 @@ export function patch(path, data) {
   return request(path, { method: "PATCH", body: JSON.stringify(data) });
 }
 
+export function put(path, data) {
+  return request(path, { method: "PUT", body: JSON.stringify(data) });
+}
+
 export function del(path) {
   return request(path, { method: "DELETE" });
 }

@@ -4,10 +4,13 @@ import {
   addExcludedExercise,
   addInjury,
   removeExcludedExercise,
+  removeExerciseWeight,
   removeInjury,
+  setExerciseWeight,
   updateProfile,
 } from "../api/profiles";
 import ExcludedExerciseList from "../components/profile/ExcludedExerciseList";
+import ExerciseWeightsList from "../components/profile/ExerciseWeightsList";
 import FriendsSection from "../components/profile/FriendsSection";
 import InjuryList from "../components/profile/InjuryList";
 import LevelSelect from "../components/profile/LevelSelect";
@@ -62,6 +65,12 @@ export default function ProfilePage() {
 
   const handleRemoveExcluded = (exerciseId) =>
     runOrShowError(() => removeExcludedExercise(profile.user_id, exerciseId));
+
+  const handleSetWeight = (exerciseId, weightKg) =>
+    runOrShowError(() => setExerciseWeight(profile.user_id, exerciseId, weightKg));
+
+  const handleRemoveWeight = (exerciseId) =>
+    runOrShowError(() => removeExerciseWeight(profile.user_id, exerciseId));
 
   return (
     <div>
@@ -122,6 +131,12 @@ export default function ProfilePage() {
         excludedExercises={profile.excluded_exercises}
         onAdd={handleAddExcluded}
         onRemove={handleRemoveExcluded}
+      />
+
+      <ExerciseWeightsList
+        exerciseWeights={profile.exercise_weights}
+        onSet={handleSetWeight}
+        onRemove={handleRemoveWeight}
       />
 
       <FriendsSection userId={profile.user_id} />

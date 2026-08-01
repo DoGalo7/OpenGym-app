@@ -110,12 +110,26 @@ class ProfileRead(BaseModel):
     created_at: datetime
     injuries: list[InjuryRead] = []
     excluded_exercises: list[ExerciseSummary] = []
+    exercise_weights: list["ExerciseWeightRead"] = []
 
     model_config = ConfigDict(from_attributes=True)
 
 
 class ExcludedExerciseAdd(BaseModel):
     exercise_id: int
+
+
+# --- Personal exercise weights ---
+
+
+class ExerciseWeightSet(BaseModel):
+    weight_kg: float = Field(gt=0, le=500)
+
+
+class ExerciseWeightRead(BaseModel):
+    exercise_id: int
+    exercise_name: str
+    weight_kg: float
 
 
 # --- Friendships ---

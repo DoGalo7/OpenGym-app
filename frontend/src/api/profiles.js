@@ -1,4 +1,4 @@
-import { del, get, patch, post } from "./client";
+import { del, get, patch, post, put } from "./client";
 
 export function login(userId, name, password) {
   return post("/profiles/login", { user_id: userId, name, password });
@@ -26,6 +26,14 @@ export function addExcludedExercise(userId, exerciseId) {
 
 export function removeExcludedExercise(userId, exerciseId) {
   return del(`/profiles/${userId}/excluded-exercises/${exerciseId}`);
+}
+
+export function setExerciseWeight(userId, exerciseId, weightKg) {
+  return put(`/profiles/${userId}/exercise-weights/${exerciseId}`, { weight_kg: weightKg });
+}
+
+export function removeExerciseWeight(userId, exerciseId) {
+  return del(`/profiles/${userId}/exercise-weights/${exerciseId}`);
 }
 
 export function listFriends(userId) {

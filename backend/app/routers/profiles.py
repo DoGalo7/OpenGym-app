@@ -62,6 +62,23 @@ def delete_excluded_exercise(user_id: str, exercise_id: int, db: Session = Depen
         raise HTTPException(404, "Oefening stond niet in de uitsluitingslijst")
 
 
+@router.put("/{user_id}/exercise-weights/{exercise_id}", response_model=schemas.ProfileRead)
+def set_exercise_weight(user_id: str, exercise_id: int, data: schemas.ExerciseWeightSet, db: Session = Depends(get_db)):
+    profile = _get_profile_or_404(db, user_id)
+    try:
+        crud.set_exercise_weight(db, profile, exercise_id, data.weight_kg)
+    except ValueError as e:
+        raise HTTPException(404, str(e))
+    return crud.profile_to_read(profile)
+
+
+@router.delete("/{user_id}/exercise-weights/{exercise_id}", status_code=204)
+def delete_exercise_weight(user_id: str, exercise_id: int, db: Session = Depends(get_db)):
+    profile = _get_profile_or_404(db, user_id)
+    if not crud.remove_exercise_weight(db, profile, exercise_id):
+        raise HTTPException(404, "Geen gewicht opgeslagen voor deze oefening")
+
+
 @router.get("/{user_id}/friends", response_model=list[schemas.FriendshipRead])
 def list_friends(user_id: str, db: Session = Depends(get_db)):
     profile = _get_profile_or_404(db, user_id)

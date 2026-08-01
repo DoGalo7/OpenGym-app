@@ -130,6 +130,24 @@ class UserProfile(Base):
     wod_history: Mapped[list["WodHistory"]] = relationship(
         back_populates="profile", cascade="all, delete-orphan"
     )
+    exercise_weights: Mapped[list["ProfileExerciseWeight"]] = relationship(
+        back_populates="profile", cascade="all, delete-orphan"
+    )
+
+
+class ProfileExerciseWeight(Base):
+    """A personal working weight for one exercise, saved so future generated WODs can default
+    to it instead of the RX weight - still editable per-WOD via ExerciseRow like before."""
+    __tablename__ = "profile_exercise_weights"
+    __table_args__ = (UniqueConstraint("profile_id", "exercise_id", name="uq_profile_exercise_weight"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    profile_id: Mapped[int] = mapped_column(ForeignKey("user_profiles.id"), nullable=False)
+    exercise_id: Mapped[int] = mapped_column(ForeignKey("exercises.id"), nullable=False)
+    weight_kg: Mapped[float] = mapped_column(nullable=False)
+
+    profile: Mapped["UserProfile"] = relationship(back_populates="exercise_weights")
+    exercise: Mapped["Exercise"] = relationship()
 
 
 class Injury(Base):
