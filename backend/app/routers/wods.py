@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, selectinload
 
 from app import crud, models, schemas
 from app.database import get_db
@@ -37,7 +37,12 @@ def get_fixed_wod(fixed_wod_id: int, db: Session = Depends(get_db)):
 
 @router.get("/predefined", response_model=list[schemas.PredefinedWodSummary])
 def list_predefined_wods(training_type: str | None = None, db: Session = Depends(get_db)):
-    query = db.query(models.PredefinedWod)
+    # Eager-load movements + their exercise in 2 extra batched queries instead of one query per
+    # movement per WOD (N+1) - invisible on local SQLite, but a real deployed-Postgres tunnel: each
+    # extra query is a full network round trip, easily adding seconds for ~20 WODs x ~4 movements.
+    query = db.query(models.PredefinedWod).options(
+        selectinload(models.PredefinedWod.movements).selectinload(models.PredefinedWodMovement.exercise)
+    )
     if training_type:
         query = query.filter_by(training_type=training_type)
     wods = query.order_by(models.PredefinedWod.training_type, models.PredefinedWod.duration_minutes).all()
