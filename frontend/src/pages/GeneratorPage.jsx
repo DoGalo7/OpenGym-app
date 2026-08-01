@@ -6,11 +6,13 @@ import { createHistory } from "../api/history";
 import { generateWarmup, generateWod } from "../api/wods";
 import CategoryPicker from "../components/wod/CategoryPicker";
 import ManualExercisePicker from "../components/wod/ManualExercisePicker";
+import ManualWodBuilder from "../components/wod/ManualWodBuilder";
 import MuscleGroupPicker from "../components/wod/MuscleGroupPicker";
 import SaveResultForm from "../components/wod/SaveResultForm";
 import TrainingTypeSelect from "../components/wod/TrainingTypeSelect";
 import WodBlockCard from "../components/wod/WodBlockCard";
 import CollapsibleSection from "../components/shared/CollapsibleSection";
+import ConfirmModal from "../components/shared/ConfirmModal";
 import Toggle from "../components/shared/Toggle";
 import { useProfile } from "../context/ProfileContext";
 
@@ -19,6 +21,18 @@ const CARDIO_TYPES = [
   { value: "ski_erg", label: "Ski erg" },
   { value: "row", label: "Roeien" },
   { value: "run", label: "Hardlopen" },
+];
+
+const TEMP_INJURY_GROUPS = [
+  { value: "", label: "Geen" },
+  { value: "schouders", label: "Schouders" },
+  { value: "rug", label: "Rug" },
+  { value: "borst", label: "Borst" },
+  { value: "armen", label: "Armen" },
+  { value: "benen", label: "Benen" },
+  { value: "billen", label: "Billen" },
+  { value: "buik", label: "Buik" },
+  { value: "volledig_lichaam", label: "Volledig lichaam" },
 ];
 
 // Mirrors backend/app/wod_generator.py so a swap-to-cardio or swap-to-strength exercise
@@ -68,7 +82,12 @@ export default function GeneratorPage() {
   const [hyroxStyle, setHyroxStyle] = useState(false);
   const [pickExercisesMyself, setPickExercisesMyself] = useState(false);
   const [chosenExerciseIds, setChosenExerciseIds] = useState([]);
+  const [tempInjuryMuscleGroup, setTempInjuryMuscleGroup] = useState("");
+  const [confirmedOverrideGroups, setConfirmedOverrideGroups] = useState([]);
+  const [pendingInjuryConflicts, setPendingInjuryConflicts] = useState([]);
+  const [showInjuryModal, setShowInjuryModal] = useState(false);
 
+  const [mode, setMode] = useState("generate");
   const [wod, setWod] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -91,9 +110,7 @@ export default function GeneratorPage() {
 
   const canSubmit = muscleGroups.length > 0 && !loading;
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    if (!canSubmit) return;
+  const runGenerate = async (overrideGroups) => {
     setLoading(true);
     setError(null);
     try {
@@ -115,6 +132,8 @@ export default function GeneratorPage() {
         preferred_categories: preferredCategories,
         chosen_exercise_ids: pickExercisesMyself ? chosenExerciseIds : [],
         hyrox_style: hyroxStyle,
+        temporary_injury_muscle_group: tempInjuryMuscleGroup || undefined,
+        override_injury_muscle_groups: overrideGroups,
       });
       setWod(result);
     } catch (err) {
@@ -122,6 +141,33 @@ export default function GeneratorPage() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    if (!canSubmit) return;
+    const conflicts = profile.injuries.filter(
+      (injury) => injury.affected_muscle_group && muscleGroups.includes(injury.affected_muscle_group)
+    );
+    if (conflicts.length > 0) {
+      setPendingInjuryConflicts(conflicts);
+      setShowInjuryModal(true);
+      return;
+    }
+    setConfirmedOverrideGroups([]);
+    await runGenerate([]);
+  };
+
+  const handleConfirmInjuryConflict = async () => {
+    const overrideGroups = pendingInjuryConflicts.map((injury) => injury.affected_muscle_group);
+    setShowInjuryModal(false);
+    setConfirmedOverrideGroups(overrideGroups);
+    await runGenerate(overrideGroups);
+  };
+
+  const handleCancelInjuryConflict = () => {
+    setShowInjuryModal(false);
+    setPendingInjuryConflicts([]);
   };
 
   const handleSwapExercise = async (blockIndex, exerciseIndex, alternative) => {
@@ -239,6 +285,8 @@ export default function GeneratorPage() {
         warmup_minutes: Number(warmupMinutes) || 8,
         warmup_exercise_count: warmupExerciseCount ? Number(warmupExerciseCount) : undefined,
         exclude_exercise_ids: excludeIds,
+        temporary_injury_muscle_group: tempInjuryMuscleGroup || undefined,
+        override_injury_muscle_groups: confirmedOverrideGroups,
       });
       setWod((prev) => {
         const blocks = [warmupBlock, ...prev.blocks];
@@ -258,7 +306,7 @@ export default function GeneratorPage() {
   return (
     <div>
       <h1>WOD maken</h1>
-      <form className="card" onSubmit={handleSubmit}>
+      <div className="card">
         <h3>Basis</h3>
 
         <div className="field">
@@ -287,22 +335,41 @@ export default function GeneratorPage() {
           </div>
         </div>
 
-        <div className="field">
-          <label>Spiergroepen</label>
-          <MuscleGroupPicker selected={muscleGroups} onChange={setMuscleGroups} />
-        </div>
+        {mode === "generate" && (
+          <div className="field">
+            <label>Spiergroepen</label>
+            <MuscleGroupPicker selected={muscleGroups} onChange={setMuscleGroups} />
+          </div>
+        )}
 
-        <div className="field">
+        <div className="field" style={{ marginBottom: 0 }}>
           <label htmlFor="location">Locatie</label>
           <select id="location" value={location} onChange={(event) => setLocation(event.target.value)}>
             <option value="gym">Crossfit-gym</option>
             <option value="home">Thuis</option>
           </select>
         </div>
+      </div>
 
-        <h3 style={{ marginTop: 28, paddingTop: 20, borderTop: "1px solid var(--color-border)" }}>
-          Workout-opbouw
-        </h3>
+      <div className="mode-toggle">
+        <button type="button" className={mode === "generate" ? "active" : ""} onClick={() => setMode("generate")}>
+          Genereer automatisch
+        </button>
+        <button type="button" className={mode === "manual" ? "active" : ""} onClick={() => setMode("manual")}>
+          Stel zelf samen
+        </button>
+      </div>
+
+      {mode === "manual" ? (
+        <ManualWodBuilder
+          profile={profile}
+          location={location}
+          trainingType={trainingType}
+          onBuild={(built) => setWod(built)}
+        />
+      ) : (
+      <form className="card" onSubmit={handleSubmit}>
+        <h3>Workout-opbouw</h3>
 
         <Toggle
           checked={hyroxStyle}
@@ -378,6 +445,24 @@ export default function GeneratorPage() {
             </div>
           </>
         )}
+
+        <div className="field">
+          <label htmlFor="temp-injury">Tijdelijke blessure (alleen voor deze workout)</label>
+          <select
+            id="temp-injury"
+            value={tempInjuryMuscleGroup}
+            onChange={(event) => setTempInjuryMuscleGroup(event.target.value)}
+          >
+            {TEMP_INJURY_GROUPS.map((group) => (
+              <option key={group.value} value={group.value}>
+                {group.label}
+              </option>
+            ))}
+          </select>
+          <p className="field-hint" style={{ marginBottom: 0 }}>
+            Wordt niet opgeslagen in je profiel, geldt alleen voor deze ene workout.
+          </p>
+        </div>
 
         <CollapsibleSection title="Meer opties" hint="Aantal oefeningen, categorie, niveau en RX-gewicht.">
           <div className="field">
@@ -455,6 +540,20 @@ export default function GeneratorPage() {
         )}
         {error && <p className="error-text">{error}</p>}
       </form>
+      )}
+
+      {showInjuryModal && (
+        <ConfirmModal
+          title="Blessure-check"
+          message={`Je hebt in je profiel aangegeven dat je ${pendingInjuryConflicts
+            .map((injury) => injury.affected_muscle_group)
+            .join(", ")} moet ontzien (${pendingInjuryConflicts.map((injury) => injury.description).join("; ")}). Weet je zeker dat je toch een workout hiervoor wilt maken?`}
+          confirmLabel="Ja, toch doorgaan"
+          cancelLabel="Annuleren"
+          onConfirm={handleConfirmInjuryConflict}
+          onCancel={handleCancelInjuryConflict}
+        />
+      )}
 
       {wod && (
         <div ref={resultRef}>

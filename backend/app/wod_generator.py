@@ -227,9 +227,16 @@ def _shape_predefined(predefined_wod: PredefinedWod, movement_count: int):
 def _apply_profile_filters(
     exercises: list[Exercise], profile: UserProfile, request: WodGenerateRequest, respect_injuries: bool = True
 ) -> list[Exercise]:
-    injured_groups = (
-        {i.affected_muscle_group for i in profile.injuries if i.affected_muscle_group} if respect_injuries else set()
-    )
+    if respect_injuries:
+        injured_groups = {i.affected_muscle_group for i in profile.injuries if i.affected_muscle_group}
+        # An override means the frontend already warned about this exact conflict and the user
+        # explicitly chose to continue - same precedent as chosen_exercise_ids bypassing injuries.
+        injured_groups -= {g.value for g in request.override_injury_muscle_groups}
+        if request.temporary_injury_muscle_group:
+            # A one-off injury/beperking for just this WOD - never written to profile.injuries.
+            injured_groups.add(request.temporary_injury_muscle_group.value)
+    else:
+        injured_groups = set()
     excluded_ids = {e.id for e in profile.excluded_exercises}
     home_only = request.location.value == "home"
     home_equipment = set(json.loads(profile.home_equipment)) if home_only else set()

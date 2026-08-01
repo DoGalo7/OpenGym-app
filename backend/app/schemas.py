@@ -27,6 +27,8 @@ class ExerciseRead(ExerciseSummary):
     rx_weight_male_kg: float | None
     rx_weight_female_kg: float | None
     description: str | None
+    equipment_tag: str | None
+    warmup_only: bool
 
 
 # --- Fixed WODs ---
@@ -163,6 +165,12 @@ class WodGenerateRequest(BaseModel):
     preferred_categories: list[Category] = []
     # restricts exercise selection to Hyrox-tagged movements and favors extra cardio pieces
     hyrox_style: bool = False
+    # a one-off injury/beperking for just this WOD, never saved to the profile
+    temporary_injury_muscle_group: MuscleGroup | None = None
+    # muscle groups where the frontend already warned about a profile-injury conflict and the
+    # user explicitly chose to continue anyway - same "explicit choice overrides automatic
+    # constraints" precedent as chosen_exercise_ids
+    override_injury_muscle_groups: list[MuscleGroup] = []
 
 
 class WarmupRequest(BaseModel):
@@ -176,6 +184,8 @@ class WarmupRequest(BaseModel):
     warmup_exercise_count: int | None = Field(default=None, ge=1, le=8)
     # exercise ids already in the WOD's main block - kept out of the warm-up for variety
     exclude_exercise_ids: list[int] = []
+    temporary_injury_muscle_group: MuscleGroup | None = None
+    override_injury_muscle_groups: list[MuscleGroup] = []
 
 
 class ExerciseInWod(BaseModel):
