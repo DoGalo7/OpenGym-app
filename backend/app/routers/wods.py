@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import Session, selectinload
+from sqlalchemy.orm import Session, joinedload
 
 from app import crud, models, schemas
 from app.database import get_db
@@ -37,11 +37,12 @@ def get_fixed_wod(fixed_wod_id: int, db: Session = Depends(get_db)):
 
 @router.get("/predefined", response_model=list[schemas.PredefinedWodSummary])
 def list_predefined_wods(training_type: str | None = None, db: Session = Depends(get_db)):
-    # Eager-load movements + their exercise in 2 extra batched queries instead of one query per
-    # movement per WOD (N+1) - invisible on local SQLite, but a real deployed-Postgres tunnel: each
-    # extra query is a full network round trip, easily adding seconds for ~20 WODs x ~4 movements.
+    # Eager-load movements + their exercise via a single joined query (this dataset is small -
+    # ~20 WODs x ~4 movements - so the row-multiplication joinedload causes is negligible, and it
+    # saves 2 extra network round trips per request compared to selectinload, which matters a lot
+    # against a remote Postgres where each round trip carries real latency.
     query = db.query(models.PredefinedWod).options(
-        selectinload(models.PredefinedWod.movements).selectinload(models.PredefinedWodMovement.exercise)
+        joinedload(models.PredefinedWod.movements).joinedload(models.PredefinedWodMovement.exercise)
     )
     if training_type:
         query = query.filter_by(training_type=training_type)
