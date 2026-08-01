@@ -60,6 +60,7 @@ export default function GeneratorPage() {
   const [cardioCount, setCardioCount] = useState("");
   const [includeWarmup, setIncludeWarmup] = useState(true);
   const [warmupMinutes, setWarmupMinutes] = useState(8);
+  const [warmupExerciseCount, setWarmupExerciseCount] = useState("");
   const [deviateLevel, setDeviateLevel] = useState("");
   const [sex, setSex] = useState(null);
   const [exerciseCount, setExerciseCount] = useState("");
@@ -107,6 +108,7 @@ export default function GeneratorPage() {
         cardio_count: (includeCardio || hyroxStyle) && cardioCount ? Number(cardioCount) : undefined,
         include_warmup: includeWarmup,
         warmup_minutes: includeWarmup ? Number(warmupMinutes) : undefined,
+        warmup_exercise_count: includeWarmup && warmupExerciseCount ? Number(warmupExerciseCount) : undefined,
         deviate_level: !profile.use_profile_level_default && deviateLevel ? deviateLevel : undefined,
         sex: sex || undefined,
         exercise_count: exerciseCount ? Number(exerciseCount) : undefined,
@@ -308,17 +310,31 @@ export default function GeneratorPage() {
 
         <Toggle checked={includeWarmup} onChange={setIncludeWarmup} label="Warming-up toevoegen" />
         {includeWarmup && (
-          <div className="field">
-            <label htmlFor="warmup-minutes">Duur warming-up (minuten)</label>
-            <input
-              id="warmup-minutes"
-              type="number"
-              min={3}
-              max={20}
-              value={warmupMinutes}
-              onChange={(event) => setWarmupMinutes(event.target.value)}
-            />
-          </div>
+          <>
+            <div className="field">
+              <label htmlFor="warmup-minutes">Duur warming-up (minuten)</label>
+              <input
+                id="warmup-minutes"
+                type="number"
+                min={3}
+                max={20}
+                value={warmupMinutes}
+                onChange={(event) => setWarmupMinutes(event.target.value)}
+              />
+            </div>
+            <div className="field">
+              <label htmlFor="warmup-exercise-count">Aantal warming-up-oefeningen (optioneel)</label>
+              <input
+                id="warmup-exercise-count"
+                type="number"
+                min={1}
+                max={8}
+                placeholder="Standaard 3"
+                value={warmupExerciseCount}
+                onChange={(event) => setWarmupExerciseCount(event.target.value)}
+              />
+            </div>
+          </>
         )}
 
         <CollapsibleSection title="Meer opties" hint="Aantal oefeningen, categorie, niveau en RX-gewicht.">

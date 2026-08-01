@@ -23,6 +23,7 @@ const HOME_EQUIPMENT_OPTIONS = [
   { value: "assault_bike", label: "Airbike" },
   { value: "row", label: "Roeimachine" },
   { value: "ski_erg", label: "Ski erg" },
+  { value: "run", label: "Ik kan buiten hardlopen" },
 ];
 
 export default function ProfilePage() {

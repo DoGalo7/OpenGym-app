@@ -130,5 +130,7 @@ EXERCISES = [
     {"name": "Assault Bike", "muscle_group": "cardio", "level": "beginner", "category": "cardio", "requires_gym": True, "is_cardio": True, "cardio_type": "assault_bike", "is_hyrox": True},
     {"name": "Ski Erg", "muscle_group": "cardio", "level": "beginner", "category": "cardio", "requires_gym": True, "is_cardio": True, "cardio_type": "ski_erg", "is_hyrox": True},
     {"name": "Row", "muscle_group": "cardio", "level": "beginner", "category": "cardio", "requires_gym": True, "is_cardio": True, "cardio_type": "row", "is_hyrox": True},
-    {"name": "Running", "muscle_group": "cardio", "level": "beginner", "category": "cardio", "requires_gym": False, "is_cardio": True, "cardio_type": "run", "is_hyrox": True},
+    # Was requires_gym=False (always available at home) - wrong: not everyone can/wants to run
+    # outside from home, so this is now an explicit opt-in like the other cardio machines.
+    {"name": "Running", "muscle_group": "cardio", "level": "beginner", "category": "cardio", "requires_gym": True, "is_cardio": True, "cardio_type": "run", "is_hyrox": True},
 ]

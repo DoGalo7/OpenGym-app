@@ -13,6 +13,7 @@ LEVEL_MULTIPLIER = {"beginner": 0.7, "intermediate": 1.0, "advanced": 1.3}
 WARMUP_CATEGORIES = {"bodyweight", "gymnastics"}
 WARMUP_MAX_LEVEL_RANK = LEVEL_RANK[Level.intermediate]
 ALL_MUSCLE_GROUPS = {"schouders", "rug", "borst", "armen", "benen", "billen", "buik", "volledig_lichaam"}
+DEFAULT_WARMUP_EXERCISES = 3
 
 # Natural unit per cardio machine, matching how these are actually programmed in a WOD
 # (running/rowing/ski erg in meters, assault bike in calories) instead of pure time.
@@ -414,7 +415,10 @@ def _build_warmup_block(
         and e.muscle_group in target_groups
         and LEVEL_RANK[e.level] <= WARMUP_MAX_LEVEL_RANK
     ]
-    n_warmup = min(5, max(3, len(target_groups) + 1))
+    # Fixed default (not derived from len(target_groups), which - now that "volledig lichaam"
+    # expands to all 8 groups for pool-filtering - would always max this out at 5). The frontend
+    # lets the user explicitly ask for more via warmup_exercise_count.
+    n_warmup = request.warmup_exercise_count or DEFAULT_WARMUP_EXERCISES
 
     # Prefer variety (skip exercises already picked for the main block), but for a single
     # or narrow muscle-group selection the main block can claim most/all warmup-eligible

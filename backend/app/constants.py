@@ -70,3 +70,4 @@ class HomeEquipment(str, Enum):
     assault_bike = "assault_bike"
     row = "row"
     ski_erg = "ski_erg"
+    run = "run"
