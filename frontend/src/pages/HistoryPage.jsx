@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 
 import { deleteHistoryEntry, listHistory, updateHistory } from "../api/history";
 import HistoryEntryCard from "../components/history/HistoryEntryCard";
@@ -30,6 +31,11 @@ export default function HistoryPage() {
   return (
     <div>
       <h1>Geschiedenis</h1>
+      {entries.length > 0 && (
+        <Link to="/rapport" className="btn-icon" style={{ display: "inline-flex", marginBottom: 12, textDecoration: "none" }}>
+          📊 Bekijk prestatierapport
+        </Link>
+      )}
       {error && <p className="error-text">{error}</p>}
       {entries.length === 0 && !error && (
         <p className="status-text">Nog geen workouts gelogd. Maak of kies een WOD om te beginnen.</p>

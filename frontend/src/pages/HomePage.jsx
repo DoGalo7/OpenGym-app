@@ -3,36 +3,7 @@ import { Link } from "react-router-dom";
 
 import { listHistory } from "../api/history";
 import { useProfile } from "../context/ProfileContext";
-
-function startOfWeek(date) {
-  const d = new Date(date);
-  const day = d.getDay();
-  const diff = (day === 0 ? -6 : 1) - day;
-  d.setHours(0, 0, 0, 0);
-  d.setDate(d.getDate() + diff);
-  return d;
-}
-
-function buildWeeklyBuckets(entries, weeksCount) {
-  const thisWeekStart = startOfWeek(new Date());
-  const buckets = [];
-  for (let i = weeksCount - 1; i >= 0; i--) {
-    const start = new Date(thisWeekStart);
-    start.setDate(start.getDate() - i * 7);
-    const end = new Date(start);
-    end.setDate(end.getDate() + 7);
-    buckets.push({ start, end, count: 0 });
-  }
-  for (const entry of entries) {
-    const created = new Date(entry.created_at);
-    const bucket = buckets.find((b) => created >= b.start && created < b.end);
-    if (bucket) bucket.count += 1;
-  }
-  return buckets.map((b) => ({
-    label: b.start.toLocaleDateString("nl-NL", { day: "numeric", month: "short" }),
-    count: b.count,
-  }));
-}
+import { buildWeeklyBuckets } from "../utils/historyStats";
 
 export default function HomePage() {
   const { profile } = useProfile();
