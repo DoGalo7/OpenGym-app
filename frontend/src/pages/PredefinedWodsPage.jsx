@@ -39,7 +39,7 @@ function toFixedItem(w) {
     kind: "fixed",
     id: w.id,
     name: w.name,
-    badgeLabel: w.wod_category,
+    badgeLabel: "Benchmark",
     meta: scheme,
     description: w.description,
     lines: movements,

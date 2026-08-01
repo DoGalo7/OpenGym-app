@@ -70,7 +70,7 @@ export default function FixedWodDetailPage() {
         </button>
       </div>
       <div className="card">
-        <span className="badge">{wod.wod_category}</span>
+        <span className="badge">Benchmark</span>
         <p style={{ marginTop: 12 }}>{wod.description}</p>
         <FixedWodStructure structure={wod.structure} />
         {wod.time_cap_minutes && (
