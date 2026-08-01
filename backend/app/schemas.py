@@ -71,6 +71,8 @@ class PredefinedWodSummary(BaseModel):
 class InjuryCreate(BaseModel):
     description: str = Field(min_length=1, max_length=200)
     affected_muscle_group: MuscleGroup | None = None
+    # key into wod_generator.CONDITION_RULES, e.g. "zwangerschap" - see that dict's docstring
+    condition_key: str | None = None
 
 
 class InjuryRead(InjuryCreate):

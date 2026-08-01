@@ -38,6 +38,66 @@ DEFAULT_CARRY_DISTANCE_METERS = 100  # used when no level filter is active
 # applies when the user hasn't explicitly overridden exercise_count themselves.
 DEFAULT_MAX_EXERCISES = 6
 
+# Best-effort exercise exclusions for common conditions/beperkingen that a single muscle
+# group can't express (e.g. pregnancy isn't "one body part"). Sourced from general,
+# widely-published guidance (ACOG exercise-in-pregnancy guidance; common CrossFit
+# injury-modification advice for shoulder/back/knee/wrist/ankle) - this is a best-effort
+# default, not medical advice, which is why the frontend always shows a disclaimer telling
+# users with any profile injury/condition to consult a specialist. Matched against
+# Exercise.name (case-insensitive substring) and/or Exercise.category.
+CONDITION_RULES: dict[str, dict] = {
+    "zwangerschap": {
+        "label": "Zwangerschap",
+        "excluded_name_keywords": [
+            "box jump", "broad jump", "double under", "muscle-up", "muscle up",
+            "rope climb", "burpee", "handstand", "wall ball", "thruster", "clean",
+            "snatch", "jerk", "kipping", "sit-up", "russian twist", "v-up",
+            "toes to bar", "sled", "run", "pistol squat",
+        ],
+    },
+    "schouder_impingement": {
+        "label": "Schouderblessure / impingement",
+        "excluded_name_keywords": [
+            "overhead", "snatch", "handstand", "muscle-up", "muscle up", "kipping",
+            "push press", "push jerk", "jerk", "wall ball", "pull-up", "pull up",
+        ],
+    },
+    "rug_hernia": {
+        "label": "Rugblessure / hernia",
+        "excluded_name_keywords": [
+            "deadlift", "good morning", "clean", "snatch", "sit-up", "russian twist",
+            "box jump", "rope climb", "v-up", "toes to bar",
+        ],
+    },
+    "knieblessure": {
+        "label": "Knieblessure",
+        "excluded_name_keywords": [
+            "box jump", "pistol squat", "lunge", "burpee", "double under", "run",
+            "wall ball", "thruster", "broad jump", "box step",
+        ],
+    },
+    "polsblessure": {
+        "label": "Polsblessure",
+        "excluded_name_keywords": [
+            "push-up", "push up", "handstand", "clean", "snatch", "wall ball",
+            "double under", "rope climb", "burpee",
+        ],
+    },
+    "enkelblessure": {
+        "label": "Enkelblessure",
+        "excluded_name_keywords": [
+            "box jump", "run", "double under", "burpee", "broad jump", "lunge",
+        ],
+    },
+    "nekblessure": {
+        "label": "Nekblessure",
+        "excluded_name_keywords": [
+            "overhead", "push press", "push jerk", "jerk", "back squat", "front squat",
+            "deadlift", "sit-up", "russian twist", "decline push-up", "handstand",
+            "kipping", "muscle-up", "muscle up",
+        ],
+    },
+}
 
 
 class WodGenerationError(Exception):
@@ -235,8 +295,10 @@ def _apply_profile_filters(
         if request.temporary_injury_muscle_group:
             # A one-off injury/beperking for just this WOD - never written to profile.injuries.
             injured_groups.add(request.temporary_injury_muscle_group.value)
+        condition_keys = {i.condition_key for i in profile.injuries if i.condition_key}
     else:
         injured_groups = set()
+        condition_keys = set()
     excluded_ids = {e.id for e in profile.excluded_exercises}
     home_only = request.location.value == "home"
     home_equipment = set(json.loads(profile.home_equipment)) if home_only else set()
@@ -252,11 +314,22 @@ def _apply_profile_filters(
             return True
         return False
 
+    def _condition_allowed(e: Exercise) -> bool:
+        if not condition_keys:
+            return True
+        name_lower = e.name.lower()
+        for key in condition_keys:
+            rule = CONDITION_RULES.get(key)
+            if rule and any(kw in name_lower for kw in rule["excluded_name_keywords"]):
+                return False
+        return True
+
     return [
         e for e in exercises
         if e.muscle_group not in injured_groups
         and e.id not in excluded_ids
         and _home_allowed(e)
+        and _condition_allowed(e)
     ]
 
 

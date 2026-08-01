@@ -34,6 +34,7 @@ def on_startup():
     ensure_column("exercises", "warmup_only", "BOOLEAN NOT NULL DEFAULT FALSE")
     ensure_column("wod_history", "note", "TEXT")
     ensure_column("wod_history", "favorite", "BOOLEAN NOT NULL DEFAULT FALSE")
+    ensure_column("injuries", "condition_key", "VARCHAR(50)")
     db = session_local()
     try:
         run_seed(db)

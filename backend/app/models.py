@@ -136,6 +136,9 @@ class Injury(Base):
     description: Mapped[str] = mapped_column(String(200), nullable=False)
     # optional muscle group to exclude from generated workouts, e.g. "schouders"
     affected_muscle_group: Mapped[str | None] = mapped_column(String(50), nullable=True)
+    # optional key into wod_generator.CONDITION_RULES (e.g. "zwangerschap") - drives exercise
+    # exclusions that a single muscle group can't express (a condition, not a body part).
+    condition_key: Mapped[str | None] = mapped_column(String(50), nullable=True)
 
     profile: Mapped["UserProfile"] = relationship(back_populates="injuries")
 

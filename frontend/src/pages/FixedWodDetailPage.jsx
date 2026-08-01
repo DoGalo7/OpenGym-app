@@ -1,19 +1,23 @@
 import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 
 import { addFavorite, listFavorites, removeFavorite } from "../api/favorites";
 import { createHistory } from "../api/history";
 import { getFixedWod } from "../api/wods";
+import ConfirmModal from "../components/shared/ConfirmModal";
 import FixedWodStructure from "../components/wod/FixedWodStructure";
 import { useProfile } from "../context/ProfileContext";
+import { useInjuryDisclaimer } from "../hooks/useInjuryDisclaimer";
 
 export default function FixedWodDetailPage() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const { profile } = useProfile();
   const [wod, setWod] = useState(null);
   const [error, setError] = useState(null);
   const [logged, setLogged] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
+  const injuryDisclaimer = useInjuryDisclaimer(profile);
 
   useEffect(() => {
     getFixedWod(id)
@@ -54,6 +58,17 @@ export default function FixedWodDetailPage() {
 
   return (
     <div>
+      {injuryDisclaimer.show && (
+        <ConfirmModal
+          title="Blessure of beperking actief"
+          message="Je hebt in je profiel een blessure of beperking aangegeven. Deze vaste WOD wordt hier niet automatisch op aangepast. Raadpleeg altijd een arts, fysiotherapeut of andere specialist om te bepalen of deze oefeningen voor jou geschikt zijn. De app doet een voorstel, maar kan niet verantwoordelijk worden gehouden voor blessures."
+          confirmLabel="Ik begrijp het, ga verder"
+          cancelLabel="Terug naar home"
+          onConfirm={injuryDisclaimer.dismiss}
+          onCancel={() => navigate("/")}
+        />
+      )}
+
       <Link to="/" className="btn-icon" style={{ display: "inline-flex", marginBottom: 12, textDecoration: "none" }}>
         ← Terug naar home
       </Link>

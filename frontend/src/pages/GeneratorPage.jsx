@@ -15,6 +15,7 @@ import CollapsibleSection from "../components/shared/CollapsibleSection";
 import ConfirmModal from "../components/shared/ConfirmModal";
 import Toggle from "../components/shared/Toggle";
 import { useProfile } from "../context/ProfileContext";
+import { useInjuryDisclaimer } from "../hooks/useInjuryDisclaimer";
 
 const CARDIO_TYPES = [
   { value: "assault_bike", label: "Airbike" },
@@ -91,6 +92,7 @@ export default function GeneratorPage() {
   const [wod, setWod] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const injuryDisclaimer = useInjuryDisclaimer(profile);
 
   useEffect(() => {
     const loaded = routerLocation.state?.loadedWod;
@@ -306,6 +308,18 @@ export default function GeneratorPage() {
   return (
     <div>
       <h1>WOD maken</h1>
+
+      {injuryDisclaimer.show && (
+        <ConfirmModal
+          title="Blessure of beperking actief"
+          message="Je hebt in je profiel een blessure of beperking aangegeven. De app past de workout hier zo goed mogelijk op aan, maar dit is geen medisch advies. Raadpleeg altijd een arts, fysiotherapeut of andere specialist om te bepalen of deze oefeningen voor jou geschikt zijn. De app doet een voorstel, maar kan niet verantwoordelijk worden gehouden voor blessures."
+          confirmLabel="Ik begrijp het, ga verder"
+          cancelLabel="Terug naar home"
+          onConfirm={injuryDisclaimer.dismiss}
+          onCancel={() => navigate("/")}
+        />
+      )}
+
       <div className="card">
         <h3>Basis</h3>
 
@@ -365,6 +379,7 @@ export default function GeneratorPage() {
           profile={profile}
           location={location}
           trainingType={trainingType}
+          setTrainingType={setTrainingType}
           onBuild={(built) => setWod(built)}
         />
       ) : (

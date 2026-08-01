@@ -82,6 +82,7 @@ def add_injury(db: Session, profile: models.UserProfile, data: schemas.InjuryCre
         profile_id=profile.id,
         description=data.description,
         affected_muscle_group=data.affected_muscle_group.value if data.affected_muscle_group else None,
+        condition_key=data.condition_key,
     )
     db.add(injury)
     db.commit()

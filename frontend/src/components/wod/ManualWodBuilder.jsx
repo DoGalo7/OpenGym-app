@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 
 import { listExercises } from "../../api/exercises";
+import TrainingTypeSelect from "./TrainingTypeSelect";
 
 const FILTER_GROUPS = [
   { value: "schouders", label: "Schouders" },
@@ -12,6 +13,21 @@ const FILTER_GROUPS = [
   { value: "buik", label: "Buik" },
 ];
 
+// Mirrors backend/app/wod_generator.py::_shape_training_type so a manually built WOD reads
+// the same way (rounds/interval/rep_scheme) as an auto-generated one of the same type.
+function shapeForTrainingType(trainingType, durationMinutes, exerciseCount) {
+  if (trainingType === "EMOM") {
+    return { rounds: durationMinutes, interval_seconds: 60, rep_scheme: "roterend, 1 oefening per minuut" };
+  }
+  if (trainingType === "TABATA") {
+    return { rounds: 8, interval_seconds: 20, rep_scheme: "20s werk / 10s rust, 8 ronden" };
+  }
+  if (trainingType === "FOR_TIME") {
+    return { rounds: 3, interval_seconds: null, rep_scheme: exerciseCount === 2 ? "21-15-9" : "flat" };
+  }
+  return { rounds: "AMRAP", interval_seconds: null, rep_scheme: "flat" };
+}
+
 function defaultFieldsFor(exercise) {
   if (exercise.is_cardio) {
     return exercise.cardio_type === "assault_bike"
@@ -21,7 +37,7 @@ function defaultFieldsFor(exercise) {
   return { reps: 10, distance_meters: null, calories: null };
 }
 
-export default function ManualWodBuilder({ profile, location, trainingType, onBuild }) {
+export default function ManualWodBuilder({ profile, location, trainingType, setTrainingType, onBuild }) {
   const [allExercises, setAllExercises] = useState([]);
   const [loadError, setLoadError] = useState(null);
   const [search, setSearch] = useState("");
@@ -74,13 +90,12 @@ export default function ManualWodBuilder({ profile, location, trainingType, onBu
   const canBuild = picked.length > 0;
 
   const handleBuild = () => {
+    const durationMinutes = Number(length) || 20;
     const block = {
       block_type: "main",
       training_type: trainingType,
-      duration_minutes: Number(length) || 20,
-      rounds: null,
-      interval_seconds: null,
-      rep_scheme: "flat",
+      duration_minutes: durationMinutes,
+      ...shapeForTrainingType(trainingType, durationMinutes, picked.length),
       exercises: picked.map((p) => ({
         exercise_id: p.exercise.id,
         name: p.exercise.name,
@@ -122,6 +137,8 @@ export default function ManualWodBuilder({ profile, location, trainingType, onBu
           onChange={(event) => setLength(event.target.value)}
         />
       </div>
+
+      <TrainingTypeSelect value={trainingType} onChange={setTrainingType} />
 
       <div className="field">
         <label>Filter op spiergroep (optioneel)</label>
