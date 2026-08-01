@@ -13,6 +13,7 @@ import SaveResultForm from "../components/wod/SaveResultForm";
 import ShareWodForm from "../components/wod/ShareWodForm";
 import TrainingTypeSelect from "../components/wod/TrainingTypeSelect";
 import WodBlockCard from "../components/wod/WodBlockCard";
+import WorkoutTimer from "../components/wod/WorkoutTimer";
 import CollapsibleSection from "../components/shared/CollapsibleSection";
 import ConfirmModal from "../components/shared/ConfirmModal";
 import Toggle from "../components/shared/Toggle";
@@ -98,6 +99,7 @@ export default function GeneratorPage() {
   const [wod, setWod] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [showTimer, setShowTimer] = useState(false);
   const [cardioWarningDismissed, setCardioWarningDismissed] = useState(false);
   const injuryDisclaimer = useInjuryDisclaimer(profile);
 
@@ -665,6 +667,20 @@ export default function GeneratorPage() {
               ↺ Opnieuw samenstellen
             </button>
           </div>
+          <button
+            type="button"
+            className="btn btn-primary"
+            style={{ width: "100%", marginBottom: 12 }}
+            onClick={() => setShowTimer(true)}
+          >
+            ⏱ Start workout
+          </button>
+          {showTimer && (
+            <WorkoutTimer
+              block={wod.blocks.find((b) => b.block_type === "main")}
+              onClose={() => setShowTimer(false)}
+            />
+          )}
           {!hasWarmup && (
             <div className="card" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
               <p className="field-hint" style={{ margin: 0 }}>Nog geen warming-up bij deze workout.</p>
