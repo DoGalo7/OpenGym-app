@@ -96,6 +96,7 @@ EXERCISES = [
     {"name": "Single-Leg Glute Bridge", "muscle_group": "billen", "level": "intermediate", "category": "bodyweight", "requires_gym": False},
     {"name": "Reverse Snow Angels", "muscle_group": "rug", "level": "intermediate", "category": "bodyweight", "requires_gym": False, "warmup_only": True},
     {"name": "Hollow Hold", "muscle_group": "buik", "level": "intermediate", "category": "bodyweight", "requires_gym": False},
+    {"name": "Russian Twist", "muscle_group": "buik", "level": "beginner", "category": "bodyweight", "requires_gym": False},
 
     # --- Extra warming-up-oefeningen (11) - dynamische mobility-moves, incl. elastiek-oefeningen.
     # Meerdere zijn getagd als "volledig_lichaam" (i.p.v. een specifieke spiergroep) omdat dat de
@@ -119,6 +120,7 @@ EXERCISES = [
     {"name": "Handstand Walk", "muscle_group": "schouders", "level": "advanced", "category": "gymnastics", "requires_gym": False},
     {"name": "Pistol Squat", "muscle_group": "benen", "level": "advanced", "category": "gymnastics", "requires_gym": False},
     {"name": "Box Jump", "muscle_group": "benen", "level": "intermediate", "category": "gymnastics", "requires_gym": True},
+    {"name": "Box Step-Up", "muscle_group": "benen", "level": "beginner", "category": "gymnastics", "requires_gym": True, "is_hyrox": True},
     # Was requires_gym=False - wrong: double-unders need a jump rope, not something everyone owns.
     {"name": "Double Unders", "muscle_group": "volledig_lichaam", "level": "intermediate", "category": "gymnastics", "requires_gym": True, "equipment_tag": "jump_rope"},
     {"name": "Wall Ball Shot", "muscle_group": "volledig_lichaam", "level": "intermediate", "category": "gymnastics", "requires_gym": True, "is_hyrox": True},
