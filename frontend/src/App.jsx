@@ -33,6 +33,10 @@ function NameSetupScreen({ onSubmit, error }) {
             placeholder="Jouw naam"
             autoFocus
           />
+          <p className="field-hint">
+            Had je al eerder een profiel met deze naam (bijv. op een ander apparaat)? Dan kom je
+            daar automatisch weer in terecht.
+          </p>
         </div>
         <button type="submit" className="btn btn-primary">
           Start

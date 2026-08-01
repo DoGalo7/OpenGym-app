@@ -165,6 +165,19 @@ class WodGenerateRequest(BaseModel):
     hyrox_style: bool = False
 
 
+class WarmupRequest(BaseModel):
+    """Builds a standalone warm-up block - used to add one after the fact to a WOD that didn't
+    get one at creation time (a loaded predefined-workout idea, or a generated WOD where the
+    user skipped the warm-up toggle and changed their mind)."""
+    user_id: str = Field(min_length=1, max_length=64)
+    muscle_groups: list[MuscleGroup] = Field(min_length=1)
+    location: Location
+    warmup_minutes: int = Field(ge=3, le=20)
+    warmup_exercise_count: int | None = Field(default=None, ge=1, le=8)
+    # exercise ids already in the WOD's main block - kept out of the warm-up for variety
+    exclude_exercise_ids: list[int] = []
+
+
 class ExerciseInWod(BaseModel):
     exercise_id: int
     name: str

@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 
 import { getExercise } from "../api/exercises";
 import { createHistory } from "../api/history";
-import { generateWod } from "../api/wods";
+import { generateWarmup, generateWod } from "../api/wods";
 import CategoryPicker from "../components/wod/CategoryPicker";
 import ManualExercisePicker from "../components/wod/ManualExercisePicker";
 import MuscleGroupPicker from "../components/wod/MuscleGroupPicker";
@@ -208,6 +208,48 @@ export default function GeneratorPage() {
         };
       }),
     }));
+  };
+
+  const handleBlockDurationChange = (blockIndex, minutes) => {
+    setWod((prev) => {
+      const blocks = prev.blocks.map((block, bi) =>
+        bi !== blockIndex ? block : { ...block, duration_minutes: minutes }
+      );
+      const total = blocks.reduce((sum, b) => sum + (Number(b.duration_minutes) || 0), 0);
+      return { ...prev, blocks, total_duration_minutes: total };
+    });
+  };
+
+  const [addingWarmup, setAddingWarmup] = useState(false);
+  const [warmupError, setWarmupError] = useState(null);
+  const hasWarmup = wod?.blocks.some((b) => b.block_type === "warmup");
+
+  const handleAddWarmup = async () => {
+    const mainBlock = wod.blocks.find((b) => b.block_type === "main");
+    if (!mainBlock) return;
+    const muscleGroupsForWarmup = [...new Set(mainBlock.exercises.map((e) => e.muscle_group))];
+    const excludeIds = mainBlock.exercises.map((e) => e.exercise_id);
+    setAddingWarmup(true);
+    setWarmupError(null);
+    try {
+      const warmupBlock = await generateWarmup({
+        user_id: profile.user_id,
+        muscle_groups: muscleGroupsForWarmup,
+        location,
+        warmup_minutes: Number(warmupMinutes) || 8,
+        warmup_exercise_count: warmupExerciseCount ? Number(warmupExerciseCount) : undefined,
+        exclude_exercise_ids: excludeIds,
+      });
+      setWod((prev) => {
+        const blocks = [warmupBlock, ...prev.blocks];
+        const total = blocks.reduce((sum, b) => sum + (Number(b.duration_minutes) || 0), 0);
+        return { ...prev, blocks, total_duration_minutes: total };
+      });
+    } catch (err) {
+      setWarmupError(err.message);
+    } finally {
+      setAddingWarmup(false);
+    }
   };
 
   const handleSaveResult = (result) =>
@@ -431,6 +473,15 @@ export default function GeneratorPage() {
               ↺ Opnieuw samenstellen
             </button>
           </div>
+          {!hasWarmup && (
+            <div className="card" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
+              <p className="field-hint" style={{ margin: 0 }}>Nog geen warming-up bij deze workout.</p>
+              <button type="button" className="btn btn-secondary" onClick={handleAddWarmup} disabled={addingWarmup}>
+                {addingWarmup ? "Bezig..." : "+ Warming-up toevoegen"}
+              </button>
+            </div>
+          )}
+          {warmupError && <p className="error-text">{warmupError}</p>}
           {wod.blocks.map((block, blockIndex) => (
             <WodBlockCard
               key={blockIndex}
@@ -442,6 +493,7 @@ export default function GeneratorPage() {
               onExerciseFieldChange={(exerciseIndex, field, value) =>
                 handleExerciseFieldChange(blockIndex, exerciseIndex, field, value)
               }
+              onDurationChange={(minutes) => handleBlockDurationChange(blockIndex, minutes)}
             />
           ))}
           <SaveResultForm onSave={handleSaveResult} />

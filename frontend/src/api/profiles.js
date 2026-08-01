@@ -8,6 +8,10 @@ export function getProfile(userId) {
   return get(`/profiles/${userId}`);
 }
 
+export function findProfileByName(name) {
+  return get(`/profiles/by-name/${encodeURIComponent(name)}`);
+}
+
 export function updateProfile(userId, data) {
   return patch(`/profiles/${userId}`, data);
 }

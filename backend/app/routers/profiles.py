@@ -16,7 +16,18 @@ def _get_profile_or_404(db: Session, user_id: str) -> models.UserProfile:
 
 @router.post("/get-or-create", response_model=schemas.ProfileRead)
 def get_or_create_profile(data: schemas.ProfileCreate, db: Session = Depends(get_db)):
-    return crud.profile_to_read(crud.get_or_create_profile(db, data))
+    try:
+        return crud.profile_to_read(crud.get_or_create_profile(db, data))
+    except ValueError as e:
+        raise HTTPException(400, str(e))
+
+
+@router.get("/by-name/{name}", response_model=schemas.ProfileRead)
+def get_profile_by_name(name: str, db: Session = Depends(get_db)):
+    profile = crud.get_profile_by_name(db, name)
+    if not profile:
+        raise HTTPException(404, "Profiel niet gevonden")
+    return crud.profile_to_read(profile)
 
 
 @router.get("/{user_id}", response_model=schemas.ProfileRead)

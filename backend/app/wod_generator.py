@@ -44,6 +44,17 @@ class WodGenerationError(Exception):
     """Raised when a WOD can't be generated with the requested filters. Message is user-facing Dutch text."""
 
 
+def build_standalone_warmup(db: Session, profile: UserProfile, request) -> WodBlock:
+    """Builds a warm-up block on its own (see schemas.WarmupRequest) - reuses
+    _apply_profile_filters/_build_warmup_block as-is since they only touch the attributes
+    WarmupRequest also provides (location, warmup_minutes, warmup_exercise_count)."""
+    all_exercises = db.query(Exercise).all()
+    filtered = _apply_profile_filters(all_exercises, profile, request)
+    target_groups = {mg.value for mg in request.muscle_groups}
+    pool_groups = ALL_MUSCLE_GROUPS if target_groups == {"volledig_lichaam"} else target_groups
+    return _build_warmup_block(filtered, pool_groups, request, set(request.exclude_exercise_ids))
+
+
 def generate_wod(db: Session, profile: UserProfile, request: WodGenerateRequest) -> GeneratedWod:
     all_exercises = db.query(Exercise).all()
     filtered = _apply_profile_filters(all_exercises, profile, request)

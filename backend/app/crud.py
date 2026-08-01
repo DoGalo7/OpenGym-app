@@ -1,5 +1,6 @@
 import json
 
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from app import models, schemas
@@ -12,10 +13,35 @@ def get_profile_by_user_id(db: Session, user_id: str) -> models.UserProfile | No
     return db.query(models.UserProfile).filter_by(user_id=user_id).first()
 
 
+def get_profile_by_name(db: Session, name: str) -> models.UserProfile | None:
+    """Case-insensitive, trimmed lookup - names are the (temporary, pre-auth) login key."""
+    normalized = name.strip().lower()
+    if not normalized:
+        return None
+    matches = db.query(models.UserProfile).filter(func.lower(models.UserProfile.name) == normalized).all()
+    if not matches:
+        return None
+    if len(matches) == 1:
+        return matches[0]
+    # Legacy duplicates from before names were enforced unique: prefer the one with logged
+    # history, then the most recently created, as the "real" profile for that name.
+    def _sort_key(p: models.UserProfile):
+        history_count = db.query(models.WodHistory).filter_by(profile_id=p.id).count()
+        return (history_count, p.created_at)
+    matches.sort(key=_sort_key, reverse=True)
+    return matches[0]
+
+
 def get_or_create_profile(db: Session, data: schemas.ProfileCreate) -> models.UserProfile:
     profile = get_profile_by_user_id(db, data.user_id)
     if profile:
         return profile
+    existing_by_name = get_profile_by_name(db, data.name)
+    if existing_by_name and existing_by_name.user_id != data.user_id:
+        raise ValueError(
+            f"De naam '{data.name}' is al in gebruik. Vul dezelfde naam opnieuw in om in te "
+            f"loggen op dat profiel, of kies een andere naam."
+        )
     profile = models.UserProfile(user_id=data.user_id, name=data.name)
     db.add(profile)
     db.commit()
