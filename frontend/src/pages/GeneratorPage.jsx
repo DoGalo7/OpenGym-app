@@ -98,6 +98,7 @@ export default function GeneratorPage() {
   const [wod, setWod] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [cardioWarningDismissed, setCardioWarningDismissed] = useState(false);
   const injuryDisclaimer = useInjuryDisclaimer(profile);
 
   useEffect(() => {
@@ -116,7 +117,13 @@ export default function GeneratorPage() {
     if (wod) resultRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   }, [wod]);
 
+  useEffect(() => {
+    setCardioWarningDismissed(false);
+  }, [cardioType, location]);
+
   const canSubmit = muscleGroups.length > 0 && !loading;
+  const cardioTypeMismatch =
+    includeCardio && location === "home" && cardioType && !(profile.home_equipment ?? []).includes(cardioType);
 
   const runGenerate = async (overrideGroups) => {
     setLoading(true);
@@ -477,6 +484,17 @@ export default function GeneratorPage() {
                 ))}
               </select>
             </div>
+            {cardioTypeMismatch && !cardioWarningDismissed && (
+              <ConfirmModal
+                title="Niet beschikbaar thuis"
+                message={`Je hebt in je profiel niet aangevinkt dat je thuis toegang hebt tot ${
+                  CARDIO_TYPES.find((c) => c.value === cardioType)?.label ?? cardioType
+                }. De app kiest daarom automatisch een ander type cardio voor deze workout.`}
+                confirmLabel="OK, begrepen"
+                hideCancel
+                onConfirm={() => setCardioWarningDismissed(true)}
+              />
+            )}
             <div className="field">
               <label htmlFor="cardio-count">Aantal cardio-oefeningen (optioneel)</label>
               <input
