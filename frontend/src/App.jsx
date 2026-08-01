@@ -13,10 +13,11 @@ import ProfilePage from "./pages/ProfilePage";
 
 function NameSetupScreen({ onSubmit, error }) {
   const [name, setName] = useState("");
+  const [password, setPassword] = useState("");
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    if (name.trim()) onSubmit(name.trim());
+    if (name.trim() && password.trim()) onSubmit(name.trim(), password.trim());
   };
 
   return (
@@ -33,9 +34,21 @@ function NameSetupScreen({ onSubmit, error }) {
             placeholder="Jouw naam"
             autoFocus
           />
+        </div>
+        <div className="field">
+          <label htmlFor="password">Wachtwoord</label>
+          <input
+            id="password"
+            type="password"
+            value={password}
+            onChange={(event) => setPassword(event.target.value)}
+            placeholder="Minimaal 4 tekens"
+            minLength={4}
+          />
           <p className="field-hint">
-            Had je al eerder een profiel met deze naam (bijv. op een ander apparaat)? Dan kom je
-            daar automatisch weer in terecht.
+            Had je al eerder een profiel met deze naam (bijv. op een ander apparaat)? Vul dan
+            hetzelfde wachtwoord in om daar weer in te loggen. Nieuwe naam? Dan wordt dit je
+            wachtwoord voor de volgende keer.
           </p>
         </div>
         <button type="submit" className="btn btn-primary">

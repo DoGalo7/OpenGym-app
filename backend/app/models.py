@@ -104,6 +104,10 @@ class UserProfile(Base):
     # can map onto existing profiles without changing the primary key.
     user_id: Mapped[str] = mapped_column(String(64), unique=True, nullable=False)
     name: Mapped[str] = mapped_column(String(80), nullable=False)
+    # PBKDF2 hash ("salt$digest", see app/security.py). Nullable so profiles created before
+    # this feature existed keep working - the first login attempt for such a profile claims
+    # it with whatever password is entered (see crud.login_or_create_profile).
+    password_hash: Mapped[str | None] = mapped_column(String(160), nullable=True)
     # None = niveau-filter staat uit (volledige oefeningenpool, geen beperking op niveau).
     level: Mapped[str | None] = mapped_column(String(20), nullable=True, default=None)
     # gym or home - default training location for this profile

@@ -27,7 +27,7 @@ const HOME_EQUIPMENT_OPTIONS = [
 ];
 
 export default function ProfilePage() {
-  const { profile, refreshProfile } = useProfile();
+  const { profile, refreshProfile, logout } = useProfile();
   const [error, setError] = useState(null);
 
   const runOrShowError = async (action) => {
@@ -68,9 +68,14 @@ export default function ProfilePage() {
       <h1>Profiel</h1>
       {error && <p className="error-text">{error}</p>}
       <div className="card">
-        <p>
-          <strong>{profile.name}</strong>
-        </p>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <p style={{ margin: 0 }}>
+            <strong>{profile.name}</strong>
+          </p>
+          <button type="button" className="btn-icon" onClick={logout}>
+            Log uit
+          </button>
+        </div>
         <LevelSelect value={profile.level} onChange={handleLevelChange} />
         <div className="field">
           <label htmlFor="profile-location">Standaardlocatie</label>

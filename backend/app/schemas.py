@@ -84,9 +84,10 @@ class InjuryRead(InjuryCreate):
 # --- Profiles ---
 
 
-class ProfileCreate(BaseModel):
+class ProfileLogin(BaseModel):
     user_id: str = Field(min_length=1, max_length=64)
     name: str = Field(min_length=1, max_length=80)
+    password: str = Field(min_length=4, max_length=100)
 
 
 class ProfileUpdate(BaseModel):

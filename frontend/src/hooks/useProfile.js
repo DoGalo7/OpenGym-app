@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 
 import { ApiError } from "../api/client";
-import { findProfileByName, getOrCreateProfile, getProfile } from "../api/profiles";
+import { getProfile, login } from "../api/profiles";
 
 const STORAGE_KEY = "open_gym_user_id";
 
@@ -39,27 +39,16 @@ export function useProfileState() {
     loadProfile();
   }, [loadProfile]);
 
-  const completeSetup = useCallback(async (name) => {
+  const completeSetup = useCallback(async (name, password) => {
     setLoading(true);
     setError(null);
     try {
-      // Names are the (temporary, pre-auth) login key: typing an existing name reconnects
-      // this browser to that profile instead of creating a new empty one - this is what lets
-      // someone get back to their own data from a different browser/device, at the cost of
-      // there being no real password check yet (fine for the current testing phase).
-      let userId;
-      try {
-        const existing = await findProfileByName(name);
-        userId = existing.user_id;
-      } catch (err) {
-        if (err instanceof ApiError && err.status === 404) {
-          userId = localStorage.getItem(STORAGE_KEY) || crypto.randomUUID();
-        } else {
-          throw err;
-        }
-      }
-      localStorage.setItem(STORAGE_KEY, userId);
-      const data = await getOrCreateProfile(userId, name);
+      // Name + password together are the (still lightweight, but no longer wide-open)
+      // login key: an existing name requires the matching password to reconnect to that
+      // profile's data, so you can't simply type someone else's name to see their data.
+      const userId = localStorage.getItem(STORAGE_KEY) || crypto.randomUUID();
+      const data = await login(userId, name, password);
+      localStorage.setItem(STORAGE_KEY, data.user_id);
       setProfile(data);
       setNeedsSetup(false);
     } catch (err) {
@@ -69,11 +58,17 @@ export function useProfileState() {
     }
   }, []);
 
+  const logout = useCallback(() => {
+    localStorage.removeItem(STORAGE_KEY);
+    setProfile(null);
+    setNeedsSetup(true);
+  }, []);
+
   const refreshProfile = useCallback(async () => {
     if (!profile) return;
     const data = await getProfile(profile.user_id);
     setProfile(data);
   }, [profile]);
 
-  return { profile, loading, needsSetup, error, completeSetup, refreshProfile, setProfile };
+  return { profile, loading, needsSetup, error, completeSetup, logout, refreshProfile, setProfile };
 }

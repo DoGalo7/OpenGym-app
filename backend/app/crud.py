@@ -4,6 +4,7 @@ from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from app import models, schemas
+from app.security import hash_password, verify_password
 
 
 # --- Profiles ---
@@ -32,17 +33,34 @@ def get_profile_by_name(db: Session, name: str) -> models.UserProfile | None:
     return matches[0]
 
 
-def get_or_create_profile(db: Session, data: schemas.ProfileCreate) -> models.UserProfile:
+def login_or_create_profile(db: Session, data: schemas.ProfileLogin) -> models.UserProfile:
+    """Logs into an existing profile by name+password, claims a legacy (pre-password)
+    profile with the given password, or creates a brand new one - the one login/signup
+    flow the frontend's name+password screen drives. Raises ValueError on a wrong password
+    (existing profile, different user_id already too - not the one on this device)."""
     profile = get_profile_by_user_id(db, data.user_id)
     if profile:
+        # Same device/browser that already owns this profile - no password re-check needed,
+        # but keep the name and a first-time password in sync.
+        if profile.password_hash is None:
+            profile.password_hash = hash_password(data.password)
+            db.commit()
+            db.refresh(profile)
         return profile
+
     existing_by_name = get_profile_by_name(db, data.name)
-    if existing_by_name and existing_by_name.user_id != data.user_id:
-        raise ValueError(
-            f"De naam '{data.name}' is al in gebruik. Vul dezelfde naam opnieuw in om in te "
-            f"loggen op dat profiel, of kies een andere naam."
-        )
-    profile = models.UserProfile(user_id=data.user_id, name=data.name)
+    if existing_by_name:
+        if existing_by_name.password_hash is None:
+            # Legacy profile from before passwords existed - claim it with this password.
+            existing_by_name.password_hash = hash_password(data.password)
+            db.commit()
+            db.refresh(existing_by_name)
+            return existing_by_name
+        if not verify_password(data.password, existing_by_name.password_hash):
+            raise ValueError("Onjuiste naam of wachtwoord.")
+        return existing_by_name
+
+    profile = models.UserProfile(user_id=data.user_id, name=data.name, password_hash=hash_password(data.password))
     db.add(profile)
     db.commit()
     db.refresh(profile)

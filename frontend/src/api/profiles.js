@@ -1,15 +1,11 @@
 import { del, get, patch, post } from "./client";
 
-export function getOrCreateProfile(userId, name) {
-  return post("/profiles/get-or-create", { user_id: userId, name });
+export function login(userId, name, password) {
+  return post("/profiles/login", { user_id: userId, name, password });
 }
 
 export function getProfile(userId) {
   return get(`/profiles/${userId}`);
-}
-
-export function findProfileByName(name) {
-  return get(`/profiles/by-name/${encodeURIComponent(name)}`);
 }
 
 export function updateProfile(userId, data) {
