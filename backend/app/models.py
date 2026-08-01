@@ -1,0 +1,160 @@
+import datetime
+
+from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String, Table, Text
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+
+from app.database import Base
+
+profile_excluded_exercise = Table(
+    "profile_excluded_exercise",
+    Base.metadata,
+    Column("profile_id", ForeignKey("user_profiles.id"), primary_key=True),
+    Column("exercise_id", ForeignKey("exercises.id"), primary_key=True),
+)
+
+
+class Exercise(Base):
+    __tablename__ = "exercises"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    name: Mapped[str] = mapped_column(String(120), nullable=False)
+    muscle_group: Mapped[str] = mapped_column(String(50), nullable=False)
+    # beginner, intermediate, advanced
+    level: Mapped[str] = mapped_column(String(20), nullable=False)
+    # barbell, dumbbell, kettlebell, rack, bodyweight, cardio, gymnastics
+    category: Mapped[str] = mapped_column(String(30), nullable=False)
+    # gym: requires crossfit-box equipment. home: doable without equipment.
+    requires_gym: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    is_cardio: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    # assault_bike, ski_erg, row, run - only set when is_cardio is true
+    cardio_type: Mapped[str | None] = mapped_column(String(30), nullable=True)
+    # a "second category": marks exercises that fit Hyrox-style training, independent of
+    # (in addition to) the equipment category above.
+    is_hyrox: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    rx_weight_male_kg: Mapped[float | None] = mapped_column(nullable=True)
+    rx_weight_female_kg: Mapped[float | None] = mapped_column(nullable=True)
+    description: Mapped[str | None] = mapped_column(Text, nullable=True)
+
+
+class FixedWod(Base):
+    __tablename__ = "fixed_wods"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    name: Mapped[str] = mapped_column(String(120), nullable=False)
+    # murph, girls, soldier
+    wod_category: Mapped[str] = mapped_column(String(30), nullable=False)
+    description: Mapped[str] = mapped_column(Text, nullable=False)
+    structure: Mapped[str] = mapped_column(Text, nullable=False)
+    time_cap_minutes: Mapped[int | None] = mapped_column(Integer, nullable=True)
+
+
+class PredefinedWod(Base):
+    __tablename__ = "predefined_wods"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    name: Mapped[str] = mapped_column(String(120), nullable=False)
+    # AMRAP, EMOM, TABATA, FOR_TIME - shown to the user as "Anders" for FOR_TIME
+    training_type: Mapped[str] = mapped_column(String(20), nullable=False)
+    description: Mapped[str] = mapped_column(Text, nullable=False)
+    duration_minutes: Mapped[int] = mapped_column(Integer, nullable=False)
+    # beginner, intermediate, advanced - display only, not used for filtering
+    level: Mapped[str] = mapped_column(String(20), nullable=False)
+    # only meaningful for training_type == FOR_TIME, where the round/rep structure
+    # varies per WOD (e.g. "3" + "21-15-9", or "1" + "aflopend"). AMRAP/EMOM/TABATA
+    # derive their shape from training_type + duration_minutes instead (see wod_generator).
+    rounds_override: Mapped[str | None] = mapped_column(String(20), nullable=True)
+    rep_scheme_override: Mapped[str | None] = mapped_column(String(60), nullable=True)
+
+    movements: Mapped[list["PredefinedWodMovement"]] = relationship(
+        back_populates="predefined_wod", cascade="all, delete-orphan",
+        order_by="PredefinedWodMovement.position",
+    )
+
+
+class PredefinedWodMovement(Base):
+    __tablename__ = "predefined_wod_movements"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    predefined_wod_id: Mapped[int] = mapped_column(ForeignKey("predefined_wods.id"), nullable=False)
+    exercise_id: Mapped[int] = mapped_column(ForeignKey("exercises.id"), nullable=False)
+    position: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    reps: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    distance_meters: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    calories: Mapped[int | None] = mapped_column(Integer, nullable=True)
+
+    predefined_wod: Mapped["PredefinedWod"] = relationship(back_populates="movements")
+    exercise: Mapped["Exercise"] = relationship()
+
+
+class UserProfile(Base):
+    __tablename__ = "user_profiles"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    # stable external identifier so a future multi-user database/auth system
+    # can map onto existing profiles without changing the primary key.
+    user_id: Mapped[str] = mapped_column(String(64), unique=True, nullable=False)
+    name: Mapped[str] = mapped_column(String(80), nullable=False)
+    # None = niveau-filter staat uit (volledige oefeningenpool, geen beperking op niveau).
+    level: Mapped[str | None] = mapped_column(String(20), nullable=True, default=None)
+    # gym or home - default training location for this profile
+    default_location: Mapped[str] = mapped_column(String(10), nullable=False, default="gym")
+    # true = always use the profile level, false = allow deviating per WOD.
+    use_profile_level_default: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+    # JSON list of equipment tags the user owns at home, e.g. ["pull_up_bar", "barbell"].
+    # Relaxes the location="home" filter for exercises needing that specific equipment.
+    home_equipment: Mapped[str] = mapped_column(Text, default="[]", nullable=False)
+    created_at: Mapped[datetime.datetime] = mapped_column(
+        DateTime, default=datetime.datetime.utcnow, nullable=False
+    )
+
+    injuries: Mapped[list["Injury"]] = relationship(
+        back_populates="profile", cascade="all, delete-orphan"
+    )
+    excluded_exercises: Mapped[list["Exercise"]] = relationship(
+        secondary=profile_excluded_exercise
+    )
+    wod_history: Mapped[list["WodHistory"]] = relationship(
+        back_populates="profile", cascade="all, delete-orphan"
+    )
+
+
+class Injury(Base):
+    __tablename__ = "injuries"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    profile_id: Mapped[int] = mapped_column(ForeignKey("user_profiles.id"), nullable=False)
+    description: Mapped[str] = mapped_column(String(200), nullable=False)
+    # optional muscle group to exclude from generated workouts, e.g. "schouders"
+    affected_muscle_group: Mapped[str | None] = mapped_column(String(50), nullable=True)
+
+    profile: Mapped["UserProfile"] = relationship(back_populates="injuries")
+
+
+class WodHistory(Base):
+    __tablename__ = "wod_history"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    profile_id: Mapped[int] = mapped_column(ForeignKey("user_profiles.id"), nullable=False)
+    created_at: Mapped[datetime.datetime] = mapped_column(
+        DateTime, default=datetime.datetime.utcnow, nullable=False
+    )
+    # generated or fixed
+    source: Mapped[str] = mapped_column(String(20), nullable=False)
+    fixed_wod_id: Mapped[int | None] = mapped_column(ForeignKey("fixed_wods.id"), nullable=True)
+    # full generated wod payload (blocks, exercises, weights) stored as JSON text
+    wod_json: Mapped[str] = mapped_column(Text, nullable=False)
+    # free-text result, e.g. "12:34" or "5 rounds + 3 reps"
+    result: Mapped[str | None] = mapped_column(String(100), nullable=True)
+
+    profile: Mapped["UserProfile"] = relationship(back_populates="wod_history")
+    fixed_wod: Mapped["FixedWod | None"] = relationship()
+
+
+class Friendship(Base):
+    __tablename__ = "friendships"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    profile_id: Mapped[int] = mapped_column(ForeignKey("user_profiles.id"), nullable=False)
+    friend_profile_id: Mapped[int] = mapped_column(ForeignKey("user_profiles.id"), nullable=False)
+    # pending or accepted
+    status: Mapped[str] = mapped_column(String(20), nullable=False, default="pending")

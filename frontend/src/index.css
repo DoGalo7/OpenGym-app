@@ -1,0 +1,11 @@
+@import "./styles/variables.css";
+@import "./styles/base.css";
+@import "./styles/components.css";
+
+.status-text {
+  color: var(--color-text-muted);
+}
+
+.error-text {
+  color: var(--color-danger);
+}
