@@ -369,6 +369,150 @@
   background: var(--color-bg);
 }
 
+.idea-card {
+  cursor: pointer;
+}
+
+.idea-movement-list {
+  margin: var(--space-2) 0 0;
+  padding-left: 20px;
+  color: var(--color-text-muted);
+  font-size: 15px;
+}
+
+.idea-movement-list li {
+  margin-bottom: 2px;
+}
+
+.favorite-heart {
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 22px;
+  line-height: 1;
+  padding: 8px;
+  color: var(--color-primary);
+  min-width: 44px;
+  min-height: 44px;
+  flex-shrink: 0;
+}
+
+.disclaimer-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  background: var(--color-warning-bg);
+  border-color: var(--color-warning);
+}
+
+.disclaimer-icon {
+  font-size: 20px;
+  line-height: 1.4;
+  flex-shrink: 0;
+}
+
+.stat-row {
+  display: flex;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+.stat-tile {
+  flex: 1;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: var(--space-3);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.stat-value {
+  font-family: var(--font-heading);
+  font-size: 28px;
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.stat-label {
+  color: var(--color-text-muted);
+  font-size: 13px;
+}
+
+.chart-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 140px;
+  margin-top: var(--space-3);
+}
+
+.chart-bar-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+}
+
+.chart-bar-track {
+  flex: 1;
+  width: 100%;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.chart-bar {
+  position: relative;
+  width: 100%;
+  max-width: 24px;
+  min-height: 3px;
+  background: var(--color-primary);
+  border-radius: 4px 4px 0 0;
+  cursor: default;
+}
+
+.chart-bar:hover,
+.chart-bar:focus-visible {
+  background: var(--color-primary-dark);
+  outline: none;
+}
+
+.chart-tooltip {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--color-secondary);
+  color: #fff;
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 400;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 150ms;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.chart-bar:hover .chart-tooltip,
+.chart-bar:focus-visible .chart-tooltip {
+  opacity: 1;
+  visibility: visible;
+}
+
+.chart-bar-label {
+  color: var(--color-text-muted);
+  font-size: 12px;
+  margin-top: var(--space-1);
+  white-space: nowrap;
+}
+
 @media (min-width: 768px) {
   .nav-bar {
     position: static;

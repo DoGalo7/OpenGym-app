@@ -1,9 +1,9 @@
 import { NavLink } from "react-router-dom";
 
 const TABS = [
-  { to: "/", label: "WOD maken", icon: "🏋️" },
+  { to: "/", label: "Home", icon: "🏠" },
+  { to: "/wod-maken", label: "WOD maken", icon: "🏋️" },
   { to: "/profiel", label: "Profiel", icon: "👤" },
-  { to: "/vaste-wods", label: "Vaste WOD's", icon: "📋" },
   { to: "/workout-ideeen", label: "Ideeën", icon: "💡" },
   { to: "/geschiedenis", label: "Geschiedenis", icon: "🕒" },
 ];

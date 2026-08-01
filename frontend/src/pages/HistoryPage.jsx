@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import { listHistory, updateHistoryResult } from "../api/history";
+import { deleteHistoryEntry, listHistory, updateHistory } from "../api/history";
 import HistoryEntryCard from "../components/history/HistoryEntryCard";
 import { useProfile } from "../context/ProfileContext";
 
@@ -17,8 +17,13 @@ export default function HistoryPage() {
 
   useEffect(load, [profile.user_id]);
 
-  const handleUpdateResult = async (historyId, result) => {
-    await updateHistoryResult(profile.user_id, historyId, result);
+  const handleUpdate = async (historyId, data) => {
+    await updateHistory(profile.user_id, historyId, data);
+    load();
+  };
+
+  const handleDelete = async (historyId) => {
+    await deleteHistoryEntry(profile.user_id, historyId);
     load();
   };
 
@@ -30,7 +35,7 @@ export default function HistoryPage() {
         <p className="status-text">Nog geen workouts gelogd. Maak of kies een WOD om te beginnen.</p>
       )}
       {entries.map((entry) => (
-        <HistoryEntryCard key={entry.id} entry={entry} onUpdateResult={handleUpdateResult} />
+        <HistoryEntryCard key={entry.id} entry={entry} onUpdate={handleUpdate} onDelete={handleDelete} />
       ))}
     </div>
   );

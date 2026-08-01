@@ -5,9 +5,9 @@ import NavBar from "./components/layout/NavBar";
 import PageContainer from "./components/layout/PageContainer";
 import { ProfileProvider, useProfile } from "./context/ProfileContext";
 import FixedWodDetailPage from "./pages/FixedWodDetailPage";
-import FixedWodsPage from "./pages/FixedWodsPage";
 import GeneratorPage from "./pages/GeneratorPage";
 import HistoryPage from "./pages/HistoryPage";
+import HomePage from "./pages/HomePage";
 import PredefinedWodsPage from "./pages/PredefinedWodsPage";
 import ProfilePage from "./pages/ProfilePage";
 
@@ -53,10 +53,10 @@ function AppContent() {
     <BrowserRouter>
       <PageContainer>
         <Routes>
-          <Route path="/" element={<GeneratorPage key={profile.user_id} />} />
+          <Route path="/" element={<HomePage key={profile.user_id} />} />
+          <Route path="/wod-maken" element={<GeneratorPage key={profile.user_id} />} />
           <Route path="/profiel" element={<ProfilePage key={profile.user_id} />} />
-          <Route path="/vaste-wods" element={<FixedWodsPage />} />
-          <Route path="/vaste-wods/:id" element={<FixedWodDetailPage />} />
+          <Route path="/vaste-wods/:id" element={<FixedWodDetailPage key={profile.user_id} />} />
           <Route path="/workout-ideeen" element={<PredefinedWodsPage key={profile.user_id} />} />
           <Route path="/geschiedenis" element={<HistoryPage key={profile.user_id} />} />
         </Routes>

@@ -46,6 +46,13 @@ class FixedWodRead(BaseModel):
 # --- Predefined WODs ---
 
 
+class PredefinedWodMovementSummary(BaseModel):
+    exercise_name: str
+    reps: int | None = None
+    distance_meters: int | None = None
+    calories: int | None = None
+
+
 class PredefinedWodSummary(BaseModel):
     id: int
     name: str
@@ -53,7 +60,7 @@ class PredefinedWodSummary(BaseModel):
     description: str
     duration_minutes: int
     level: str
-    movement_names: list[str]
+    movements: list[PredefinedWodMovementSummary]
 
 
 # --- Injuries ---

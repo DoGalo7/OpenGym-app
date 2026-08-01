@@ -1,4 +1,4 @@
-import { get, patch, post } from "./client";
+import { del, get, patch, post } from "./client";
 
 export function createHistory(data) {
   return post("/history", data);
@@ -16,6 +16,14 @@ export function getHistoryEntry(userId, historyId) {
   return get(`/history/${userId}/${historyId}`);
 }
 
+export function updateHistory(userId, historyId, data) {
+  return patch(`/history/${userId}/${historyId}`, data);
+}
+
 export function updateHistoryResult(userId, historyId, result) {
   return patch(`/history/${userId}/${historyId}`, { result });
+}
+
+export function deleteHistoryEntry(userId, historyId) {
+  return del(`/history/${userId}/${historyId}`);
 }

@@ -58,7 +58,7 @@ export default function GeneratorPage() {
   const [includeCardio, setIncludeCardio] = useState(false);
   const [cardioType, setCardioType] = useState("");
   const [cardioCount, setCardioCount] = useState("");
-  const [includeWarmup, setIncludeWarmup] = useState(true);
+  const [includeWarmup, setIncludeWarmup] = useState(false);
   const [warmupMinutes, setWarmupMinutes] = useState(8);
   const [warmupExerciseCount, setWarmupExerciseCount] = useState("");
   const [deviateLevel, setDeviateLevel] = useState("");

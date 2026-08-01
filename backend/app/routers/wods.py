@@ -55,7 +55,15 @@ def list_predefined_wods(training_type: str | None = None, db: Session = Depends
             description=w.description,
             duration_minutes=w.duration_minutes,
             level=w.level,
-            movement_names=[m.exercise.name for m in sorted(w.movements, key=lambda m: m.position)],
+            movements=[
+                schemas.PredefinedWodMovementSummary(
+                    exercise_name=m.exercise.name,
+                    reps=m.reps,
+                    distance_meters=m.distance_meters,
+                    calories=m.calories,
+                )
+                for m in sorted(w.movements, key=lambda m: m.position)
+            ],
         )
         for w in wods
     ]

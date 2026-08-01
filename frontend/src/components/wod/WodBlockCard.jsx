@@ -1,6 +1,6 @@
 import ExerciseRow from "./ExerciseRow";
 
-const BLOCK_LABELS = { warmup: "Warming-up", main: "Hoofdblok", cardio: "Cardio" };
+const BLOCK_LABELS = { warmup: "Warming-up", main: "Workout", cardio: "Cardio" };
 
 function blockSummary(block) {
   const parts = [`${block.duration_minutes} min`];
