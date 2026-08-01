@@ -14,6 +14,7 @@ const CATEGORIES = [
   { value: "FOR_TIME", label: "Anders" },
   { value: "BENCHMARK", label: "Benchmark" },
   { value: "SHARED", label: "Gedeeld door sporters" },
+  { value: "FAVORIETEN", label: "Mijn favorieten" },
 ];
 
 const LEVEL_LABELS = { beginner: "Beginner", intermediate: "Gemiddeld", advanced: "Gevorderd" };
@@ -85,6 +86,13 @@ export default function PredefinedWodsPage() {
       listFixedWods().then((data) => setItems(data.map(toFixedItem))).catch((err) => setError(err.message));
     } else if (category === "SHARED") {
       listSharedWods().then((data) => setItems(data.map(toSharedItem))).catch((err) => setError(err.message));
+    } else if (category === "FAVORIETEN") {
+      Promise.all([listPredefinedWods(), listFixedWods(), listSharedWods()])
+        .then(([predefined, fixed, shared]) => {
+          const all = [...predefined.map(toPredefinedItem), ...fixed.map(toFixedItem), ...shared.map(toSharedItem)];
+          setItems(all.filter((item) => favoriteKeys.has(`${itemTypeFor(item)}:${item.id}`)));
+        })
+        .catch((err) => setError(err.message));
     } else if (category === "") {
       Promise.all([listPredefinedWods(), listFixedWods(), listSharedWods()])
         .then(([predefined, fixed, shared]) =>
@@ -94,7 +102,10 @@ export default function PredefinedWodsPage() {
     } else {
       listPredefinedWods(category).then((data) => setItems(data.map(toPredefinedItem))).catch((err) => setError(err.message));
     }
-  }, [category]);
+    // favoriteKeys only matters for the FAVORIETEN category, but including it here keeps that
+    // list in sync when a favorite is toggled while browsing it.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [category, favoriteKeys]);
 
   const handleSelect = async (item) => {
     if (loadingId !== null) return;
