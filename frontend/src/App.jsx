@@ -4,6 +4,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import NavBar from "./components/layout/NavBar";
 import PageContainer from "./components/layout/PageContainer";
 import { ProfileProvider, useProfile } from "./context/ProfileContext";
+import AdminChangelogPage from "./pages/AdminChangelogPage";
 import AdminExercisesPage from "./pages/AdminExercisesPage";
 import FixedWodDetailPage from "./pages/FixedWodDetailPage";
 import GeneratorPage from "./pages/GeneratorPage";
@@ -79,6 +80,7 @@ function AppContent() {
           <Route path="/workout-ideeen" element={<PredefinedWodsPage key={profile.user_id} />} />
           <Route path="/geschiedenis" element={<HistoryPage key={profile.user_id} />} />
           <Route path="/admin/oefeningen" element={<AdminExercisesPage />} />
+          <Route path="/admin/rapport" element={<AdminChangelogPage />} />
           <Route path="/rapport" element={<PerformanceReportPage key={profile.user_id} />} />
         </Routes>
       </PageContainer>

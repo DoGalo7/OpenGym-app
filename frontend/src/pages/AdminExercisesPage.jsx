@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 
 import { createExercise, deleteExercise, listAllExercises, updateExercise } from "../api/adminExercises";
 
@@ -250,6 +251,9 @@ export default function AdminExercisesPage() {
         Niet gekoppeld aan het hoofdmenu - alleen voor beheer. Wijzigingen zijn direct zichtbaar
         voor alle sporters.
       </p>
+      <Link to="/admin/rapport" className="btn-icon" style={{ display: "inline-flex", marginBottom: 12, textDecoration: "none" }}>
+        📋 Overzicht van alle instellingen &amp; functies
+      </Link>
       {error && <p className="error-text">{error}</p>}
 
       <div className="card">
