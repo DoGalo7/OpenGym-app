@@ -1,3 +1,5 @@
+import os
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -7,9 +9,13 @@ from app.seed.seeder import run_seed
 
 app = FastAPI(title="Open Gym-app API")
 
+# Comma-separated list of allowed frontend origins. Defaults to the local Vite dev server;
+# override via env var for tunnels/deployments (e.g. a Vercel URL) without touching this file.
+cors_origins = os.environ.get("CORS_ORIGINS", "http://localhost:5173").split(",")
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=cors_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

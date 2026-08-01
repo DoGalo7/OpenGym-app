@@ -1,4 +1,8 @@
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000/api";
+// localtunnel (used for quick phone-testing, see project notes) shows an interstitial
+// warning page (HTTP 511) to browsers it hasn't seen before, unless this header is set.
+// Harmless no-op against any other backend (Render, localhost, ...).
+const TUNNEL_BYPASS_HEADERS = API_URL.includes(".loca.lt") ? { "Bypass-Tunnel-Reminder": "true" } : {};
 
 export class ApiError extends Error {
   constructor(message, status) {
@@ -9,7 +13,7 @@ export class ApiError extends Error {
 
 async function request(path, options = {}) {
   const response = await fetch(`${API_URL}${path}`, {
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", ...TUNNEL_BYPASS_HEADERS },
     ...options,
   });
 
