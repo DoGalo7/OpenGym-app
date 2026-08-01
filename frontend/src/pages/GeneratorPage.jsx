@@ -3,12 +3,14 @@ import { useLocation, useNavigate } from "react-router-dom";
 
 import { getExercise } from "../api/exercises";
 import { createHistory } from "../api/history";
+import { shareWod } from "../api/sharedWods";
 import { generateWarmup, generateWod } from "../api/wods";
 import CategoryPicker from "../components/wod/CategoryPicker";
 import ManualExercisePicker from "../components/wod/ManualExercisePicker";
 import ManualWodBuilder from "../components/wod/ManualWodBuilder";
 import MuscleGroupPicker from "../components/wod/MuscleGroupPicker";
 import SaveResultForm from "../components/wod/SaveResultForm";
+import ShareWodForm from "../components/wod/ShareWodForm";
 import TrainingTypeSelect from "../components/wod/TrainingTypeSelect";
 import WodBlockCard from "../components/wod/WodBlockCard";
 import CollapsibleSection from "../components/shared/CollapsibleSection";
@@ -304,6 +306,8 @@ export default function GeneratorPage() {
 
   const handleSaveResult = (result) =>
     createHistory({ user_id: profile.user_id, source: "generated", wod_json: wod, result });
+
+  const handleShareWod = (name) => shareWod(profile.user_id, name, wod);
 
   return (
     <div>
@@ -611,6 +615,7 @@ export default function GeneratorPage() {
             />
           ))}
           <SaveResultForm onSave={handleSaveResult} />
+          <ShareWodForm onShare={handleShareWod} />
         </div>
       )}
     </div>

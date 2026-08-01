@@ -170,6 +170,25 @@ class WodHistory(Base):
     fixed_wod: Mapped["FixedWod | None"] = relationship()
 
 
+class SharedWod(Base):
+    """A generated or manually-built WOD a user chose to share - shows up for every sporter
+    under Ideeën, category "Gedeeld door andere sporters"."""
+    __tablename__ = "shared_wods"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    profile_id: Mapped[int] = mapped_column(ForeignKey("user_profiles.id"), nullable=False)
+    name: Mapped[str] = mapped_column(String(120), nullable=False)
+    training_type: Mapped[str] = mapped_column(String(20), nullable=False)
+    duration_minutes: Mapped[int] = mapped_column(Integer, nullable=False)
+    # full GeneratedWod payload (blocks, exercises, weights), same shape as WodHistory.wod_json
+    wod_json: Mapped[str] = mapped_column(Text, nullable=False)
+    shared_at: Mapped[datetime.datetime] = mapped_column(
+        DateTime, default=datetime.datetime.utcnow, nullable=False
+    )
+
+    profile: Mapped["UserProfile"] = relationship()
+
+
 class Favorite(Base):
     """Per-profile bookmark on a shared library item (fixed or predefined WOD) - separate from
     WodHistory.favorite, which marks a WOD you've actually logged, not just one you'd like to try."""

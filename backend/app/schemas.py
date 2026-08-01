@@ -230,6 +230,24 @@ class GeneratedWod(BaseModel):
     generated_at: datetime
 
 
+# --- Shared WODs ---
+
+
+class SharedWodCreate(BaseModel):
+    user_id: str = Field(min_length=1, max_length=64)
+    name: str = Field(min_length=1, max_length=120)
+    wod: GeneratedWod
+
+
+class SharedWodSummary(BaseModel):
+    id: int
+    name: str
+    training_type: str
+    duration_minutes: int
+    shared_by_name: str
+    movements: list[PredefinedWodMovementSummary]
+
+
 # --- History ---
 
 

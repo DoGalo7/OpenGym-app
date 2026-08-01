@@ -247,6 +247,55 @@ def history_to_read(entry: models.WodHistory) -> schemas.HistoryRead:
     )
 
 
+# --- Shared WODs ---
+
+
+def _shared_wod_to_summary(db: Session, row: models.SharedWod) -> schemas.SharedWodSummary:
+    wod = json.loads(row.wod_json)
+    main_block = next((b for b in wod["blocks"] if b["block_type"] == "main"), wod["blocks"][0])
+    sharer = db.get(models.UserProfile, row.profile_id)
+    return schemas.SharedWodSummary(
+        id=row.id,
+        name=row.name,
+        training_type=row.training_type,
+        duration_minutes=row.duration_minutes,
+        shared_by_name=sharer.name if sharer else "Onbekend",
+        movements=[
+            schemas.PredefinedWodMovementSummary(
+                exercise_name=e["name"],
+                reps=e.get("reps"),
+                distance_meters=e.get("distance_meters"),
+                calories=e.get("calories"),
+            )
+            for e in main_block["exercises"]
+        ],
+    )
+
+
+def create_shared_wod(db: Session, profile: models.UserProfile, data: schemas.SharedWodCreate) -> schemas.SharedWodSummary:
+    main_block = next((b for b in data.wod.blocks if b.block_type == "main"), data.wod.blocks[0])
+    shared = models.SharedWod(
+        profile_id=profile.id,
+        name=data.name,
+        training_type=main_block.training_type or "AMRAP",
+        duration_minutes=data.wod.total_duration_minutes,
+        wod_json=data.wod.model_dump_json(),
+    )
+    db.add(shared)
+    db.commit()
+    db.refresh(shared)
+    return _shared_wod_to_summary(db, shared)
+
+
+def list_shared_wods(db: Session) -> list[schemas.SharedWodSummary]:
+    rows = db.query(models.SharedWod).order_by(models.SharedWod.shared_at.desc()).all()
+    return [_shared_wod_to_summary(db, row) for row in rows]
+
+
+def get_shared_wod(db: Session, shared_wod_id: int) -> models.SharedWod | None:
+    return db.get(models.SharedWod, shared_wod_id)
+
+
 # --- Favorites (library bookmarks) ---
 
 

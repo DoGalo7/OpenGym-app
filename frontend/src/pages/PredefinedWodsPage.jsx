@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { addFavorite, listFavorites, removeFavorite } from "../api/favorites";
+import { listSharedWods, loadSharedWod } from "../api/sharedWods";
 import { listFixedWods, listPredefinedWods, loadPredefinedWod } from "../api/wods";
 import { useProfile } from "../context/ProfileContext";
 
@@ -12,6 +13,7 @@ const CATEGORIES = [
   { value: "TABATA", label: "Tabata" },
   { value: "FOR_TIME", label: "Anders" },
   { value: "BENCHMARK", label: "Benchmark" },
+  { value: "SHARED", label: "Gedeeld door sporters" },
 ];
 
 const LEVEL_LABELS = { beginner: "Beginner", intermediate: "Gemiddeld", advanced: "Gevorderd" };
@@ -46,6 +48,22 @@ function toFixedItem(w) {
   };
 }
 
+function itemTypeFor(item) {
+  return item.kind === "fixed" ? "fixed_wod" : item.kind === "shared" ? "shared_wod" : "predefined_wod";
+}
+
+function toSharedItem(w) {
+  return {
+    kind: "shared",
+    id: w.id,
+    name: w.name,
+    badgeLabel: w.training_type === "FOR_TIME" ? "Anders" : w.training_type,
+    meta: `${w.duration_minutes} min · Gedeeld door ${w.shared_by_name}`,
+    description: "",
+    lines: w.movements.map(formatMovement),
+  };
+}
+
 export default function PredefinedWodsPage() {
   const { profile } = useProfile();
   const navigate = useNavigate();
@@ -65,9 +83,13 @@ export default function PredefinedWodsPage() {
     setError(null);
     if (category === "BENCHMARK") {
       listFixedWods().then((data) => setItems(data.map(toFixedItem))).catch((err) => setError(err.message));
+    } else if (category === "SHARED") {
+      listSharedWods().then((data) => setItems(data.map(toSharedItem))).catch((err) => setError(err.message));
     } else if (category === "") {
-      Promise.all([listPredefinedWods(), listFixedWods()])
-        .then(([predefined, fixed]) => setItems([...predefined.map(toPredefinedItem), ...fixed.map(toFixedItem)]))
+      Promise.all([listPredefinedWods(), listFixedWods(), listSharedWods()])
+        .then(([predefined, fixed, shared]) =>
+          setItems([...predefined.map(toPredefinedItem), ...fixed.map(toFixedItem), ...shared.map(toSharedItem)])
+        )
         .catch((err) => setError(err.message));
     } else {
       listPredefinedWods(category).then((data) => setItems(data.map(toPredefinedItem))).catch((err) => setError(err.message));
@@ -83,7 +105,9 @@ export default function PredefinedWodsPage() {
     setLoadingId(item.id);
     setError(null);
     try {
-      const wod = await loadPredefinedWod(item.id, profile.user_id);
+      const wod = item.kind === "shared"
+        ? await loadSharedWod(item.id, profile.user_id)
+        : await loadPredefinedWod(item.id, profile.user_id);
       navigate("/wod-maken", { state: { loadedWod: wod } });
     } catch (err) {
       setError(err.message);
@@ -93,7 +117,7 @@ export default function PredefinedWodsPage() {
 
   const toggleFavorite = async (event, item) => {
     event.stopPropagation();
-    const itemType = item.kind === "fixed" ? "fixed_wod" : "predefined_wod";
+    const itemType = itemTypeFor(item);
     const key = `${itemType}:${item.id}`;
     const isFavorite = favoriteKeys.has(key);
     setFavoriteKeys((prev) => {
@@ -142,7 +166,7 @@ export default function PredefinedWodsPage() {
       )}
 
       {items.map((item) => {
-        const itemType = item.kind === "fixed" ? "fixed_wod" : "predefined_wod";
+        const itemType = itemTypeFor(item);
         const isFavorite = favoriteKeys.has(`${itemType}:${item.id}`);
         return (
           <div
