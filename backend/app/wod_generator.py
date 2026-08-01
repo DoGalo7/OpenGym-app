@@ -12,6 +12,7 @@ from app.schemas import ExerciseInWod, ExerciseSummary, GeneratedWod, WodBlock, 
 LEVEL_MULTIPLIER = {"beginner": 0.7, "intermediate": 1.0, "advanced": 1.3}
 WARMUP_CATEGORIES = {"bodyweight", "gymnastics"}
 WARMUP_MAX_LEVEL_RANK = LEVEL_RANK[Level.intermediate]
+ALL_MUSCLE_GROUPS = {"schouders", "rug", "borst", "armen", "benen", "billen", "buik", "volledig_lichaam"}
 
 # Natural unit per cardio machine, matching how these are actually programmed in a WOD
 # (running/rowing/ski erg in meters, assault bike in calories) instead of pure time.
@@ -52,12 +53,19 @@ def generate_wod(db: Session, profile: UserProfile, request: WodGenerateRequest)
 
     effective_level = _effective_level(profile, request)
     target_groups = {mg.value for mg in request.muscle_groups}
+    # "Volledig lichaam" means "any muscle group is fair game", not "only exercises literally
+    # tagged volledig_lichaam" - that pool was too narrow (missing e.g. Push-up/borst, Sit-up/
+    # buik, Air Squat/benen), making both the main block and warm-up feel repetitive. Only used
+    # for pool-filtering below - _slot_count still sizes off the original (narrow) target_groups
+    # so picking "volledig lichaam" doesn't inflate the exercise count to one-per-muscle-group.
+    pool_groups = ALL_MUSCLE_GROUPS if target_groups == {"volledig_lichaam"} else target_groups
 
     def _to_main_pool(exercises: list[Exercise]) -> list[Exercise]:
         return [
             e for e in exercises
             if not e.is_cardio
-            and e.muscle_group in target_groups
+            and not e.warmup_only
+            and e.muscle_group in pool_groups
             and (effective_level is None or LEVEL_RANK[e.level] <= LEVEL_RANK[effective_level])
             and (not request.hyrox_style or e.is_hyrox)
         ]
@@ -88,7 +96,7 @@ def generate_wod(db: Session, profile: UserProfile, request: WodGenerateRequest)
         n_slots = max(2, total_target - n_cardio)
     preferred_categories = {c.value for c in request.preferred_categories}
     chosen = _select_main_exercises(
-        main_pool, choosable_main_pool, target_groups, n_slots, request.chosen_exercise_ids, preferred_categories
+        main_pool, choosable_main_pool, pool_groups, n_slots, request.chosen_exercise_ids, preferred_categories
     )
     used_ids = {e.id for e in chosen}
 
@@ -125,7 +133,7 @@ def generate_wod(db: Session, profile: UserProfile, request: WodGenerateRequest)
     blocks: list[WodBlock] = []
 
     if request.include_warmup and request.warmup_minutes:
-        blocks.append(_build_warmup_block(filtered, target_groups, request, used_ids))
+        blocks.append(_build_warmup_block(filtered, pool_groups, request, used_ids))
 
     blocks.append(main_block)
 
@@ -304,7 +312,13 @@ def _select_main_exercises(
             available[:] = [e for e in available if e.base_movement != pick.base_movement]
 
     covered_groups = {e.muscle_group for e in chosen}
-    for group in target_groups:
+    # Python set iteration order is fixed for the lifetime of the process (not re-randomized per
+    # call), so iterating target_groups directly would - when n_slots is smaller than the number
+    # of groups - consistently favor the same subset of groups (e.g. always skipping "borst"/
+    # "benen") for as long as the server process stays up. Shuffle to a fresh order every call.
+    shuffled_groups = list(target_groups)
+    random.shuffle(shuffled_groups)
+    for group in shuffled_groups:
         if remaining <= 0:
             break
         if group in covered_groups:
@@ -416,12 +430,27 @@ def _build_warmup_block(
     if opener:
         chosen.append(opener)
 
+    # base_movement groups equipment/variant-duplicates of the same movement (e.g. Burpee vs
+    # Burpee Broad Jump) - never pick a second one into the same block (see _select_main_exercises
+    # for the identical rule on the main block).
     used_ids = {e.id for e in chosen}
-    available = [e for e in warmup_pool if e.id not in used_ids]
+    used_base_movements = {e.base_movement for e in chosen if e.base_movement}
+    available = [e for e in warmup_pool if e.id not in used_ids and e.base_movement not in used_base_movements]
     remaining = n_warmup - len(chosen)
 
+    def _consume(pick: Exercise) -> None:
+        chosen.append(pick)
+        available.remove(pick)
+        if pick.base_movement:
+            used_base_movements.add(pick.base_movement)
+            available[:] = [e for e in available if e.base_movement != pick.base_movement]
+
     covered_groups = {e.muscle_group for e in chosen}
-    for group in target_groups:
+    # See the identical comment in _select_main_exercises: shuffle so this doesn't consistently
+    # favor the same subset of groups for the lifetime of the server process.
+    shuffled_groups = list(target_groups)
+    random.shuffle(shuffled_groups)
+    for group in shuffled_groups:
         if remaining <= 0:
             break
         if group in covered_groups:
@@ -430,14 +459,12 @@ def _build_warmup_block(
         if not candidates:
             continue
         pick = random.choice(candidates)
-        chosen.append(pick)
-        available.remove(pick)
+        _consume(pick)
         remaining -= 1
 
     while remaining > 0 and available:
         pick = random.choice(available)
-        chosen.append(pick)
-        available.remove(pick)
+        _consume(pick)
         remaining -= 1
 
     warmup_exercises = [

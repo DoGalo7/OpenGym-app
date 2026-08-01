@@ -31,6 +31,7 @@ def on_startup():
     Base.metadata.create_all(bind=engine)
     ensure_column("exercises", "base_movement", "VARCHAR(50)")
     ensure_column("exercises", "equipment_tag", "VARCHAR(30)")
+    ensure_column("exercises", "warmup_only", "BOOLEAN NOT NULL DEFAULT FALSE")
     db = session_local()
     try:
         run_seed(db)

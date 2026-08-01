@@ -41,6 +41,9 @@ class Exercise(Base):
     # checked against the profile's owned home_equipment for location=home. None + requires_gym
     # means gym-only with no home-equipment escape hatch (e.g. a sled).
     equipment_tag: Mapped[str | None] = mapped_column(String(30), nullable=True)
+    # Mobility/activation drills (inchworm, high knees, ...) that are only ever appropriate for
+    # the warm-up block, never selected for the main WOD block.
+    warmup_only: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
 
 
 class FixedWod(Base):
