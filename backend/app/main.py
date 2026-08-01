@@ -41,12 +41,6 @@ def health_check():
     return {"status": "ok"}
 
 
-@app.get("/debug/cors")
-def debug_cors():
-    """Temporary: shows exactly which origins the running instance parsed from CORS_ORIGINS."""
-    return {"cors_origins": cors_origins}
-
-
 app.include_router(exercises.router, prefix="/api/exercises", tags=["exercises"])
 app.include_router(profiles.router, prefix="/api/profiles", tags=["profiles"])
 app.include_router(wods.router, prefix="/api/wods", tags=["wods"])
