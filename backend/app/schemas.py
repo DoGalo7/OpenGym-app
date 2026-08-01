@@ -210,7 +210,9 @@ class HistoryCreate(BaseModel):
 
 
 class HistoryUpdate(BaseModel):
-    result: str = Field(min_length=1, max_length=100)
+    result: str | None = Field(default=None, max_length=100)
+    note: str | None = Field(default=None, max_length=500)
+    favorite: bool | None = None
 
 
 class HistoryRead(BaseModel):
@@ -221,3 +223,19 @@ class HistoryRead(BaseModel):
     fixed_wod_id: int | None
     wod_json: dict
     result: str | None
+    note: str | None = None
+    favorite: bool = False
+
+
+# --- Favorites (bookmarked library items - fixed/predefined WODs, not logged history) ---
+
+
+class FavoriteCreate(BaseModel):
+    user_id: str = Field(min_length=1, max_length=64)
+    item_type: Literal["fixed_wod", "predefined_wod"]
+    item_id: int
+
+
+class FavoriteRead(BaseModel):
+    item_type: str
+    item_id: int

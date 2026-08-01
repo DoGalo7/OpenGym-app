@@ -1,6 +1,6 @@
 import datetime
 
-from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String, Table, Text
+from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String, Table, Text, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
@@ -155,9 +155,25 @@ class WodHistory(Base):
     wod_json: Mapped[str] = mapped_column(Text, nullable=False)
     # free-text result, e.g. "12:34" or "5 rounds + 3 reps"
     result: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    # free-text personal note, separate from the result (e.g. "voelde zwaar, RX gehaald")
+    note: Mapped[str | None] = mapped_column(Text, nullable=True)
+    favorite: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
 
     profile: Mapped["UserProfile"] = relationship(back_populates="wod_history")
     fixed_wod: Mapped["FixedWod | None"] = relationship()
+
+
+class Favorite(Base):
+    """Per-profile bookmark on a shared library item (fixed or predefined WOD) - separate from
+    WodHistory.favorite, which marks a WOD you've actually logged, not just one you'd like to try."""
+    __tablename__ = "favorites"
+    __table_args__ = (UniqueConstraint("profile_id", "item_type", "item_id", name="uq_favorite_item"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    profile_id: Mapped[int] = mapped_column(ForeignKey("user_profiles.id"), nullable=False)
+    # "fixed_wod" or "predefined_wod"
+    item_type: Mapped[str] = mapped_column(String(20), nullable=False)
+    item_id: Mapped[int] = mapped_column(Integer, nullable=False)
 
 
 class Friendship(Base):

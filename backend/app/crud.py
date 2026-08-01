@@ -175,11 +175,17 @@ def get_history(db: Session, profile: models.UserProfile, history_id: int) -> mo
     return db.query(models.WodHistory).filter_by(id=history_id, profile_id=profile.id).first()
 
 
-def update_history_result(db: Session, entry: models.WodHistory, result: str) -> models.WodHistory:
-    entry.result = result
+def update_history(db: Session, entry: models.WodHistory, data: schemas.HistoryUpdate) -> models.WodHistory:
+    for field, value in data.model_dump(exclude_unset=True).items():
+        setattr(entry, field, value)
     db.commit()
     db.refresh(entry)
     return entry
+
+
+def delete_history(db: Session, entry: models.WodHistory) -> None:
+    db.delete(entry)
+    db.commit()
 
 
 def history_to_read(entry: models.WodHistory) -> schemas.HistoryRead:
@@ -191,4 +197,37 @@ def history_to_read(entry: models.WodHistory) -> schemas.HistoryRead:
         fixed_wod_id=entry.fixed_wod_id,
         wod_json=json.loads(entry.wod_json),
         result=entry.result,
+        note=entry.note,
+        favorite=entry.favorite,
     )
+
+
+# --- Favorites (library bookmarks) ---
+
+
+def list_favorites(db: Session, profile: models.UserProfile) -> list[models.Favorite]:
+    return db.query(models.Favorite).filter_by(profile_id=profile.id).all()
+
+
+def add_favorite(db: Session, profile: models.UserProfile, item_type: str, item_id: int) -> models.Favorite:
+    existing = db.query(models.Favorite).filter_by(
+        profile_id=profile.id, item_type=item_type, item_id=item_id
+    ).first()
+    if existing:
+        return existing
+    favorite = models.Favorite(profile_id=profile.id, item_type=item_type, item_id=item_id)
+    db.add(favorite)
+    db.commit()
+    db.refresh(favorite)
+    return favorite
+
+
+def remove_favorite(db: Session, profile: models.UserProfile, item_type: str, item_id: int) -> bool:
+    favorite = db.query(models.Favorite).filter_by(
+        profile_id=profile.id, item_type=item_type, item_id=item_id
+    ).first()
+    if not favorite:
+        return False
+    db.delete(favorite)
+    db.commit()
+    return True

@@ -78,7 +78,7 @@ EXERCISES = [
     {"name": "Burpee Broad Jump", "muscle_group": "volledig_lichaam", "level": "intermediate", "category": "bodyweight", "requires_gym": False, "is_hyrox": True, "base_movement": "burpee"},
     {"name": "Walking Lunge", "muscle_group": "benen", "level": "beginner", "category": "bodyweight", "requires_gym": False, "is_hyrox": True},
     {"name": "Plank", "muscle_group": "buik", "level": "beginner", "category": "bodyweight", "requires_gym": False},
-    {"name": "Mountain Climbers", "muscle_group": "buik", "level": "beginner", "category": "bodyweight", "requires_gym": False},
+    {"name": "Mountain Climbers", "muscle_group": "buik", "level": "beginner", "category": "bodyweight", "requires_gym": False, "warmup_only": True},
     {"name": "Jumping Jack", "muscle_group": "volledig_lichaam", "level": "beginner", "category": "bodyweight", "requires_gym": False, "warmup_only": True},
     {"name": "Glute Bridge", "muscle_group": "billen", "level": "beginner", "category": "bodyweight", "requires_gym": False},
     {"name": "Superman", "muscle_group": "rug", "level": "beginner", "category": "bodyweight", "requires_gym": False},
@@ -94,7 +94,7 @@ EXERCISES = [
     {"name": "Scapular Push-up", "muscle_group": "schouders", "level": "intermediate", "category": "bodyweight", "requires_gym": False},
     {"name": "Decline Push-up", "muscle_group": "borst", "level": "intermediate", "category": "bodyweight", "requires_gym": False},
     {"name": "Single-Leg Glute Bridge", "muscle_group": "billen", "level": "intermediate", "category": "bodyweight", "requires_gym": False},
-    {"name": "Reverse Snow Angels", "muscle_group": "rug", "level": "intermediate", "category": "bodyweight", "requires_gym": False},
+    {"name": "Reverse Snow Angels", "muscle_group": "rug", "level": "intermediate", "category": "bodyweight", "requires_gym": False, "warmup_only": True},
     {"name": "Hollow Hold", "muscle_group": "buik", "level": "intermediate", "category": "bodyweight", "requires_gym": False},
 
     # --- Extra warming-up-oefeningen (11) - dynamische mobility-moves, incl. elastiek-oefeningen.

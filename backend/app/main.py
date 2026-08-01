@@ -4,7 +4,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.database import Base, engine, ensure_column, session_local
-from app.routers import exercises, history, profiles, wods
+from app.routers import exercises, favorites, history, profiles, wods
 from app.seed.seeder import run_seed
 
 app = FastAPI(title="Open Gym-app API")
@@ -32,6 +32,8 @@ def on_startup():
     ensure_column("exercises", "base_movement", "VARCHAR(50)")
     ensure_column("exercises", "equipment_tag", "VARCHAR(30)")
     ensure_column("exercises", "warmup_only", "BOOLEAN NOT NULL DEFAULT FALSE")
+    ensure_column("wod_history", "note", "TEXT")
+    ensure_column("wod_history", "favorite", "BOOLEAN NOT NULL DEFAULT FALSE")
     db = session_local()
     try:
         run_seed(db)
@@ -48,3 +50,4 @@ app.include_router(exercises.router, prefix="/api/exercises", tags=["exercises"]
 app.include_router(profiles.router, prefix="/api/profiles", tags=["profiles"])
 app.include_router(wods.router, prefix="/api/wods", tags=["wods"])
 app.include_router(history.router, prefix="/api/history", tags=["history"])
+app.include_router(favorites.router, prefix="/api/favorites", tags=["favorites"])

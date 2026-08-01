@@ -43,5 +43,14 @@ def patch_history(user_id: str, history_id: int, data: schemas.HistoryUpdate, db
     entry = crud.get_history(db, profile, history_id)
     if not entry:
         raise HTTPException(404, "Geschiedenis-item niet gevonden")
-    entry = crud.update_history_result(db, entry, data.result)
+    entry = crud.update_history(db, entry, data)
     return crud.history_to_read(entry)
+
+
+@router.delete("/{user_id}/{history_id}", status_code=204)
+def delete_history(user_id: str, history_id: int, db: Session = Depends(get_db)):
+    profile = _get_profile_or_404(db, user_id)
+    entry = crud.get_history(db, profile, history_id)
+    if not entry:
+        raise HTTPException(404, "Geschiedenis-item niet gevonden")
+    crud.delete_history(db, entry)
