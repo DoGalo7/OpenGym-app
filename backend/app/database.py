@@ -1,7 +1,7 @@
 import os
 from pathlib import Path
 
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, inspect, text
 from sqlalchemy.orm import DeclarativeBase, sessionmaker
 
 db_path = Path(__file__).resolve().parent.parent / "open_gym.db"
@@ -31,3 +31,18 @@ def get_db():
         yield db
     finally:
         db.close()
+
+
+def ensure_column(table: str, column: str, ddl_type: str) -> None:
+    """Adds a column to an already-existing table if it's missing, for the rare small schema
+    change that `Base.metadata.create_all()` can't handle (it only creates missing tables, never
+    alters existing ones). There's no migrations framework in this project - this is a deliberately
+    minimal stand-in, safe to call on every startup since it's a no-op once the column exists."""
+    inspector = inspect(engine)
+    if table not in inspector.get_table_names():
+        return  # table doesn't exist yet - create_all() will create it with the column already
+    existing_columns = {c["name"] for c in inspector.get_columns(table)}
+    if column in existing_columns:
+        return
+    with engine.begin() as conn:
+        conn.execute(text(f"ALTER TABLE {table} ADD COLUMN {column} {ddl_type}"))

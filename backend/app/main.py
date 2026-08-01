@@ -3,7 +3,7 @@ import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.database import Base, engine, session_local
+from app.database import Base, engine, ensure_column, session_local
 from app.routers import exercises, history, profiles, wods
 from app.seed.seeder import run_seed
 
@@ -29,6 +29,8 @@ app.add_middleware(
 @app.on_event("startup")
 def on_startup():
     Base.metadata.create_all(bind=engine)
+    ensure_column("exercises", "base_movement", "VARCHAR(50)")
+    ensure_column("exercises", "equipment_tag", "VARCHAR(30)")
     db = session_local()
     try:
         run_seed(db)

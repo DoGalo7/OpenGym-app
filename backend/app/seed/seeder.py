@@ -7,10 +7,23 @@ from app.seed.predefined_wods import PREDEFINED_WODS
 
 
 def run_seed(db: Session) -> None:
-    """Idempotent: only inserts when the table is currently empty. Safe to call on every startup."""
-    if db.query(Exercise).count() == 0:
-        db.add_all(Exercise(**data) for data in EXERCISES)
+    """Idempotent: EXERCISES is the source of truth for exercise metadata - already-seeded rows
+    (matched by name) are kept in sync with it (covers e.g. later re-tagging equipment_tag/
+    requires_gym/base_movement without a full reseed), and any brand-new names are inserted.
+    Safe to call on every startup, including against an already-populated database."""
+    existing_by_name = {e.name: e for e in db.query(Exercise).all()}
+    new_exercises = []
+    for data in EXERCISES:
+        existing = existing_by_name.get(data["name"])
+        if existing:
+            for field, value in data.items():
+                setattr(existing, field, value)
+        else:
+            new_exercises.append(Exercise(**data))
+    if new_exercises:
+        db.add_all(new_exercises)
         db.flush()  # assign ids so predefined-wod seeding below can resolve exercise names
+
     if db.query(FixedWod).count() == 0:
         db.add_all(FixedWod(**data) for data in FIXED_WODS)
     if db.query(PredefinedWod).count() == 0:

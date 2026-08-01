@@ -64,6 +64,9 @@ class WodCategory(str, Enum):
 class HomeEquipment(str, Enum):
     pull_up_bar = "pull_up_bar"
     barbell = "barbell"
+    dumbbell = "dumbbell"
+    kettlebell = "kettlebell"
+    jump_rope = "jump_rope"
     assault_bike = "assault_bike"
     row = "row"
     ski_erg = "ski_erg"

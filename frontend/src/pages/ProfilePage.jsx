@@ -17,6 +17,9 @@ import { useProfile } from "../context/ProfileContext";
 const HOME_EQUIPMENT_OPTIONS = [
   { value: "pull_up_bar", label: "Pull-up bar / rekstok" },
   { value: "barbell", label: "Halterstang + schijven" },
+  { value: "dumbbell", label: "Dumbbells" },
+  { value: "kettlebell", label: "Kettlebell" },
+  { value: "jump_rope", label: "Springtouw" },
   { value: "assault_bike", label: "Airbike" },
   { value: "row", label: "Roeimachine" },
   { value: "ski_erg", label: "Ski erg" },

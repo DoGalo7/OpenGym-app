@@ -34,6 +34,13 @@ class Exercise(Base):
     rx_weight_male_kg: Mapped[float | None] = mapped_column(nullable=True)
     rx_weight_female_kg: Mapped[float | None] = mapped_column(nullable=True)
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
+    # Groups equipment-variants of the same movement (e.g. "farmers_carry" for both DB and KB
+    # Farmers Carry) so the generator picks at most one variant per WOD - never both.
+    base_movement: Mapped[str | None] = mapped_column(String(50), nullable=True)
+    # Specific gear this exercise needs when requires_gym=True (see constants.HomeEquipment),
+    # checked against the profile's owned home_equipment for location=home. None + requires_gym
+    # means gym-only with no home-equipment escape hatch (e.g. a sled).
+    equipment_tag: Mapped[str | None] = mapped_column(String(30), nullable=True)
 
 
 class FixedWod(Base):

@@ -36,9 +36,6 @@ DEFAULT_CARRY_DISTANCE_METERS = 100  # used when no level filter is active
 # applies when the user hasn't explicitly overridden exercise_count themselves.
 DEFAULT_MAX_EXERCISES = 6
 
-# equipment tags (see constants.HomeEquipment) that unlock specific gym-only categories
-# at location=home when the profile lists them as owned.
-HOME_EQUIPMENT_BY_CATEGORY = {"barbell": "barbell", "rack": "pull_up_bar"}
 
 
 class WodGenerationError(Exception):
@@ -221,9 +218,8 @@ def _apply_profile_filters(
         if not home_only or not e.requires_gym:
             return True
         # Owned home equipment (see constants.HomeEquipment) relaxes the plain
-        # bodyweight-only restriction for the specific categories/cardio it unlocks.
-        unlock_tag = HOME_EQUIPMENT_BY_CATEGORY.get(e.category)
-        if unlock_tag and unlock_tag in home_equipment:
+        # bodyweight-only restriction for the specific gear it unlocks.
+        if e.equipment_tag and e.equipment_tag in home_equipment:
             return True
         if e.is_cardio and e.cardio_type in home_equipment:
             return True
@@ -292,9 +288,20 @@ def _select_main_exercises(
                 return random.choice(preferred)
         return random.choice(candidates)
 
+    # base_movement groups equipment-variants of the same movement (e.g. DB/KB Farmers Carry) -
+    # auto-fill never picks a second variant of one already present. An explicit chosen_exercise_id
+    # pick is exempt (same "explicit choice overrides automatic constraints" precedent as injuries).
     used_ids = {e.id for e in chosen}
-    available = [e for e in pool if e.id not in used_ids]
+    used_base_movements = {e.base_movement for e in chosen if e.base_movement}
+    available = [e for e in pool if e.id not in used_ids and e.base_movement not in used_base_movements]
     remaining = max(0, n_slots - len(chosen))
+
+    def _consume(pick: Exercise) -> None:
+        chosen.append(pick)
+        available.remove(pick)
+        if pick.base_movement:
+            used_base_movements.add(pick.base_movement)
+            available[:] = [e for e in available if e.base_movement != pick.base_movement]
 
     covered_groups = {e.muscle_group for e in chosen}
     for group in target_groups:
@@ -306,14 +313,12 @@ def _select_main_exercises(
         if not candidates:
             continue
         pick = _pick(candidates)
-        chosen.append(pick)
-        available.remove(pick)
+        _consume(pick)
         remaining -= 1
 
     while remaining > 0 and available:
         pick = _pick(available)
-        chosen.append(pick)
-        available.remove(pick)
+        _consume(pick)
         remaining -= 1
 
     return chosen
