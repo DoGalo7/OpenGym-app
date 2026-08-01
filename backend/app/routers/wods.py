@@ -3,7 +3,13 @@ from sqlalchemy.orm import Session, joinedload
 
 from app import crud, models, schemas
 from app.database import get_db
-from app.wod_generator import WodGenerationError, build_standalone_warmup, generate_wod, load_predefined_wod
+from app.wod_generator import (
+    WodGenerationError,
+    build_standalone_warmup,
+    build_stretch_wod,
+    generate_wod,
+    load_predefined_wod,
+)
 
 router = APIRouter()
 
@@ -25,6 +31,17 @@ def warmup(data: schemas.WarmupRequest, db: Session = Depends(get_db)):
     if not profile:
         raise HTTPException(404, "Profiel niet gevonden")
     return build_standalone_warmup(db, profile, data)
+
+
+@router.post("/stretch", response_model=schemas.GeneratedWod)
+def stretch(data: schemas.StretchWodRequest, db: Session = Depends(get_db)):
+    profile = crud.get_profile_by_user_id(db, data.user_id)
+    if not profile:
+        raise HTTPException(404, "Profiel niet gevonden")
+    try:
+        return build_stretch_wod(db, profile, data)
+    except WodGenerationError as e:
+        raise HTTPException(400, str(e))
 
 
 @router.get("/fixed", response_model=list[schemas.FixedWodRead])

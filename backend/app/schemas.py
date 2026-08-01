@@ -191,6 +191,17 @@ class WarmupRequest(BaseModel):
     override_injury_muscle_groups: list[MuscleGroup] = []
 
 
+class StretchWodRequest(BaseModel):
+    """Builds a full Stretch/Cooldown-WOD - static holds (duration_seconds) covering the
+    requested muscle groups, instead of the usual reps-based metcon."""
+    user_id: str = Field(min_length=1, max_length=64)
+    muscle_groups: list[MuscleGroup] = Field(min_length=1)
+    location: Location
+    length_minutes: int = Field(ge=5, le=60)
+    temporary_injury_muscle_group: MuscleGroup | None = None
+    override_injury_muscle_groups: list[MuscleGroup] = []
+
+
 class ExerciseInWod(BaseModel):
     exercise_id: int
     name: str

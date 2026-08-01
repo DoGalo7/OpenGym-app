@@ -135,4 +135,18 @@ EXERCISES = [
     # Was requires_gym=False (always available at home) - wrong: not everyone can/wants to run
     # outside from home, so this is now an explicit opt-in like the other cardio machines.
     {"name": "Running", "muscle_group": "cardio", "level": "beginner", "category": "cardio", "requires_gym": True, "is_cardio": True, "cardio_type": "run", "is_hyrox": True},
+
+    # --- Stretching (static holds, used by the Stretch/Cooldown-WOD option, not warmup) ---
+    # level=beginner for all - a static stretch isn't gated by strength level like the rest
+    # of the pool, so this keeps them selectable regardless of the profile's niveau.
+    {"name": "Shoulder Cross-body Stretch", "muscle_group": "schouders", "level": "beginner", "category": "stretching", "requires_gym": False},
+    {"name": "Child's Pose", "muscle_group": "rug", "level": "beginner", "category": "stretching", "requires_gym": False},
+    {"name": "Doorway Chest Stretch", "muscle_group": "borst", "level": "beginner", "category": "stretching", "requires_gym": False},
+    {"name": "Triceps Overhead Stretch", "muscle_group": "armen", "level": "beginner", "category": "stretching", "requires_gym": False},
+    {"name": "Seated Hamstring Stretch", "muscle_group": "benen", "level": "beginner", "category": "stretching", "requires_gym": False},
+    {"name": "Quad Stretch (Staand)", "muscle_group": "benen", "level": "beginner", "category": "stretching", "requires_gym": False},
+    {"name": "Figure-4 Glute Stretch", "muscle_group": "billen", "level": "beginner", "category": "stretching", "requires_gym": False},
+    {"name": "Cobra Stretch", "muscle_group": "buik", "level": "beginner", "category": "stretching", "requires_gym": False},
+    {"name": "Standing Forward Fold", "muscle_group": "volledig_lichaam", "level": "beginner", "category": "stretching", "requires_gym": False},
+    {"name": "Reclined Spinal Twist", "muscle_group": "volledig_lichaam", "level": "beginner", "category": "stretching", "requires_gym": False},
 ]

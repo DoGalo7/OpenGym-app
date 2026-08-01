@@ -34,6 +34,7 @@ class Category(str, Enum):
     bodyweight = "bodyweight"
     cardio = "cardio"
     gymnastics = "gymnastics"
+    stretching = "stretching"
 
 
 class CardioType(str, Enum):

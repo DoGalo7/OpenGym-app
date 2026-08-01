@@ -8,6 +8,10 @@ export function generateWarmup(data) {
   return post("/wods/warmup", data);
 }
 
+export function generateStretchWod(data) {
+  return post("/wods/stretch", data);
+}
+
 export function listFixedWods(wodCategory) {
   const query = wodCategory ? `?wod_category=${wodCategory}` : "";
   return get(`/wods/fixed${query}`);

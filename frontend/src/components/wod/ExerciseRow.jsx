@@ -28,9 +28,15 @@ export default function ExerciseRow({ exercise, sex, onSwap, onFieldChange, read
   const metaParts = [];
   if (exercise.distance_meters) metaParts.push(`${exercise.distance_meters} m`);
   if (exercise.calories) metaParts.push(`${exercise.calories} cal`);
-  if (exercise.duration_seconds) metaParts.push(`${Math.round(exercise.duration_seconds / 60)} min`);
   if (readOnly) {
     if (exercise.reps) metaParts.push(`${exercise.reps} herhalingen`);
+    if (exercise.duration_seconds) {
+      metaParts.push(
+        exercise.duration_seconds < 60
+          ? `${exercise.duration_seconds} sec`
+          : `${Math.round(exercise.duration_seconds / 60)} min`
+      );
+    }
     const weight = weightText(exercise, sex);
     if (weight) metaParts.push(weight);
   }
@@ -51,6 +57,19 @@ export default function ExerciseRow({ exercise, sex, onSwap, onFieldChange, read
                 style={{ width: 52 }}
               />{" "}
               herhalingen
+            </span>
+          )}
+          {!readOnly && exercise.duration_seconds != null && exercise.reps == null && (
+            <span className="inline-edit">
+              <input
+                type="number"
+                min={5}
+                value={exercise.duration_seconds}
+                onChange={(event) => onFieldChange("duration_seconds", Number(event.target.value))}
+                aria-label={`Duur voor ${exercise.name}`}
+                style={{ width: 52 }}
+              />{" "}
+              sec
             </span>
           )}
           {!readOnly && showsWeight && (

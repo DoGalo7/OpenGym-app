@@ -4,7 +4,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { getExercise } from "../api/exercises";
 import { createHistory } from "../api/history";
 import { shareWod } from "../api/sharedWods";
-import { generateWarmup, generateWod } from "../api/wods";
+import { generateStretchWod, generateWarmup, generateWod } from "../api/wods";
 import CategoryPicker from "../components/wod/CategoryPicker";
 import ManualExercisePicker from "../components/wod/ManualExercisePicker";
 import ManualWodBuilder from "../components/wod/ManualWodBuilder";
@@ -18,6 +18,9 @@ import ConfirmModal from "../components/shared/ConfirmModal";
 import Toggle from "../components/shared/Toggle";
 import { useProfile } from "../context/ProfileContext";
 import { useInjuryDisclaimer } from "../hooks/useInjuryDisclaimer";
+
+// Mirrors backend/app/wod_generator.py::STRETCH_HOLD_SECONDS - purely informational text here.
+const STRETCH_HOLD_SECONDS = 40;
 
 const CARDIO_TYPES = [
   { value: "assault_bike", label: "Airbike" },
@@ -89,6 +92,7 @@ export default function GeneratorPage() {
   const [confirmedOverrideGroups, setConfirmedOverrideGroups] = useState([]);
   const [pendingInjuryConflicts, setPendingInjuryConflicts] = useState([]);
   const [showInjuryModal, setShowInjuryModal] = useState(false);
+  const [pendingAction, setPendingAction] = useState("generate");
 
   const [mode, setMode] = useState("generate");
   const [wod, setWod] = useState(null);
@@ -147,26 +151,60 @@ export default function GeneratorPage() {
     }
   };
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    if (!canSubmit) return;
+  const runStretch = async (overrideGroups) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const result = await generateStretchWod({
+        user_id: profile.user_id,
+        muscle_groups: muscleGroups,
+        location,
+        length_minutes: Number(length),
+        temporary_injury_muscle_group: tempInjuryMuscleGroup || undefined,
+        override_injury_muscle_groups: overrideGroups,
+      });
+      setWod(result);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const checkInjuryConflictsThen = (action) => {
     const conflicts = profile.injuries.filter(
       (injury) => injury.affected_muscle_group && muscleGroups.includes(injury.affected_muscle_group)
     );
     if (conflicts.length > 0) {
       setPendingInjuryConflicts(conflicts);
+      setPendingAction(action);
       setShowInjuryModal(true);
-      return;
+      return false;
     }
+    return true;
+  };
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    if (!canSubmit) return;
+    if (!checkInjuryConflictsThen("generate")) return;
     setConfirmedOverrideGroups([]);
     await runGenerate([]);
+  };
+
+  const handleGenerateStretch = async () => {
+    if (muscleGroups.length === 0 || loading) return;
+    if (!checkInjuryConflictsThen("stretch")) return;
+    setConfirmedOverrideGroups([]);
+    await runStretch([]);
   };
 
   const handleConfirmInjuryConflict = async () => {
     const overrideGroups = pendingInjuryConflicts.map((injury) => injury.affected_muscle_group);
     setShowInjuryModal(false);
     setConfirmedOverrideGroups(overrideGroups);
-    await runGenerate(overrideGroups);
+    if (pendingAction === "stretch") await runStretch(overrideGroups);
+    else await runGenerate(overrideGroups);
   };
 
   const handleCancelInjuryConflict = () => {
@@ -272,7 +310,7 @@ export default function GeneratorPage() {
 
   const [addingWarmup, setAddingWarmup] = useState(false);
   const [warmupError, setWarmupError] = useState(null);
-  const hasWarmup = wod?.blocks.some((b) => b.block_type === "warmup");
+  const hasWarmup = wod?.blocks.some((b) => b.block_type === "warmup" || b.training_type === "STRETCH");
 
   const handleAddWarmup = async () => {
     const mainBlock = wod.blocks.find((b) => b.block_type === "main");
@@ -353,7 +391,7 @@ export default function GeneratorPage() {
           </div>
         </div>
 
-        {mode === "generate" && (
+        {(mode === "generate" || mode === "stretch") && (
           <div className="field">
             <label>Spiergroepen</label>
             <MuscleGroupPicker selected={muscleGroups} onChange={setMuscleGroups} />
@@ -376,6 +414,9 @@ export default function GeneratorPage() {
         <button type="button" className={mode === "manual" ? "active" : ""} onClick={() => setMode("manual")}>
           Stel zelf samen
         </button>
+        <button type="button" className={mode === "stretch" ? "active" : ""} onClick={() => setMode("stretch")}>
+          Stretch/Cooldown
+        </button>
       </div>
 
       {mode === "manual" ? (
@@ -386,6 +427,21 @@ export default function GeneratorPage() {
           setTrainingType={setTrainingType}
           onBuild={(built) => setWod(built)}
         />
+      ) : mode === "stretch" ? (
+        <div className="card">
+          <h3>Stretch/Cooldown-WOD</h3>
+          <p className="field-hint" style={{ marginTop: 0 }}>
+            Een reeks rustige stretches ({STRETCH_HOLD_SECONDS} sec per stretch) voor de gekozen
+            spiergroepen. Geen kracht- of conditietraining, alleen mobiliteit en ontspanning.
+          </p>
+          <button type="button" className="btn btn-primary" onClick={handleGenerateStretch} disabled={muscleGroups.length === 0 || loading}>
+            {loading ? "Bezig met samenstellen..." : "Maak stretch-WOD"}
+          </button>
+          {muscleGroups.length === 0 && (
+            <p className="field-hint" style={{ marginTop: 8 }}>Kies minstens één spiergroep om te starten.</p>
+          )}
+          {error && <p className="error-text">{error}</p>}
+        </div>
       ) : (
       <form className="card" onSubmit={handleSubmit}>
         <h3>Workout-opbouw</h3>

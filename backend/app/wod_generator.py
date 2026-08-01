@@ -115,6 +115,77 @@ def build_standalone_warmup(db: Session, profile: UserProfile, request) -> WodBl
     return _build_warmup_block(filtered, pool_groups, request, set(request.exclude_exercise_ids))
 
 
+STRETCH_HOLD_SECONDS = 40
+
+
+def build_stretch_wod(db: Session, profile: UserProfile, request) -> GeneratedWod:
+    """Builds a full Stretch/Cooldown-WOD (see schemas.StretchWodRequest) - a sequence of
+    static holds (category=stretching) covering the requested muscle groups, instead of the
+    usual reps-based metcon block."""
+    all_exercises = db.query(Exercise).all()
+    filtered = _apply_profile_filters(all_exercises, profile, request)
+    target_groups = {mg.value for mg in request.muscle_groups}
+    pool_groups = ALL_MUSCLE_GROUPS if target_groups == {"volledig_lichaam"} else target_groups
+
+    pool = [e for e in filtered if e.category == "stretching" and e.muscle_group in pool_groups]
+    if not pool:
+        raise WodGenerationError(
+            "Geen stretch-oefeningen gevonden voor deze spiergroepen. Probeer een andere combinatie."
+        )
+
+    n_stretches = max(2, min(len(pool), request.length_minutes * 60 // STRETCH_HOLD_SECONDS))
+
+    chosen: list[Exercise] = []
+    available = list(pool)
+    shuffled_groups = list(pool_groups)
+    random.shuffle(shuffled_groups)
+    for group in shuffled_groups:
+        if len(chosen) >= n_stretches:
+            break
+        candidates = [e for e in available if e.muscle_group == group]
+        if not candidates:
+            continue
+        pick = random.choice(candidates)
+        chosen.append(pick)
+        available.remove(pick)
+    while len(chosen) < n_stretches and available:
+        pick = random.choice(available)
+        chosen.append(pick)
+        available.remove(pick)
+
+    exercises = [
+        ExerciseInWod(
+            exercise_id=e.id,
+            name=e.name,
+            muscle_group=e.muscle_group,
+            category=e.category,
+            duration_seconds=STRETCH_HOLD_SECONDS,
+            alternatives=_alternatives_for(e, pool, {c.id for c in chosen}),
+        )
+        for e in chosen
+    ]
+
+    total_minutes = max(request.length_minutes, round(len(exercises) * STRETCH_HOLD_SECONDS / 60))
+    main_block = WodBlock(
+        block_type="main",
+        training_type="STRETCH",
+        duration_minutes=total_minutes,
+        rounds=1,
+        interval_seconds=STRETCH_HOLD_SECONDS,
+        rep_scheme="flat",
+        exercises=exercises,
+    )
+
+    return GeneratedWod(
+        profile_id=profile.id,
+        location=request.location.value,
+        level_used=None,
+        total_duration_minutes=total_minutes,
+        blocks=[main_block],
+        generated_at=datetime.datetime.utcnow(),
+    )
+
+
 def generate_wod(db: Session, profile: UserProfile, request: WodGenerateRequest) -> GeneratedWod:
     all_exercises = db.query(Exercise).all()
     filtered = _apply_profile_filters(all_exercises, profile, request)
