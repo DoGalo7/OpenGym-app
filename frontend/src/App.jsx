@@ -4,6 +4,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import NavBar from "./components/layout/NavBar";
 import PageContainer from "./components/layout/PageContainer";
 import { ProfileProvider, useProfile } from "./context/ProfileContext";
+import AdminExercisesPage from "./pages/AdminExercisesPage";
 import FixedWodDetailPage from "./pages/FixedWodDetailPage";
 import GeneratorPage from "./pages/GeneratorPage";
 import HistoryPage from "./pages/HistoryPage";
@@ -76,6 +77,7 @@ function AppContent() {
           <Route path="/vaste-wods/:id" element={<FixedWodDetailPage key={profile.user_id} />} />
           <Route path="/workout-ideeen" element={<PredefinedWodsPage key={profile.user_id} />} />
           <Route path="/geschiedenis" element={<HistoryPage key={profile.user_id} />} />
+          <Route path="/admin/oefeningen" element={<AdminExercisesPage />} />
         </Routes>
       </PageContainer>
       <NavBar />

@@ -29,6 +29,43 @@ class ExerciseRead(ExerciseSummary):
     description: str | None
     equipment_tag: str | None
     warmup_only: bool
+    base_movement: str | None = None
+
+
+class ExerciseAdminCreate(BaseModel):
+    """Full editable exercise shape for the (unauthenticated, not linked from the app's
+    navigation - see routers/admin_exercises.py) admin page."""
+    name: str = Field(min_length=1, max_length=120)
+    muscle_group: MuscleGroup
+    level: Level
+    category: Category
+    requires_gym: bool = False
+    equipment_tag: str | None = None
+    is_cardio: bool = False
+    cardio_type: CardioType | None = None
+    is_hyrox: bool = False
+    rx_weight_male_kg: float | None = None
+    rx_weight_female_kg: float | None = None
+    description: str | None = None
+    base_movement: str | None = None
+    warmup_only: bool = False
+
+
+class ExerciseAdminUpdate(BaseModel):
+    name: str | None = Field(default=None, min_length=1, max_length=120)
+    muscle_group: MuscleGroup | None = None
+    level: Level | None = None
+    category: Category | None = None
+    requires_gym: bool | None = None
+    equipment_tag: str | None = None
+    is_cardio: bool | None = None
+    cardio_type: CardioType | None = None
+    is_hyrox: bool | None = None
+    rx_weight_male_kg: float | None = None
+    rx_weight_female_kg: float | None = None
+    description: str | None = None
+    base_movement: str | None = None
+    warmup_only: bool | None = None
 
 
 # --- Fixed WODs ---

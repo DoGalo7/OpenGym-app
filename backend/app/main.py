@@ -4,7 +4,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.database import Base, engine, ensure_column, session_local
-from app.routers import exercises, favorites, history, profiles, shared_wods, wods
+from app.routers import admin_exercises, exercises, favorites, history, profiles, shared_wods, wods
 from app.seed.seeder import run_seed
 
 app = FastAPI(title="Open Gym-app API")
@@ -54,3 +54,4 @@ app.include_router(wods.router, prefix="/api/wods", tags=["wods"])
 app.include_router(history.router, prefix="/api/history", tags=["history"])
 app.include_router(favorites.router, prefix="/api/favorites", tags=["favorites"])
 app.include_router(shared_wods.router, prefix="/api/shared-wods", tags=["shared-wods"])
+app.include_router(admin_exercises.router, prefix="/api/admin/exercises", tags=["admin"])
