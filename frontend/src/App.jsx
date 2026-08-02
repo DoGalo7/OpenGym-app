@@ -8,6 +8,7 @@ import ConfirmModal from "./components/shared/ConfirmModal";
 import { ProfileProvider, useProfile } from "./context/ProfileContext";
 import AdminChangelogPage from "./pages/AdminChangelogPage";
 import AdminExercisesPage from "./pages/AdminExercisesPage";
+import AdminUsersPage from "./pages/AdminUsersPage";
 import FixedWodDetailPage from "./pages/FixedWodDetailPage";
 import GeneratorPage from "./pages/GeneratorPage";
 import HistoryPage from "./pages/HistoryPage";
@@ -191,6 +192,7 @@ function AppContent() {
           <Route path="/workout-ideeen" element={<PredefinedWodsPage key={profile.user_id} />} />
           <Route path="/geschiedenis" element={<HistoryPage key={profile.user_id} />} />
           <Route path="/admin/oefeningen" element={<AdminExercisesPage />} />
+          <Route path="/admin/gebruikers" element={<AdminUsersPage />} />
           <Route path="/admin/rapport" element={<AdminChangelogPage />} />
           <Route path="/rapport" element={<PerformanceReportPage key={profile.user_id} />} />
         </Routes>

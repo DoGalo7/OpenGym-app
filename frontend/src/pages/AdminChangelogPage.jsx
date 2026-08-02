@@ -55,7 +55,8 @@ const SECTIONS = [
   {
     title: "Beheer (deze pagina's, niet gekoppeld aan het hoofdmenu)",
     items: [
-      "Oefeningen beheren: zoeken, bewerken, toevoegen en verwijderen van elke oefening in de database (dit rapport).",
+      "Oefeningen beheren (/admin/oefeningen): zoeken, bewerken, toevoegen en verwijderen van elke oefening in de database.",
+      "Gebruikers-overzicht (/admin/gebruikers): alle aangemelde profielen, met aanmelddatum, niveau, aantal gelogde workouts en laatste workout - alleen leesbaar, geen wachtwoorden of andere gevoelige data zichtbaar.",
       "Wijzigingen hier zijn direct zichtbaar voor alle sporters - er is geen aparte test-/productieomgeving voor data.",
     ],
   },

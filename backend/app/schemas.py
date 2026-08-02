@@ -174,6 +174,21 @@ class ProfileRead(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
+class AdminUserSummary(BaseModel):
+    """/api/admin/users - deliberately excludes password_hash/recovery_code_hash (even
+    hashed, they have no reason to leave the database) and other profile detail
+    (injuries/exclusions/etc.) not relevant to a signup overview."""
+    id: int
+    user_id: str
+    name: str
+    level: str | None
+    default_location: str
+    created_at: datetime
+    has_password: bool
+    workout_count: int
+    last_workout_at: datetime | None
+
+
 class ExcludedExerciseAdd(BaseModel):
     exercise_id: int
 
