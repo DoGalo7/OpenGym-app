@@ -74,6 +74,10 @@ class PredefinedWod(Base):
     # derive their shape from training_type + duration_minutes instead (see wod_generator).
     rounds_override: Mapped[str | None] = mapped_column(String(20), nullable=True)
     rep_scheme_override: Mapped[str | None] = mapped_column(String(60), nullable=True)
+    # True for a partner/Buddy WOD (I-Go-You-Go, split-reps or synchro format - the exact
+    # format is explained in `description`). The movements/reps listed are the workout's
+    # total; the description tells the two partners how to divide it.
+    is_buddy: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
 
     movements: Mapped[list["PredefinedWodMovement"]] = relationship(
         back_populates="predefined_wod", cascade="all, delete-orphan",

@@ -70,6 +70,22 @@ PREDEFINED_WODS = [
             {"exercise_name": "Running", "distance_meters": 200},
         ],
     },
+    # --- Buddy WOD (1, AMRAP) - I-Go-You-Go format: one partner works a full round while
+    # the other rests, then switches. See the FOR_TIME/EMOM sections below for the other two
+    # partner formats (split-reps, synchro). is_buddy=True surfaces the "Buddy WOD"-filter/tag.
+    {
+        "name": "I-Go-You-Go Sprint",
+        "training_type": "AMRAP",
+        "description": "I-Go-You-Go: partner A doet 1 ronde, dan rust terwijl partner B dezelfde ronde doet. Wissel na elke ronde - samen zoveel mogelijk ronden in de tijd.",
+        "duration_minutes": 20,
+        "level": "intermediate",
+        "is_buddy": True,
+        "movements": [
+            {"exercise_name": "KB Swing American", "reps": 12},
+            {"exercise_name": "Push-up", "reps": 10},
+            {"exercise_name": "Air Squat", "reps": 15},
+        ],
+    },
     # --- Long Hyrox-style AMRAPs (10) - user-supplied, 45 min multi-station chippers.
     # A few movements without a direct equivalent are substituted with the closest existing
     # exercise: Sandbag Carry -> DB/KB Farmers Carry (documented stand-in, see exercises.py),
@@ -298,6 +314,19 @@ PREDEFINED_WODS = [
             {"exercise_name": "Running", "distance_meters": 200},
         ],
     },
+    # --- Buddy WOD (1, EMOM) - alternating-minute format, the EMOM equivalent of I-Go-You-Go.
+    {
+        "name": "Buddy EMOM Engine",
+        "training_type": "EMOM",
+        "description": "EMOM om en om: in de oneven minuten werkt partner A, in de even minuten partner B - ieder je eigen oefening, samen 1 blok.",
+        "duration_minutes": 16,
+        "level": "intermediate",
+        "is_buddy": True,
+        "movements": [
+            {"exercise_name": "DB Thruster", "reps": 10},
+            {"exercise_name": "KB Swing Russian", "reps": 12},
+        ],
+    },
     # --- TABATA ---
     {
         "name": "Tabata Classics",
@@ -431,6 +460,39 @@ PREDEFINED_WODS = [
         "movements": [
             {"exercise_name": "DB Snatch", "reps": 10},
             {"exercise_name": "Box Jump", "reps": 10},
+        ],
+    },
+    # --- Buddy WODs (2, FOR_TIME) - split-reps and synchro, the other two partner formats
+    # (see "I-Go-You-Go Sprint" above for the alternating one).
+    {
+        "name": "Buddy Chipper",
+        "training_type": "FOR_TIME",
+        "description": "Partner-chipper: verdeel de reps onderling zoals jullie willen, samen optellen tot het totaal hieronder. Ideaal om samen met een buddy te doen.",
+        "duration_minutes": 25,
+        "level": "intermediate",
+        "rounds_override": "1",
+        "rep_scheme_override": "aflopend, samen verdelen",
+        "is_buddy": True,
+        "movements": [
+            {"exercise_name": "KB Swing Russian", "reps": 80},
+            {"exercise_name": "Box Jump", "reps": 60},
+            {"exercise_name": "Wall Ball Shot", "reps": 50},
+            {"exercise_name": "Burpee", "reps": 40},
+            {"exercise_name": "Sit-up", "reps": 30},
+        ],
+    },
+    {
+        "name": "Synchro Squat & Row",
+        "training_type": "FOR_TIME",
+        "description": "Synchro: voer de kniebuigingen tegelijk met je buddy uit - een rep telt pas als jullie gelijk zijn. Bij het roeien wissel je om de beurt af.",
+        "duration_minutes": 20,
+        "level": "advanced",
+        "rounds_override": "3",
+        "rep_scheme_override": "synchro krachtdeel + afwisselend cardio",
+        "is_buddy": True,
+        "movements": [
+            {"exercise_name": "Goblet Squat", "reps": 15},
+            {"exercise_name": "Row", "distance_meters": 250},
         ],
     },
 ]

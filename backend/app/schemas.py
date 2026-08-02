@@ -109,6 +109,9 @@ class PredefinedWodSummary(BaseModel):
     # (it's fully derivable from the movements already loaded here). See routers/wods.py
     # for why 70% and not "any"/"majority".
     is_hyrox: bool = False
+    # Direct passthrough of PredefinedWod.is_buddy (not derived, unlike home_friendly/is_hyrox
+    # above) - a partner-WOD format isn't something the movement list alone tells you.
+    is_buddy: bool = False
 
 
 # --- Injuries ---

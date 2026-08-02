@@ -35,6 +35,7 @@ function toPredefinedItem(w) {
     lines: w.movements.map(formatMovement),
     homeFriendly: w.home_friendly,
     isHyrox: w.is_hyrox,
+    isBuddy: w.is_buddy,
   };
 }
 
@@ -73,6 +74,7 @@ export default function PredefinedWodsPage() {
   const [category, setCategory] = useState("");
   const [homeOnly, setHomeOnly] = useState(false);
   const [hyroxOnly, setHyroxOnly] = useState(false);
+  const [buddyOnly, setBuddyOnly] = useState(false);
   const [items, setItems] = useState([]);
   const [favoriteKeys, setFavoriteKeys] = useState(new Set());
   const [error, setError] = useState(null);
@@ -155,7 +157,7 @@ export default function PredefinedWodsPage() {
   };
 
   const filteredItems = items.filter(
-    (item) => (!homeOnly || item.homeFriendly) && (!hyroxOnly || item.isHyrox)
+    (item) => (!homeOnly || item.homeFriendly) && (!hyroxOnly || item.isHyrox) && (!buddyOnly || item.isBuddy)
   );
 
   return (
@@ -194,6 +196,13 @@ export default function PredefinedWodsPage() {
           onClick={() => setHyroxOnly((v) => !v)}
         >
           🔥 Hyrox-stijl
+        </button>
+        <button
+          type="button"
+          className={`chip${buddyOnly ? " active" : ""}`}
+          onClick={() => setBuddyOnly((v) => !v)}
+        >
+          🤝 Buddy WOD
         </button>
       </div>
 
@@ -237,6 +246,11 @@ export default function PredefinedWodsPage() {
               {item.homeFriendly && (
                 <span className="badge" style={{ marginLeft: 6, background: "var(--color-primary)", color: "#fff" }}>
                   🏠 Ook thuis
+                </span>
+              )}
+              {item.isBuddy && (
+                <span className="badge" style={{ marginLeft: 6, background: "var(--color-secondary)", color: "#fff" }}>
+                  🤝 Buddy WOD
                 </span>
               )}
               {" · "}

@@ -48,6 +48,7 @@ def run_seed(db: Session) -> None:
             wod.level = entry["level"]
             wod.rounds_override = entry.get("rounds_override")
             wod.rep_scheme_override = entry.get("rep_scheme_override")
+            wod.is_buddy = entry.get("is_buddy", False)
             db.query(PredefinedWodMovement).filter_by(predefined_wod_id=wod.id).delete()
         else:
             wod = PredefinedWod(
@@ -58,6 +59,7 @@ def run_seed(db: Session) -> None:
                 level=entry["level"],
                 rounds_override=entry.get("rounds_override"),
                 rep_scheme_override=entry.get("rep_scheme_override"),
+                is_buddy=entry.get("is_buddy", False),
             )
             db.add(wod)
         db.flush()  # assign/confirm wod.id for the movements below

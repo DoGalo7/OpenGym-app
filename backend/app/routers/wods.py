@@ -95,6 +95,7 @@ def list_predefined_wods(training_type: str | None = None, db: Session = Depends
             # is_hyrox=True as *generic* Hyrox-adjacent moves) don't get mistagged, while every
             # WOD from the dedicated Hyrox-style seeding batch still qualifies.
             is_hyrox=bool(w.movements) and sum(1 for m in w.movements if m.exercise.is_hyrox) >= len(w.movements) * 0.7,
+            is_buddy=w.is_buddy,
         )
         for w in wods
     ]

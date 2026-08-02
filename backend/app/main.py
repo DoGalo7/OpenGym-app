@@ -36,6 +36,7 @@ def on_startup():
     ensure_column("wod_history", "favorite", "BOOLEAN NOT NULL DEFAULT FALSE")
     ensure_column("injuries", "condition_key", "VARCHAR(50)")
     ensure_column("user_profiles", "password_hash", "VARCHAR(160)")
+    ensure_column("predefined_wods", "is_buddy", "BOOLEAN NOT NULL DEFAULT FALSE")
     db = session_local()
     try:
         run_seed(db)
