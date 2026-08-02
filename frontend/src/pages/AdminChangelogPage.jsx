@@ -9,9 +9,11 @@ const SECTIONS = [
       "Stretch & Core: bouwt een reeks rustige stretches én core-stabiliteitsoefeningen (plank, dead bug, bird dog, glute bridge hold - elk 40 sec, aanpasbaar) voor de gekozen spiergroepen - geen kracht- of conditietraining.",
       "Elke oefening heeft een wisselknop (alternatief van dezelfde spiergroep/categorie), volgorde-knoppen (▲▼) om te herschikken, en een uitleg-link (YouTube-zoekopdracht).",
       "Duur per blok en reps/gewicht/seconden per oefening zijn achteraf nog aan te passen, ook nadat de WOD is gemaakt.",
-      "Losse \"+ Warming-up toevoegen\"-knop als een workout er nog geen heeft.",
+      "Losse \"+ Warming-up toevoegen\"-knop als een workout er nog geen heeft, en daarna nog een losse \"+ Oefening toevoegen\"-knop om er stuk voor stuk nog eentje bij te doen (standaard begint een warming-up met 3 oefeningen).",
+      "\"In het kort\"-kaart bovenaan een gemaakte WOD toont in één oogopslag alle blokken en oefeningen, zonder te hoeven scrollen door de volledige (bewerkbare) lijst.",
       "\"Start workout\"-knop (onder de oefeningenlijst) opent een timer die meetelt/aftelt passend bij het type training, met piepjes bij rondewissels (AMRAP/EMOM/Tabata/Stretch & Core/For Time) en een schermvergrendeling-blocker zolang hij loopt.",
-      "\"Delen met andere sporters\"-knop zet een gemaakte WOD onder Ideeën, zichtbaar voor iedereen.",
+      "\"Deel via WhatsApp\"-knop stuurt een tekstsamenvatting van de workout naar WhatsApp om te versturen.",
+      "\"Delen met andere sporters\"-knop zet een gemaakte WOD onder Ideeën; kies \"Iedereen\" (zichtbaar voor alle sporters) of stuur hem rechtstreeks naar één geaccepteerde vriend(in) (alleen die persoon ziet hem dan bij Ideeën, gemarkeerd met 🎁 Voor jou).",
     ],
   },
   {
@@ -39,8 +41,9 @@ const SECTIONS = [
   {
     title: "Ideeën",
     items: [
-      "Categorieën: AMRAP, EMOM, Tabata, Anders, Benchmark (vaste WOD's zoals Murph en de Girls-WOD's), Gedeeld door sporters, Mijn favorieten.",
+      "Categorieën: AMRAP, EMOM, Tabata, Anders, Benchmark (vaste WOD's zoals Murph en de Girls-WOD's), Gedeeld door sporters, Mijn favorieten. Categorie- en filterknoppen blijven vastgezet bovenaan zichtbaar tijdens het scrollen.",
       "Elke kaart toont in één oogopslag type, duur/niveau en de oefeningen. Hartje om te bewaren als favoriet.",
+      "Gedeeld door sporters bevat zowel workouts die voor iedereen gedeeld zijn als workouts die een vriend(in) rechtstreeks naar jou heeft gestuurd (herkenbaar aan 🎁 Voor jou) - die laatste zie alleen jij.",
       "Een idee laden vult WOD maken automatisch in, met tijd/spiergroepen aanpasbaar; bij Benchmark zie je de vaste workout-structuur.",
     ],
   },
