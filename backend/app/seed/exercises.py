@@ -1,4 +1,4 @@
-# Curated starter dataset (~141 exercises). Not sourced online - see sync.py for why.
+# Curated starter dataset (~144 exercises). Not sourced online - see sync.py for why.
 # `is_hyrox` tags exercises that fit Hyrox-style training - the official 8 race stations
 # (SkiErg, Sled Push, Sled Pull, Burpee Broad Jumps, Row, Farmers Carry, Sandbag Lunges,
 # Wall Balls, each after a 1km run) plus movements that commonly appear in Hyrox-style gym
@@ -87,6 +87,11 @@ EXERCISES = [
     {"name": "Knees-to-Elbow", "muscle_group": "buik", "level": "intermediate", "category": "rack", "requires_gym": True, "equipment_tag": "pull_up_bar"},
 
     # --- Bodyweight (10, requires_gym=False, no weight) ---
+    # warmup_only was audited across the whole file (2026-08-02): Arm Circles/Wall Angels/
+    # Scapular Push-up below were missing it - pure mobility/activation drills with no real
+    # rep-scored-WOD tradition, unlike e.g. Superman/Bird Dog/Glute Bridge/Plank which are
+    # dual-purpose (also seen as light scaled main-block movements) and were deliberately left
+    # as main-pool-eligible to avoid re-thinning the schouders/rug home pools fixed earlier.
     {"name": "Air Squat", "muscle_group": "benen", "level": "beginner", "category": "bodyweight", "requires_gym": False, "is_hyrox": True},
     {"name": "Push-up", "muscle_group": "borst", "level": "beginner", "category": "bodyweight", "requires_gym": False, "is_hyrox": True},
     {"name": "Sit-up", "muscle_group": "buik", "level": "beginner", "category": "bodyweight", "requires_gym": False},
@@ -99,15 +104,15 @@ EXERCISES = [
     {"name": "Glute Bridge", "muscle_group": "billen", "level": "beginner", "category": "bodyweight", "requires_gym": False},
     {"name": "Superman", "muscle_group": "rug", "level": "beginner", "category": "bodyweight", "requires_gym": False},
     {"name": "Shoulder Taps", "muscle_group": "schouders", "level": "beginner", "category": "bodyweight", "requires_gym": False},
-    {"name": "Arm Circles", "muscle_group": "schouders", "level": "beginner", "category": "bodyweight", "requires_gym": False},
+    {"name": "Arm Circles", "muscle_group": "schouders", "level": "beginner", "category": "bodyweight", "requires_gym": False, "warmup_only": True},
     {"name": "Pike Push-up", "muscle_group": "schouders", "level": "intermediate", "category": "bodyweight", "requires_gym": False},
     {"name": "Tricep Dips", "muscle_group": "armen", "level": "beginner", "category": "bodyweight", "requires_gym": False},
     {"name": "Diamond Push-up", "muscle_group": "armen", "level": "intermediate", "category": "bodyweight", "requires_gym": False},
     {"name": "Bird Dog", "muscle_group": "rug", "level": "beginner", "category": "bodyweight", "requires_gym": False},
     {"name": "Fire Hydrants", "muscle_group": "billen", "level": "beginner", "category": "bodyweight", "requires_gym": False},
     {"name": "Incline Push-up", "muscle_group": "borst", "level": "beginner", "category": "bodyweight", "requires_gym": False},
-    {"name": "Wall Angels", "muscle_group": "schouders", "level": "beginner", "category": "bodyweight", "requires_gym": False},
-    {"name": "Scapular Push-up", "muscle_group": "schouders", "level": "intermediate", "category": "bodyweight", "requires_gym": False},
+    {"name": "Wall Angels", "muscle_group": "schouders", "level": "beginner", "category": "bodyweight", "requires_gym": False, "warmup_only": True},
+    {"name": "Scapular Push-up", "muscle_group": "schouders", "level": "intermediate", "category": "bodyweight", "requires_gym": False, "warmup_only": True},
     {"name": "Decline Push-up", "muscle_group": "borst", "level": "intermediate", "category": "bodyweight", "requires_gym": False},
     {"name": "Single-Leg Glute Bridge", "muscle_group": "billen", "level": "intermediate", "category": "bodyweight", "requires_gym": False},
     {"name": "Reverse Snow Angels", "muscle_group": "rug", "level": "intermediate", "category": "bodyweight", "requires_gym": False, "warmup_only": True},
@@ -131,6 +136,12 @@ EXERCISES = [
     {"name": "Curtsy Lunge", "muscle_group": "billen", "level": "intermediate", "category": "bodyweight", "requires_gym": False},
     {"name": "Wide Push-up", "muscle_group": "borst", "level": "beginner", "category": "bodyweight", "requires_gym": False},
     {"name": "Archer Push-up", "muscle_group": "borst", "level": "advanced", "category": "bodyweight", "requires_gym": False},
+    # Compensates the thuis+schouders pool after reclassifying Arm Circles/Wall Angels/
+    # Scapular Push-up as warmup_only above - both are legitimate scored isometric holds
+    # (not pure mobility drills), so they're a fair main-pool replacement, not a workaround.
+    {"name": "Pike Hold", "muscle_group": "schouders", "level": "beginner", "category": "bodyweight", "requires_gym": False},
+    {"name": "Plank Walkout", "muscle_group": "schouders", "level": "beginner", "category": "bodyweight", "requires_gym": False},
+    {"name": "Wall Handstand Hold", "muscle_group": "schouders", "level": "intermediate", "category": "bodyweight", "requires_gym": False},
 
     # --- Extra warming-up-oefeningen (11) - dynamische mobility-moves, incl. elastiek-oefeningen.
     # Meerdere zijn getagd als "volledig_lichaam" (i.p.v. een specifieke spiergroep) omdat dat de
