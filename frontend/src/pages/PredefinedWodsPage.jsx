@@ -62,9 +62,12 @@ function toSharedItem(w) {
     id: w.id,
     name: w.name,
     badgeLabel: w.training_type === "FOR_TIME" ? "Anders" : w.training_type,
-    meta: `${w.duration_minutes} min · Gedeeld door ${w.shared_by_name}`,
+    meta: w.recipient_name
+      ? `${w.duration_minutes} min · Naar jou gestuurd door ${w.shared_by_name}`
+      : `${w.duration_minutes} min · Gedeeld door ${w.shared_by_name}`,
     description: "",
     lines: w.movements.map(formatMovement),
+    isDirect: Boolean(w.recipient_name),
   };
 }
 
@@ -91,16 +94,16 @@ export default function PredefinedWodsPage() {
     if (category === "BENCHMARK") {
       listFixedWods().then((data) => setItems(data.map(toFixedItem))).catch((err) => setError(err.message));
     } else if (category === "SHARED") {
-      listSharedWods().then((data) => setItems(data.map(toSharedItem))).catch((err) => setError(err.message));
+      listSharedWods(profile.user_id).then((data) => setItems(data.map(toSharedItem))).catch((err) => setError(err.message));
     } else if (category === "FAVORIETEN") {
-      Promise.all([listPredefinedWods(), listFixedWods(), listSharedWods()])
+      Promise.all([listPredefinedWods(), listFixedWods(), listSharedWods(profile.user_id)])
         .then(([predefined, fixed, shared]) => {
           const all = [...predefined.map(toPredefinedItem), ...fixed.map(toFixedItem), ...shared.map(toSharedItem)];
           setItems(all.filter((item) => favoriteKeys.has(`${itemTypeFor(item)}:${item.id}`)));
         })
         .catch((err) => setError(err.message));
     } else if (category === "") {
-      Promise.all([listPredefinedWods(), listFixedWods(), listSharedWods()])
+      Promise.all([listPredefinedWods(), listFixedWods(), listSharedWods(profile.user_id)])
         .then(([predefined, fixed, shared]) =>
           setItems([...predefined.map(toPredefinedItem), ...fixed.map(toFixedItem), ...shared.map(toSharedItem)])
         )
@@ -246,6 +249,11 @@ export default function PredefinedWodsPage() {
               {item.isBuddy && (
                 <span className="badge" style={{ marginLeft: 6, background: "var(--color-secondary)", color: "#fff" }}>
                   🤝 Buddy WOD
+                </span>
+              )}
+              {item.isDirect && (
+                <span className="badge" style={{ marginLeft: 6, background: "var(--color-secondary)", color: "#fff" }}>
+                  🎁 Voor jou
                 </span>
               )}
               {" · "}

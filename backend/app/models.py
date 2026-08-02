@@ -235,7 +235,8 @@ class WodHistory(Base):
 
 class SharedWod(Base):
     """A generated or manually-built WOD a user chose to share - shows up for every sporter
-    under Ideeën, category "Gedeeld door andere sporters"."""
+    under Ideeën, category "Gedeeld door andere sporters". When recipient_profile_id is set,
+    it's a direct share instead: only visible to that one friend, not to every sporter."""
     __tablename__ = "shared_wods"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
@@ -248,8 +249,12 @@ class SharedWod(Base):
     shared_at: Mapped[datetime.datetime] = mapped_column(
         DateTime, default=datetime.datetime.utcnow, nullable=False
     )
+    recipient_profile_id: Mapped[int | None] = mapped_column(
+        ForeignKey("user_profiles.id"), nullable=True
+    )
 
-    profile: Mapped["UserProfile"] = relationship()
+    profile: Mapped["UserProfile"] = relationship(foreign_keys=[profile_id])
+    recipient: Mapped["UserProfile | None"] = relationship(foreign_keys=[recipient_profile_id])
 
 
 class Favorite(Base):

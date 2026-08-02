@@ -347,6 +347,8 @@ class SharedWodCreate(BaseModel):
     user_id: str = Field(min_length=1, max_length=64)
     name: str = Field(min_length=1, max_length=120)
     wod: GeneratedWod
+    # when set, only this friend sees the shared WOD instead of every sporter
+    recipient_user_id: str | None = Field(default=None, max_length=64)
 
 
 class SharedWodSummary(BaseModel):
@@ -356,6 +358,7 @@ class SharedWodSummary(BaseModel):
     duration_minutes: int
     shared_by_name: str
     movements: list[PredefinedWodMovementSummary]
+    recipient_name: str | None = None
 
 
 # --- History ---

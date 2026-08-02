@@ -1,11 +1,11 @@
 import { get, post } from "./client";
 
-export function listSharedWods() {
-  return get("/shared-wods");
+export function listSharedWods(userId) {
+  return get(`/shared-wods${userId ? `?user_id=${encodeURIComponent(userId)}` : ""}`);
 }
 
-export function shareWod(userId, name, wod) {
-  return post("/shared-wods", { user_id: userId, name, wod });
+export function shareWod(userId, name, wod, recipientUserId) {
+  return post("/shared-wods", { user_id: userId, name, wod, recipient_user_id: recipientUserId || undefined });
 }
 
 export function loadSharedWod(id, userId) {

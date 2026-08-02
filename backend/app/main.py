@@ -44,6 +44,7 @@ def on_startup():
     ensure_column("fixed_wods", "duration_minutes", "INTEGER NOT NULL DEFAULT 20")
     ensure_column("fixed_wods", "rounds_override", "VARCHAR(20)")
     ensure_column("fixed_wods", "rep_scheme_override", "VARCHAR(60)")
+    ensure_column("shared_wods", "recipient_profile_id", "INTEGER")
     db = session_local()
     try:
         run_seed(db)

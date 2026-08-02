@@ -360,6 +360,7 @@ def _shared_wod_to_summary(db: Session, row: models.SharedWod) -> schemas.Shared
     wod = json.loads(row.wod_json)
     main_block = next((b for b in wod["blocks"] if b["block_type"] == "main"), wod["blocks"][0])
     sharer = db.get(models.UserProfile, row.profile_id)
+    recipient = db.get(models.UserProfile, row.recipient_profile_id) if row.recipient_profile_id else None
     return schemas.SharedWodSummary(
         id=row.id,
         name=row.name,
@@ -375,17 +376,25 @@ def _shared_wod_to_summary(db: Session, row: models.SharedWod) -> schemas.Shared
             )
             for e in main_block["exercises"]
         ],
+        recipient_name=recipient.name if recipient else None,
     )
 
 
 def create_shared_wod(db: Session, profile: models.UserProfile, data: schemas.SharedWodCreate) -> schemas.SharedWodSummary:
     main_block = next((b for b in data.wod.blocks if b.block_type == "main"), data.wod.blocks[0])
+    recipient_profile_id = None
+    if data.recipient_user_id:
+        recipient = get_profile_by_user_id(db, data.recipient_user_id)
+        if not recipient:
+            raise ValueError("Vriend niet gevonden")
+        recipient_profile_id = recipient.id
     shared = models.SharedWod(
         profile_id=profile.id,
         name=data.name,
         training_type=main_block.training_type or "AMRAP",
         duration_minutes=data.wod.total_duration_minutes,
         wod_json=data.wod.model_dump_json(),
+        recipient_profile_id=recipient_profile_id,
     )
     db.add(shared)
     db.commit()
@@ -393,9 +402,13 @@ def create_shared_wod(db: Session, profile: models.UserProfile, data: schemas.Sh
     return _shared_wod_to_summary(db, shared)
 
 
-def list_shared_wods(db: Session) -> list[schemas.SharedWodSummary]:
+def list_shared_wods(db: Session, viewer_profile_id: int | None = None) -> list[schemas.SharedWodSummary]:
     rows = db.query(models.SharedWod).order_by(models.SharedWod.shared_at.desc()).all()
-    return [_shared_wod_to_summary(db, row) for row in rows]
+    visible = [
+        row for row in rows
+        if row.recipient_profile_id is None or row.recipient_profile_id == viewer_profile_id
+    ]
+    return [_shared_wod_to_summary(db, row) for row in visible]
 
 
 def get_shared_wod(db: Session, shared_wod_id: int) -> models.SharedWod | None:

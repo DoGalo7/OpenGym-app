@@ -413,7 +413,30 @@ export default function GeneratorPage() {
   const handleSaveResult = (result) =>
     createHistory({ user_id: profile.user_id, source: "generated", wod_json: wod, result });
 
-  const handleShareWod = (name) => shareWod(profile.user_id, name, wod);
+  const handleShareWod = (name, recipientUserId) => shareWod(profile.user_id, name, wod, recipientUserId);
+
+  const BLOCK_LABELS = { warmup: "Warming-up", main: "Workout", cardio: "Cardio" };
+
+  const handleShareWhatsApp = () => {
+    const lines = [`💪 Mijn workout (${wod.total_duration_minutes} min):`];
+    wod.blocks.forEach((block) => {
+      lines.push(`\n${BLOCK_LABELS[block.block_type] ?? block.block_type} (${block.duration_minutes} min):`);
+      block.exercises.forEach((e) => {
+        const qty = e.reps
+          ? `${e.reps}x `
+          : e.duration_seconds
+          ? `${e.duration_seconds}s `
+          : e.distance_meters
+          ? `${e.distance_meters}m `
+          : e.calories
+          ? `${e.calories}cal `
+          : "";
+        lines.push(`- ${qty}${e.name}`);
+      });
+    });
+    lines.push("\nGemaakt met Open Gym-app 🏋️");
+    window.open(`https://wa.me/?text=${encodeURIComponent(lines.join("\n"))}`, "_blank");
+  };
 
   return (
     <div>
@@ -751,6 +774,20 @@ export default function GeneratorPage() {
               ↺ Opnieuw samenstellen
             </button>
           </div>
+          <div className="card" style={{ marginBottom: 12 }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
+              <h3 style={{ margin: 0 }}>In het kort</h3>
+              <button type="button" className="btn-icon" onClick={handleShareWhatsApp}>
+                📤 WhatsApp
+              </button>
+            </div>
+            {wod.blocks.map((block, i) => (
+              <p key={i} className="field-hint" style={{ margin: "8px 0 0" }}>
+                <strong>{BLOCK_LABELS[block.block_type] ?? block.block_type}</strong> ({block.duration_minutes} min):{" "}
+                {block.exercises.map((e) => e.name).join(", ")}
+              </p>
+            ))}
+          </div>
           {!hasWarmup && (
             <div className="card" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
               <p className="field-hint" style={{ margin: 0 }}>Nog geen warming-up bij deze workout.</p>
@@ -806,7 +843,7 @@ export default function GeneratorPage() {
             />
           )}
           <SaveResultForm onSave={handleSaveResult} />
-          <ShareWodForm onShare={handleShareWod} />
+          <ShareWodForm onShare={handleShareWod} userId={profile.user_id} />
         </div>
       )}
     </div>

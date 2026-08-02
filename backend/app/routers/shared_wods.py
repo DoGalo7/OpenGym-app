@@ -11,8 +11,12 @@ router = APIRouter()
 
 
 @router.get("", response_model=list[schemas.SharedWodSummary])
-def list_shared_wods(db: Session = Depends(get_db)):
-    return crud.list_shared_wods(db)
+def list_shared_wods(user_id: str | None = None, db: Session = Depends(get_db)):
+    viewer_profile_id = None
+    if user_id:
+        viewer = crud.get_profile_by_user_id(db, user_id)
+        viewer_profile_id = viewer.id if viewer else None
+    return crud.list_shared_wods(db, viewer_profile_id)
 
 
 @router.post("", response_model=schemas.SharedWodSummary)
@@ -20,7 +24,10 @@ def share_wod(data: schemas.SharedWodCreate, db: Session = Depends(get_db)):
     profile = crud.get_profile_by_user_id(db, data.user_id)
     if not profile:
         raise HTTPException(404, "Profiel niet gevonden")
-    return crud.create_shared_wod(db, profile, data)
+    try:
+        return crud.create_shared_wod(db, profile, data)
+    except ValueError as e:
+        raise HTTPException(404, str(e))
 
 
 @router.get("/{shared_wod_id}/load", response_model=schemas.GeneratedWod)
