@@ -1,9 +1,16 @@
 import { useEffect, useRef, useState } from "react";
 
-function playBeep(frequency = 880, durationMs = 200) {
+// A fresh `new AudioContext()` created outside a user-gesture call stack (e.g. from a
+// setInterval tick, as every beep after the first one is) starts "suspended" on iOS Safari
+// and produces no sound - even though the very first beep, played synchronously inside the
+// Start button's onClick, works fine. That mismatch ("beeps on start, silent afterwards")
+// is exactly the bug this file used to have: one AudioContext was created and closed *per
+// beep*. The fix is to create a single AudioContext inside the user gesture (handleStart)
+// and reuse + resume() it for every later beep instead of creating a new one each time.
+function playBeep(ctx, frequency = 880, durationMs = 200) {
+  if (!ctx) return;
   try {
-    const AudioCtx = window.AudioContext || window.webkitAudioContext;
-    const ctx = new AudioCtx();
+    if (ctx.state === "suspended") ctx.resume();
     const oscillator = ctx.createOscillator();
     const gain = ctx.createGain();
     oscillator.frequency.value = frequency;
@@ -12,7 +19,6 @@ function playBeep(frequency = 880, durationMs = 200) {
     gain.gain.setValueAtTime(0.2, ctx.currentTime);
     oscillator.start();
     oscillator.stop(ctx.currentTime + durationMs / 1000);
-    oscillator.onended = () => ctx.close();
   } catch {
     // Web Audio not available - the timer still works visually without sound.
   }
@@ -74,6 +80,32 @@ export default function WorkoutTimer({ block, onClose }) {
   const [secondsLeft, setSecondsLeft] = useState(isCountUp ? 0 : phasesRef.current[0]?.seconds ?? 0);
   const [running, setRunning] = useState(false);
   const [finished, setFinished] = useState(false);
+  const audioCtxRef = useRef(null);
+  const wakeLockRef = useRef(null);
+
+  // Screen Wake Lock (iOS Safari 16.4+, Chrome/Android): keeps the display on for as long as
+  // the timer runs, which is what actually keeps a browser tab's setInterval firing on time -
+  // once the screen locks, iOS throttles/suspends background tab JS and there's no Web API
+  // that can hook into or hand off to the native iOS Clock/Timer app. This can't make the
+  // timer survive switching apps or a fully backgrounded tab, but it covers the common case
+  // of "mid-workout, screen auto-locked."
+  useEffect(() => {
+    if (!running) return undefined;
+    let cancelled = false;
+    navigator.wakeLock?.request("screen").then((lock) => {
+      if (cancelled) lock.release();
+      else wakeLockRef.current = lock;
+    }).catch(() => {
+      // Wake Lock not available/denied - timer still works, screen may just lock on its own.
+    });
+    return () => {
+      cancelled = true;
+      wakeLockRef.current?.release();
+      wakeLockRef.current = null;
+    };
+  }, [running]);
+
+  useEffect(() => () => audioCtxRef.current?.close(), []);
 
   useEffect(() => {
     if (!running || finished) return undefined;
@@ -86,13 +118,13 @@ export default function WorkoutTimer({ block, onClose }) {
         if (s > 1) return s - 1;
         const nextIndex = phaseIndex + 1;
         if (nextIndex >= phasesRef.current.length) {
-          playBeep(660, 400);
-          setTimeout(() => playBeep(660, 400), 350);
+          playBeep(audioCtxRef.current, 660, 400);
+          setTimeout(() => playBeep(audioCtxRef.current, 660, 400), 350);
           setFinished(true);
           setRunning(false);
           return 0;
         }
-        playBeep(880, 200);
+        playBeep(audioCtxRef.current, 880, 200);
         setPhaseIndex(nextIndex);
         return phasesRef.current[nextIndex].seconds;
       });
@@ -101,7 +133,11 @@ export default function WorkoutTimer({ block, onClose }) {
   }, [running, finished, isCountUp, phaseIndex]);
 
   const handleStart = () => {
-    playBeep(1046, 150);
+    if (!audioCtxRef.current) {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      audioCtxRef.current = AudioCtx ? new AudioCtx() : null;
+    }
+    playBeep(audioCtxRef.current, 1046, 150);
     setRunning(true);
   };
 
