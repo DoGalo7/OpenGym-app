@@ -120,6 +120,17 @@ EXERCISES = [
     {"name": "Russian Twist", "muscle_group": "buik", "level": "beginner", "category": "bodyweight", "requires_gym": False},
     {"name": "V-up", "muscle_group": "buik", "level": "beginner", "category": "bodyweight", "requires_gym": False},
 
+    # --- Extra core-oefeningen (5) - op verzoek: meer variatie in "buik", rep-gescoord (dus
+    # ook bruikbaar in gewone AMRAP/EMOM/For Time-WOD's, niet alleen Stretch & Core). Onderzocht
+    # via gangbare core-workout-bronnen (Men's Health UK's artikel was zelf niet op te halen -
+    # geblokkeerd voor scraping - dus via trainwell.net en vergelijkbare bronnen, zie sessie-
+    # geschiedenis) - geen verzonnen namen.
+    {"name": "Flutter Kicks", "muscle_group": "buik", "level": "beginner", "category": "bodyweight", "requires_gym": False},
+    {"name": "Bicycle Crunch", "muscle_group": "buik", "level": "beginner", "category": "bodyweight", "requires_gym": False},
+    {"name": "Lying Leg Raise", "muscle_group": "buik", "level": "beginner", "category": "bodyweight", "requires_gym": False},
+    {"name": "Reverse Crunch", "muscle_group": "buik", "level": "beginner", "category": "bodyweight", "requires_gym": False},
+    {"name": "Toe Touches", "muscle_group": "buik", "level": "beginner", "category": "bodyweight", "requires_gym": False},
+
     # --- Extra thuis-vriendelijke oefeningen (11) - main-pool bodyweight, requires_gym=False.
     # measure_pools.py (zie sessie-geschiedenis) liet zien dat rug/armen/benen/billen/borst thuis
     # zonder eigen apparatuur soms maar 2, of bij rug/armen zelfs op elk niveau maar 2, hoofd-
@@ -201,14 +212,45 @@ EXERCISES = [
     {"name": "Standing Forward Fold", "muscle_group": "volledig_lichaam", "level": "beginner", "category": "stretching", "requires_gym": False},
     {"name": "Reclined Spinal Twist", "muscle_group": "volledig_lichaam", "level": "beginner", "category": "stretching", "requires_gym": False},
 
-    # --- Core-stabiliteit (6, static holds - same category="stretching" pool as above, so
+    # --- Extra stretches (20) - aangevuld nadat bleek dat "rug" bij Stretch & Core maar 2
+    # oefeningen had (en schouders/borst/armen ook flink dun waren). Onderzocht via de gangbare
+    # fysio-/mobility-bronnen (Cleveland Clinic, Healthline, Mayo Clinic e.a., zie sessie-
+    # geschiedenis) - geen verzonnen namen. "Neck Tilt"/"Levator Scapulae"/"Behind-the-Back
+    # Shoulder Stretch" vallen onder schouders (er is geen aparte "nek"-spiergroep in dit model;
+    # nekklachten worden elders al via CONDITION_RULES["nekblessure"] afgehandeld, los van
+    # muscle_group). Namen zijn bewust anders dan de bestaande bodyweight-oefeningen "Cat-Cow
+    # Stretch"/"Superman Hold"/"World's Greatest Stretch" (die zijn dynamische warmup-drills,
+    # geen statische stretch-holds - dezelfde naam zou de seeder's naam-matching laten botsen).
+    {"name": "Knee-to-Chest Stretch", "muscle_group": "rug", "level": "beginner", "category": "stretching", "requires_gym": False},
+    {"name": "Seated Spinal Twist", "muscle_group": "rug", "level": "beginner", "category": "stretching", "requires_gym": False},
+    {"name": "Thread the Needle", "muscle_group": "rug", "level": "beginner", "category": "stretching", "requires_gym": False},
+    {"name": "Neck Tilt Stretch", "muscle_group": "schouders", "level": "beginner", "category": "stretching", "requires_gym": False},
+    {"name": "Levator Scapulae Stretch", "muscle_group": "schouders", "level": "beginner", "category": "stretching", "requires_gym": False},
+    {"name": "Shoulder Roll Stretch", "muscle_group": "schouders", "level": "beginner", "category": "stretching", "requires_gym": False},
+    {"name": "Behind-the-Back Shoulder Stretch", "muscle_group": "schouders", "level": "beginner", "category": "stretching", "requires_gym": False},
+    {"name": "Lying Pectoral Stretch", "muscle_group": "borst", "level": "beginner", "category": "stretching", "requires_gym": False},
+    {"name": "Kneeling Chest Stretch", "muscle_group": "borst", "level": "beginner", "category": "stretching", "requires_gym": False},
+    {"name": "Bicep Wall Stretch", "muscle_group": "armen", "level": "beginner", "category": "stretching", "requires_gym": False},
+    {"name": "Wrist Flexor Stretch", "muscle_group": "armen", "level": "beginner", "category": "stretching", "requires_gym": False},
+    {"name": "Wrist Extensor Stretch", "muscle_group": "armen", "level": "beginner", "category": "stretching", "requires_gym": False},
+    {"name": "Kneeling Hip Flexor Stretch", "muscle_group": "benen", "level": "beginner", "category": "stretching", "requires_gym": False},
+    {"name": "Couch Stretch", "muscle_group": "benen", "level": "beginner", "category": "stretching", "requires_gym": False},
+    {"name": "Calf Stretch (Muur)", "muscle_group": "benen", "level": "beginner", "category": "stretching", "requires_gym": False},
+    {"name": "90/90 Hip Stretch", "muscle_group": "benen", "level": "beginner", "category": "stretching", "requires_gym": False},
+    {"name": "Pigeon Pose", "muscle_group": "billen", "level": "beginner", "category": "stretching", "requires_gym": False},
+    {"name": "Standing Glute Stretch", "muscle_group": "billen", "level": "beginner", "category": "stretching", "requires_gym": False},
+    {"name": "Downward Dog", "muscle_group": "volledig_lichaam", "level": "beginner", "category": "stretching", "requires_gym": False},
+
+    # --- Core-stabiliteit (8, static holds - same category="stretching" pool as above, so
     # the Stretch & Core-WOD needs no new backend logic: it already builds a duration-based
     # hold sequence per muscle group from this category). Unlike pure flexibility stretches
     # these have a real difficulty progression, hence Hollow Body Hold is intermediate.
     {"name": "Plank Hold", "muscle_group": "buik", "level": "beginner", "category": "stretching", "requires_gym": False},
     {"name": "Side Plank Hold", "muscle_group": "buik", "level": "beginner", "category": "stretching", "requires_gym": False},
     {"name": "Dead Bug", "muscle_group": "buik", "level": "beginner", "category": "stretching", "requires_gym": False},
+    {"name": "Reverse Plank Hold", "muscle_group": "buik", "level": "intermediate", "category": "stretching", "requires_gym": False},
     {"name": "Bird Dog Hold", "muscle_group": "rug", "level": "beginner", "category": "stretching", "requires_gym": False},
+    {"name": "Locust Hold", "muscle_group": "rug", "level": "beginner", "category": "stretching", "requires_gym": False},
     {"name": "Glute Bridge Hold", "muscle_group": "billen", "level": "beginner", "category": "stretching", "requires_gym": False},
     {"name": "Hollow Body Hold", "muscle_group": "buik", "level": "intermediate", "category": "stretching", "requires_gym": False},
 ]
