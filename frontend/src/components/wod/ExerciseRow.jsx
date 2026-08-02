@@ -26,9 +26,9 @@ export default function ExerciseRow({ exercise, sex, onSwap, onFieldChange, onMo
     "";
 
   const metaParts = [];
-  if (exercise.distance_meters) metaParts.push(`${exercise.distance_meters} m`);
-  if (exercise.calories) metaParts.push(`${exercise.calories} cal`);
   if (readOnly) {
+    if (exercise.distance_meters) metaParts.push(`${exercise.distance_meters} m`);
+    if (exercise.calories) metaParts.push(`${exercise.calories} cal`);
     if (exercise.reps) metaParts.push(`${exercise.reps} herhalingen`);
     if (exercise.duration_seconds) {
       metaParts.push(
@@ -70,6 +70,32 @@ export default function ExerciseRow({ exercise, sex, onSwap, onFieldChange, onMo
                 style={{ width: 52 }}
               />{" "}
               sec
+            </span>
+          )}
+          {!readOnly && exercise.distance_meters != null && (
+            <span className="inline-edit">
+              <input
+                type="number"
+                min={1}
+                value={exercise.distance_meters}
+                onChange={(event) => onFieldChange("distance_meters", Number(event.target.value))}
+                aria-label={`Afstand voor ${exercise.name}`}
+                style={{ width: 60 }}
+              />{" "}
+              m
+            </span>
+          )}
+          {!readOnly && exercise.calories != null && (
+            <span className="inline-edit">
+              <input
+                type="number"
+                min={1}
+                value={exercise.calories}
+                onChange={(event) => onFieldChange("calories", Number(event.target.value))}
+                aria-label={`Calorieën voor ${exercise.name}`}
+                style={{ width: 52 }}
+              />{" "}
+              cal
             </span>
           )}
           {!readOnly && showsWeight && (
