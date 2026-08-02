@@ -6,6 +6,7 @@ import { createHistory } from "../api/history";
 import { shareWod } from "../api/sharedWods";
 import { generateStretchWod, generateWarmup, generateWod } from "../api/wods";
 import CategoryPicker from "../components/wod/CategoryPicker";
+import { weightText } from "../components/wod/ExerciseRow";
 import ManualExercisePicker from "../components/wod/ManualExercisePicker";
 import ManualWodBuilder from "../components/wod/ManualWodBuilder";
 import MuscleGroupPicker from "../components/wod/MuscleGroupPicker";
@@ -431,10 +432,11 @@ export default function GeneratorPage() {
           : e.calories
           ? `${e.calories}cal `
           : "";
-        lines.push(`- ${qty}${e.name}`);
+        const weight = weightText(e, sex);
+        lines.push(`- ${qty}${e.name}${weight ? ` - ${weight}` : ""}`);
       });
     });
-    lines.push("\nGemaakt met Open Gym-app 🏋️");
+    lines.push("\nGemaakt met Open Gym-app 🏋️ https://open-gym-app.vercel.app");
     window.open(`https://wa.me/?text=${encodeURIComponent(lines.join("\n"))}`, "_blank");
   };
 

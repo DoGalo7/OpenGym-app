@@ -3,7 +3,7 @@ import { useState } from "react";
 import { explanationUrl } from "../../utils/explanationLink";
 import SwapMenu from "./SwapMenu";
 
-function weightText(exercise, sex) {
+export function weightText(exercise, sex) {
   if (exercise.own_weight_kg) return `${exercise.own_weight_kg} kg (eigen gewicht)`;
   const { suggested_weight_male_kg: m, suggested_weight_female_kg: f } = exercise;
   if (m == null && f == null) return null;
