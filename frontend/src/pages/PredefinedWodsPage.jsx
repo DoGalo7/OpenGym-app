@@ -162,42 +162,44 @@ export default function PredefinedWodsPage() {
     <div>
       <h1>Ideeën</h1>
 
-      <div className="chip-group chip-group--scroll" style={{ marginBottom: 8 }}>
-        {CATEGORIES.map((c) => (
-          <button
-            key={c.value}
-            type="button"
-            className={`chip chip--sm${category === c.value ? " active" : ""}`}
-            onClick={() => setCategory(c.value)}
-          >
-            {c.label}
-          </button>
-        ))}
-      </div>
-
-      <div className="chip-group chip-group--sm" style={{ marginBottom: 16 }}>
-          <button
-            type="button"
-            className={`chip chip--sm${homeOnly ? " active" : ""}`}
-            onClick={() => setHomeOnly((v) => !v)}
-          >
-            🏠 Ook thuis
-          </button>
-          <button
-            type="button"
-            className={`chip chip--sm${hyroxOnly ? " active" : ""}`}
-            onClick={() => setHyroxOnly((v) => !v)}
-          >
-            🔥 Hyrox-stijl
-          </button>
-          <button
-            type="button"
-            className={`chip chip--sm${buddyOnly ? " active" : ""}`}
-            onClick={() => setBuddyOnly((v) => !v)}
-          >
-            🤝 Buddy WOD
-          </button>
+      <div className="idea-filters-sticky">
+        <div className="chip-group chip-group--scroll" style={{ marginBottom: 8 }}>
+          {CATEGORIES.map((c) => (
+            <button
+              key={c.value}
+              type="button"
+              className={`chip chip--sm${category === c.value ? " active" : ""}`}
+              onClick={() => setCategory(c.value)}
+            >
+              {c.label}
+            </button>
+          ))}
         </div>
+
+        <div className="chip-group chip-group--sm" style={{ marginBottom: 0 }}>
+            <button
+              type="button"
+              className={`chip chip--sm${homeOnly ? " active" : ""}`}
+              onClick={() => setHomeOnly((v) => !v)}
+            >
+              🏠 Ook thuis
+            </button>
+            <button
+              type="button"
+              className={`chip chip--sm${hyroxOnly ? " active" : ""}`}
+              onClick={() => setHyroxOnly((v) => !v)}
+            >
+              🔥 Hyrox-stijl
+            </button>
+            <button
+              type="button"
+              className={`chip chip--sm${buddyOnly ? " active" : ""}`}
+              onClick={() => setBuddyOnly((v) => !v)}
+            >
+              🤝 Buddy WOD
+            </button>
+          </div>
+      </div>
 
       {error && <p className="error-text">{error}</p>}
       {filteredItems.length === 0 && !error && (
