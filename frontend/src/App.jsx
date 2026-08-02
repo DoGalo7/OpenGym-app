@@ -16,6 +16,10 @@ import HomePage from "./pages/HomePage";
 import PerformanceReportPage from "./pages/PerformanceReportPage";
 import PredefinedWodsPage from "./pages/PredefinedWodsPage";
 import ProfilePage from "./pages/ProfilePage";
+import AccordionConcept from "./pages/concepts/AccordionConcept";
+import ConceptIndexPage from "./pages/concepts/ConceptIndexPage";
+import CompactConcept from "./pages/concepts/CompactConcept";
+import KebabMenuConcept from "./pages/concepts/KebabMenuConcept";
 
 function RecoverPasswordForm({ initialName, onRecovered, onCancel }) {
   const [name, setName] = useState(initialName);
@@ -195,6 +199,10 @@ function AppContent() {
           <Route path="/admin/gebruikers" element={<AdminUsersPage />} />
           <Route path="/admin/rapport" element={<AdminChangelogPage />} />
           <Route path="/rapport" element={<PerformanceReportPage key={profile.user_id} />} />
+          <Route path="/concept" element={<ConceptIndexPage />} />
+          <Route path="/concept/compact" element={<CompactConcept />} />
+          <Route path="/concept/menu" element={<KebabMenuConcept />} />
+          <Route path="/concept/accordion" element={<AccordionConcept />} />
         </Routes>
       </PageContainer>
       <NavBar />
