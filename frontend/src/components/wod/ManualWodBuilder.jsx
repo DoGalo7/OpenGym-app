@@ -63,14 +63,17 @@ export default function ManualWodBuilder({ profile, location, trainingType, setT
     setFilterGroups((prev) => (prev.includes(value) ? prev.filter((v) => v !== value) : [...prev, value]));
   };
 
-  const pickedIds = new Set(picked.map((p) => p.exercise.id));
+  // Count instead of exclude: an exercise can be added multiple times (e.g. several running
+  // intervals at different afstanden), so already-picked exercises stay in the browse list
+  // with a "Nx toegevoegd" hint instead of disappearing after the first add.
+  const pickedCounts = new Map();
+  for (const p of picked) pickedCounts.set(p.exercise.id, (pickedCounts.get(p.exercise.id) ?? 0) + 1);
   const searchTerm = search.trim().toLowerCase();
 
   const options = allExercises.filter(
     (e) =>
       !e.warmup_only &&
       e.category !== "stretching" &&
-      !pickedIds.has(e.id) &&
       homeAllowed(e) &&
       (filterGroups.length === 0 || filterGroups.includes(e.muscle_group)) &&
       (searchTerm === "" || e.name.toLowerCase().includes(searchTerm))
@@ -78,15 +81,16 @@ export default function ManualWodBuilder({ profile, location, trainingType, setT
 
   const addExercise = (exercise) => {
     const saved = (profile.exercise_weights ?? []).find((w) => w.exercise_id === exercise.id);
-    setPicked((prev) => [...prev, { exercise, own_weight_kg: saved?.weight_kg ?? null, ...defaultFieldsFor(exercise) }]);
+    const entryId = crypto.randomUUID();
+    setPicked((prev) => [...prev, { entryId, exercise, own_weight_kg: saved?.weight_kg ?? null, ...defaultFieldsFor(exercise) }]);
   };
 
-  const removeExercise = (id) => {
-    setPicked((prev) => prev.filter((p) => p.exercise.id !== id));
+  const removeExercise = (entryId) => {
+    setPicked((prev) => prev.filter((p) => p.entryId !== entryId));
   };
 
-  const updateField = (id, field, value) => {
-    setPicked((prev) => prev.map((p) => (p.exercise.id === id ? { ...p, [field]: value } : p)));
+  const updateField = (entryId, field, value) => {
+    setPicked((prev) => prev.map((p) => (p.entryId === entryId ? { ...p, [field]: value } : p)));
   };
 
   const canBuild = picked.length > 0;
@@ -173,94 +177,105 @@ export default function ManualWodBuilder({ profile, location, trainingType, setT
 
       <div style={{ maxHeight: 260, overflowY: "auto", marginBottom: "var(--space-4)" }}>
         {options.length === 0 && <p className="field-hint">Geen oefeningen gevonden.</p>}
-        {options.map((exercise) => (
-          <div key={exercise.id} className="exercise-row">
-            <div className="exercise-main">
-              <div className="exercise-name">{exercise.name}</div>
-              <div className="exercise-meta">{exercise.muscle_group} · {exercise.category}</div>
+        {options.map((exercise) => {
+          const count = pickedCounts.get(exercise.id) ?? 0;
+          return (
+            <div key={exercise.id} className="exercise-row">
+              <div className="exercise-main">
+                <div className="exercise-name">{exercise.name}</div>
+                <div className="exercise-meta">
+                  {exercise.muscle_group} · {exercise.category}
+                  {count > 0 && ` · ✓ ${count}x toegevoegd`}
+                </div>
+              </div>
+              <button type="button" className="btn-icon" onClick={() => addExercise(exercise)}>
+                + Toevoegen
+              </button>
             </div>
-            <button type="button" className="btn-icon" onClick={() => addExercise(exercise)}>
-              + Toevoegen
-            </button>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       <h3>Jouw workout ({picked.length})</h3>
       {picked.length === 0 && <p className="field-hint">Voeg hierboven oefeningen toe.</p>}
-      {picked.map((p) => (
-        <div key={p.exercise.id} className="exercise-row">
-          <div className="exercise-main">
-            <div className="exercise-name">{p.exercise.name}</div>
-            <div className="exercise-meta">
-              {!p.exercise.is_cardio && (
-                <span className="inline-edit">
-                  <input
-                    type="number"
-                    min={1}
-                    value={p.reps ?? ""}
-                    onChange={(event) => updateField(p.exercise.id, "reps", Number(event.target.value))}
-                    aria-label={`Herhalingen voor ${p.exercise.name}`}
-                    style={{ width: 52 }}
-                  />{" "}
-                  herhalingen
-                </span>
-              )}
-              {p.exercise.is_cardio && p.exercise.cardio_type === "assault_bike" && (
-                <span className="inline-edit">
-                  <input
-                    type="number"
-                    min={1}
-                    value={p.calories ?? ""}
-                    onChange={(event) => updateField(p.exercise.id, "calories", Number(event.target.value))}
-                    aria-label={`Calorieën voor ${p.exercise.name}`}
-                    style={{ width: 60 }}
-                  />{" "}
-                  cal
-                </span>
-              )}
-              {p.exercise.is_cardio && p.exercise.cardio_type !== "assault_bike" && (
-                <span className="inline-edit">
-                  <input
-                    type="number"
-                    min={1}
-                    value={p.distance_meters ?? ""}
-                    onChange={(event) => updateField(p.exercise.id, "distance_meters", Number(event.target.value))}
-                    aria-label={`Afstand voor ${p.exercise.name}`}
-                    style={{ width: 70 }}
-                  />{" "}
-                  m
-                </span>
-              )}
-              {!p.exercise.is_cardio && (p.exercise.rx_weight_male_kg != null || p.exercise.rx_weight_female_kg != null) && (
-                <span className="inline-edit">
-                  <input
-                    type="number"
-                    min={0}
-                    step={0.5}
-                    placeholder="gewicht"
-                    value={p.own_weight_kg ?? ""}
-                    onChange={(event) =>
-                      updateField(p.exercise.id, "own_weight_kg", event.target.value === "" ? null : Number(event.target.value))
-                    }
-                    aria-label={`Gewicht voor ${p.exercise.name}`}
-                    style={{ width: 70 }}
-                  />{" "}
-                  kg
-                </span>
-              )}
+      {picked.map((p, index) => {
+        const occurrence = picked.slice(0, index).filter((other) => other.exercise.id === p.exercise.id).length + 1;
+        const totalForExercise = pickedCounts.get(p.exercise.id) ?? 1;
+        const label = totalForExercise > 1 ? `${p.exercise.name} (${occurrence})` : p.exercise.name;
+        return (
+          <div key={p.entryId} className="exercise-row">
+            <div className="exercise-main">
+              <div className="exercise-name">{label}</div>
+              <div className="exercise-meta">
+                {!p.exercise.is_cardio && (
+                  <span className="inline-edit">
+                    <input
+                      type="number"
+                      min={1}
+                      value={p.reps ?? ""}
+                      onChange={(event) => updateField(p.entryId, "reps", Number(event.target.value))}
+                      aria-label={`Herhalingen voor ${label}`}
+                      style={{ width: 52 }}
+                    />{" "}
+                    herhalingen
+                  </span>
+                )}
+                {p.exercise.is_cardio && p.exercise.cardio_type === "assault_bike" && (
+                  <span className="inline-edit">
+                    <input
+                      type="number"
+                      min={1}
+                      value={p.calories ?? ""}
+                      onChange={(event) => updateField(p.entryId, "calories", Number(event.target.value))}
+                      aria-label={`Calorieën voor ${label}`}
+                      style={{ width: 60 }}
+                    />{" "}
+                    cal
+                  </span>
+                )}
+                {p.exercise.is_cardio && p.exercise.cardio_type !== "assault_bike" && (
+                  <span className="inline-edit">
+                    <input
+                      type="number"
+                      min={1}
+                      value={p.distance_meters ?? ""}
+                      onChange={(event) => updateField(p.entryId, "distance_meters", Number(event.target.value))}
+                      aria-label={`Afstand voor ${label}`}
+                      style={{ width: 70 }}
+                    />{" "}
+                    m
+                  </span>
+                )}
+                {!p.exercise.is_cardio && (p.exercise.rx_weight_male_kg != null || p.exercise.rx_weight_female_kg != null) && (
+                  <span className="inline-edit">
+                    <input
+                      type="number"
+                      min={0}
+                      step={0.5}
+                      placeholder="gewicht"
+                      value={p.own_weight_kg ?? ""}
+                      onChange={(event) =>
+                        updateField(p.entryId, "own_weight_kg", event.target.value === "" ? null : Number(event.target.value))
+                      }
+                      aria-label={`Gewicht voor ${label}`}
+                      style={{ width: 70 }}
+                    />{" "}
+                    kg
+                  </span>
+                )}
+              </div>
             </div>
+            <button
+              type="button"
+              className="btn-icon"
+              onClick={() => removeExercise(p.entryId)}
+              aria-label={`Verwijder ${label}`}
+            >
+              ✕
+            </button>
           </div>
-          <button
-            type="button"
-            className="btn-icon"
-            onClick={() => removeExercise(p.exercise.id)}
-            aria-label={`Verwijder ${p.exercise.name}`}
-          >
-            ✕
-          </button>
-        </div>
-      ))}
+        );
+      })}
 
       <button type="button" className="btn btn-primary" disabled={!canBuild} onClick={handleBuild} style={{ marginTop: 16 }}>
         Maak workout
