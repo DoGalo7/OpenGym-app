@@ -85,6 +85,7 @@ export default function GeneratorPage() {
   const [deviateLevel, setDeviateLevel] = useState("");
   const [sex, setSex] = useState(null);
   const [exerciseCount, setExerciseCount] = useState("");
+  const [stretchExerciseCount, setStretchExerciseCount] = useState("");
   const [preferredCategories, setPreferredCategories] = useState([]);
   const [hyroxStyle, setHyroxStyle] = useState(false);
   const [pickExercisesMyself, setPickExercisesMyself] = useState(false);
@@ -177,6 +178,7 @@ export default function GeneratorPage() {
         length_minutes: Number(length),
         temporary_injury_muscle_group: tempInjuryMuscleGroup || undefined,
         override_injury_muscle_groups: overrideGroups,
+        exercise_count: stretchExerciseCount ? Number(stretchExerciseCount) : undefined,
       });
       setWod(result);
     } catch (err) {
@@ -449,6 +451,18 @@ export default function GeneratorPage() {
           <div className="field">
             <label>Spiergroepen</label>
             <MuscleGroupPicker selected={muscleGroups} onChange={setMuscleGroups} />
+          </div>
+          <div className="field">
+            <label htmlFor="stretch-exercise-count">Aantal oefeningen (optioneel)</label>
+            <input
+              id="stretch-exercise-count"
+              type="number"
+              min={1}
+              max={10}
+              placeholder="Standaard 4"
+              value={stretchExerciseCount}
+              onChange={(event) => setStretchExerciseCount(event.target.value)}
+            />
           </div>
           <button type="button" className="btn btn-primary" onClick={handleGenerateStretch} disabled={muscleGroups.length === 0 || loading}>
             {loading ? "Bezig met samenstellen..." : "Maak Stretch & Core-WOD"}

@@ -282,6 +282,8 @@ class StretchWodRequest(BaseModel):
     length_minutes: int = Field(ge=5, le=60)
     temporary_injury_muscle_group: MuscleGroup | None = None
     override_injury_muscle_groups: list[MuscleGroup] = []
+    # overrides the default of 4 stretch/core-oefeningen when set
+    exercise_count: int | None = Field(default=None, ge=1, le=10)
 
 
 class ExerciseInWod(BaseModel):

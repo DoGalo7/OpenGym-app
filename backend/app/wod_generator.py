@@ -116,6 +116,7 @@ def build_standalone_warmup(db: Session, profile: UserProfile, request) -> WodBl
 
 
 STRETCH_HOLD_SECONDS = 40
+DEFAULT_STRETCH_EXERCISES = 4
 
 
 def build_stretch_wod(db: Session, profile: UserProfile, request) -> GeneratedWod:
@@ -133,7 +134,11 @@ def build_stretch_wod(db: Session, profile: UserProfile, request) -> GeneratedWo
             "Geen stretch-oefeningen gevonden voor deze spiergroepen. Probeer een andere combinatie."
         )
 
-    n_stretches = max(2, min(len(pool), request.length_minutes * 60 // STRETCH_HOLD_SECONDS))
+    # Default to a fixed count (not derived from length_minutes, which could balloon past the
+    # full stretching-category pool as more core-stability holds get added) - request.exercise_count
+    # lets the user ask for more or fewer, same override pattern as generate_wod's exercise_count.
+    n_stretches = request.exercise_count or DEFAULT_STRETCH_EXERCISES
+    n_stretches = max(1, min(n_stretches, len(pool)))
 
     chosen: list[Exercise] = []
     available = list(pool)
