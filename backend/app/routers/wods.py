@@ -89,6 +89,7 @@ def list_predefined_wods(training_type: str | None = None, db: Session = Depends
                 )
                 for m in sorted(w.movements, key=lambda m: m.position)
             ],
+            home_friendly=all(not m.exercise.requires_gym for m in w.movements),
         )
         for w in wods
     ]

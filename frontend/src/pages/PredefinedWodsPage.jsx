@@ -33,6 +33,7 @@ function toPredefinedItem(w) {
     meta: `${w.duration_minutes} min · ${LEVEL_LABELS[w.level] ?? w.level}`,
     description: w.description,
     lines: w.movements.map(formatMovement),
+    homeFriendly: w.home_friendly,
   };
 }
 
@@ -208,6 +209,11 @@ export default function PredefinedWodsPage() {
             </div>
             <p className="field-hint" style={{ margin: 0 }}>
               <span className="badge">{item.badgeLabel}</span>
+              {item.homeFriendly && (
+                <span className="badge" style={{ marginLeft: 6, background: "var(--color-primary)", color: "#fff" }}>
+                  🏠 Ook thuis
+                </span>
+              )}
               {" · "}
               {item.meta}
             </p>

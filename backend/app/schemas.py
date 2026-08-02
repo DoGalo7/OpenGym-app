@@ -100,6 +100,10 @@ class PredefinedWodSummary(BaseModel):
     duration_minutes: int
     level: str
     movements: list[PredefinedWodMovementSummary]
+    # True when every movement is doable without gym equipment (derived from each
+    # movement's Exercise.requires_gym) - lets the Ideeën page show a "Ook thuis"-tag
+    # without the frontend needing to know about equipment_tag/cardio_type internals.
+    home_friendly: bool = False
 
 
 # --- Injuries ---
