@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 import { addFavorite, listFavorites, removeFavorite } from "../api/favorites";
 import { listSharedWods, loadSharedWod } from "../api/sharedWods";
-import { listFixedWods, listPredefinedWods, loadPredefinedWod } from "../api/wods";
+import { listFixedWods, listPredefinedWods, loadFixedWod, loadPredefinedWod } from "../api/wods";
 import { useProfile } from "../context/ProfileContext";
 
 const CATEGORIES = [
@@ -115,15 +115,13 @@ export default function PredefinedWodsPage() {
 
   const handleSelect = async (item) => {
     if (loadingId !== null) return;
-    if (item.kind === "fixed") {
-      navigate(`/vaste-wods/${item.id}`);
-      return;
-    }
     setLoadingId(item.id);
     setError(null);
     try {
       const wod = item.kind === "shared"
         ? await loadSharedWod(item.id, profile.user_id)
+        : item.kind === "fixed"
+        ? await loadFixedWod(item.id, profile.user_id)
         : await loadPredefinedWod(item.id, profile.user_id);
       navigate("/wod-maken", { state: { loadedWod: wod } });
     } catch (err) {

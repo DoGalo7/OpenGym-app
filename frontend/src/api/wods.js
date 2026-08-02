@@ -21,6 +21,10 @@ export function getFixedWod(id) {
   return get(`/wods/fixed/${id}`);
 }
 
+export function loadFixedWod(id, userId) {
+  return get(`/wods/fixed/${id}/load?user_id=${encodeURIComponent(userId)}`);
+}
+
 export function listPredefinedWods(trainingType) {
   const query = trainingType ? `?training_type=${trainingType}` : "";
   return get(`/wods/predefined${query}`);

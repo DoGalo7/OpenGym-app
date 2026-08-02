@@ -6,7 +6,7 @@ from math import ceil
 from sqlalchemy.orm import Session
 
 from app.constants import LEVEL_RANK, Level
-from app.models import Exercise, PredefinedWod, UserProfile
+from app.models import Exercise, FixedWod, PredefinedWod, UserProfile
 from app.schemas import ExerciseInWod, ExerciseSummary, GeneratedWod, WodBlock, WodGenerateRequest
 
 LEVEL_MULTIPLIER = {"beginner": 0.7, "intermediate": 1.0, "advanced": 1.3}
@@ -347,6 +347,58 @@ def load_predefined_wod(db: Session, profile: UserProfile, predefined_wod: Prede
         location=profile.default_location,
         level_used=predefined_wod.level,
         total_duration_minutes=predefined_wod.duration_minutes,
+        blocks=[main_block],
+        generated_at=datetime.datetime.utcnow(),
+    )
+
+
+def load_fixed_wod(db: Session, profile: UserProfile, fixed_wod: FixedWod) -> GeneratedWod:
+    """Expands a benchmark FixedWod (Murph, a Girl WOD, a Soldier WOD) into the same
+    GeneratedWod shape load_predefined_wod() produces, so a benchmark gets the full
+    builder/timer/save experience instead of only a "save a result" page. Reuses
+    _shape_predefined() as-is - FixedWod has the same training_type/duration_minutes/
+    rounds_override/rep_scheme_override fields PredefinedWod does, for exactly this reason."""
+    all_exercises = db.query(Exercise).all()
+    exercises_by_id = {e.id: e for e in all_exercises}
+    movements = sorted(fixed_wod.movements, key=lambda m: m.position)
+    saved_weights = {w.exercise_id: w.weight_kg for w in profile.exercise_weights}
+
+    main_exercises: list[ExerciseInWod] = []
+    used_ids: set[int] = set()
+    for movement in movements:
+        exercise = exercises_by_id[movement.exercise_id]
+        main_exercises.append(ExerciseInWod(
+            exercise_id=exercise.id,
+            name=exercise.name,
+            muscle_group=exercise.muscle_group,
+            category=exercise.category,
+            reps=movement.reps,
+            distance_meters=movement.distance_meters,
+            calories=movement.calories,
+            cardio_type=exercise.cardio_type if exercise.is_cardio else None,
+            own_weight_kg=saved_weights.get(exercise.id),
+            suggested_weight_male_kg=exercise.rx_weight_male_kg,
+            suggested_weight_female_kg=exercise.rx_weight_female_kg,
+            alternatives=_alternatives_for(exercise, all_exercises, used_ids | {exercise.id}),
+        ))
+        used_ids.add(exercise.id)
+
+    rounds, interval_seconds, rep_scheme = _shape_predefined(fixed_wod, len(movements))
+    main_block = WodBlock(
+        block_type="main",
+        training_type=fixed_wod.training_type,
+        duration_minutes=fixed_wod.duration_minutes,
+        rounds=rounds,
+        interval_seconds=interval_seconds,
+        rep_scheme=rep_scheme,
+        exercises=main_exercises,
+    )
+
+    return GeneratedWod(
+        profile_id=profile.id,
+        location=profile.default_location,
+        level_used=None,
+        total_duration_minutes=fixed_wod.duration_minutes,
         blocks=[main_block],
         generated_at=datetime.datetime.utcnow(),
     )

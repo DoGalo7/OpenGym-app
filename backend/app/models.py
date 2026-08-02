@@ -63,6 +63,34 @@ class FixedWod(Base):
     description: Mapped[str] = mapped_column(Text, nullable=False)
     structure: Mapped[str] = mapped_column(Text, nullable=False)
     time_cap_minutes: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    # Structured equivalent of `structure` (free text, still used by FixedWodDetailPage's
+    # read-only view) - lets load_fixed_wod() expand this into the same GeneratedWod shape
+    # load_predefined_wod() produces, so a benchmark WOD gets the full builder/timer/save
+    # experience instead of only "save a result". Same fields/semantics as PredefinedWod's.
+    training_type: Mapped[str] = mapped_column(String(20), nullable=False, default="FOR_TIME")
+    duration_minutes: Mapped[int] = mapped_column(Integer, nullable=False, default=20)
+    rounds_override: Mapped[str | None] = mapped_column(String(20), nullable=True)
+    rep_scheme_override: Mapped[str | None] = mapped_column(String(60), nullable=True)
+
+    movements: Mapped[list["FixedWodMovement"]] = relationship(
+        back_populates="fixed_wod", cascade="all, delete-orphan",
+        order_by="FixedWodMovement.position",
+    )
+
+
+class FixedWodMovement(Base):
+    __tablename__ = "fixed_wod_movements"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    fixed_wod_id: Mapped[int] = mapped_column(ForeignKey("fixed_wods.id"), nullable=False)
+    exercise_id: Mapped[int] = mapped_column(ForeignKey("exercises.id"), nullable=False)
+    position: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    reps: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    distance_meters: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    calories: Mapped[int | None] = mapped_column(Integer, nullable=True)
+
+    fixed_wod: Mapped["FixedWod"] = relationship(back_populates="movements")
+    exercise: Mapped["Exercise"] = relationship()
 
 
 class PredefinedWod(Base):

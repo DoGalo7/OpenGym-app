@@ -40,6 +40,10 @@ def on_startup():
     ensure_column("wod_history", "rating", "INTEGER")
     ensure_column("user_profiles", "recovery_code_hash", "VARCHAR(160)")
     ensure_column("exercises", "pending_review", "BOOLEAN NOT NULL DEFAULT FALSE")
+    ensure_column("fixed_wods", "training_type", "VARCHAR(20) NOT NULL DEFAULT 'FOR_TIME'")
+    ensure_column("fixed_wods", "duration_minutes", "INTEGER NOT NULL DEFAULT 20")
+    ensure_column("fixed_wods", "rounds_override", "VARCHAR(20)")
+    ensure_column("fixed_wods", "rep_scheme_override", "VARCHAR(60)")
     db = session_local()
     try:
         run_seed(db)

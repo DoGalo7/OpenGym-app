@@ -8,6 +8,7 @@ from app.wod_generator import (
     build_standalone_warmup,
     build_stretch_wod,
     generate_wod,
+    load_fixed_wod,
     load_predefined_wod,
 )
 
@@ -58,6 +59,17 @@ def get_fixed_wod(fixed_wod_id: int, db: Session = Depends(get_db)):
     if not fixed_wod:
         raise HTTPException(404, "Vaste WOD niet gevonden")
     return fixed_wod
+
+
+@router.get("/fixed/{fixed_wod_id}/load", response_model=schemas.GeneratedWod)
+def load_fixed(fixed_wod_id: int, user_id: str, db: Session = Depends(get_db)):
+    profile = crud.get_profile_by_user_id(db, user_id)
+    if not profile:
+        raise HTTPException(404, "Profiel niet gevonden")
+    fixed_wod = db.get(models.FixedWod, fixed_wod_id)
+    if not fixed_wod:
+        raise HTTPException(404, "Vaste WOD niet gevonden")
+    return load_fixed_wod(db, profile, fixed_wod)
 
 
 @router.get("/predefined", response_model=list[schemas.PredefinedWodSummary])
