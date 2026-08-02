@@ -78,7 +78,7 @@ Bij het opstarten van de backend maakt `Base.metadata.create_all()` automatisch 
 
 ### Build
 
-Frontend productie-build: `npm run build` (vanuit `frontend/`). Geen build-stap voor de backend (draait direct via uvicorn). Er zijn nog geen geautomatiseerde tests of lint-commando's.
+Frontend productie-build: `npm run build` (vanuit `frontend/`). Geen build-stap voor de backend (draait direct via uvicorn). Backend-tests: `pytest` (vanuit `backend/`, venv geactiveerd) — dekt `wod_generator.py`'s spiergroep/niveau/locatie-filtering, blessure- en conditie-uitsluiting, en de override/tijdelijke-blessure/gekozen-oefening-precedenten (zie `backend/tests/`). Geen lint-commando voor de backend; frontend heeft `npm run lint` (oxlint).
 
 ### Architectuur
 
