@@ -104,6 +104,11 @@ class PredefinedWodSummary(BaseModel):
     # movement's Exercise.requires_gym) - lets the Ideeën page show a "Ook thuis"-tag
     # without the frontend needing to know about equipment_tag/cardio_type internals.
     home_friendly: bool = False
+    # True when >=70% of movements are tagged is_hyrox on Exercise - lets the Ideeën page
+    # offer a "Hyrox-stijl" filter without duplicating that flag onto PredefinedWod itself
+    # (it's fully derivable from the movements already loaded here). See routers/wods.py
+    # for why 70% and not "any"/"majority".
+    is_hyrox: bool = False
 
 
 # --- Injuries ---

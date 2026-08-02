@@ -90,6 +90,11 @@ def list_predefined_wods(training_type: str | None = None, db: Session = Depends
                 for m in sorted(w.movements, key=lambda m: m.position)
             ],
             home_friendly=all(not m.exercise.requires_gym for m in w.movements),
+            # 70% threshold (not "any"/"majority") - tuned against the actual seeded WODs so
+            # generic bodyweight WODs that happen to include an Air Squat or Push-up (both
+            # is_hyrox=True as *generic* Hyrox-adjacent moves) don't get mistagged, while every
+            # WOD from the dedicated Hyrox-style seeding batch still qualifies.
+            is_hyrox=bool(w.movements) and sum(1 for m in w.movements if m.exercise.is_hyrox) >= len(w.movements) * 0.7,
         )
         for w in wods
     ]

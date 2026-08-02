@@ -34,6 +34,7 @@ function toPredefinedItem(w) {
     description: w.description,
     lines: w.movements.map(formatMovement),
     homeFriendly: w.home_friendly,
+    isHyrox: w.is_hyrox,
   };
 }
 
@@ -70,6 +71,8 @@ export default function PredefinedWodsPage() {
   const { profile } = useProfile();
   const navigate = useNavigate();
   const [category, setCategory] = useState("");
+  const [homeOnly, setHomeOnly] = useState(false);
+  const [hyroxOnly, setHyroxOnly] = useState(false);
   const [items, setItems] = useState([]);
   const [favoriteKeys, setFavoriteKeys] = useState(new Set());
   const [error, setError] = useState(null);
@@ -151,6 +154,10 @@ export default function PredefinedWodsPage() {
     }
   };
 
+  const filteredItems = items.filter(
+    (item) => (!homeOnly || item.homeFriendly) && (!hyroxOnly || item.isHyrox)
+  );
+
   return (
     <div>
       <h1>Ideeën</h1>
@@ -159,7 +166,7 @@ export default function PredefinedWodsPage() {
         in je WOD-menu om nog aan te passen; bij Benchmark zie je de vaste workout.
       </p>
 
-      <div className="chip-group" style={{ marginBottom: 16 }}>
+      <div className="chip-group" style={{ marginBottom: 12 }}>
         {CATEGORIES.map((c) => (
           <button
             key={c.value}
@@ -172,12 +179,30 @@ export default function PredefinedWodsPage() {
         ))}
       </div>
 
+      <p className="field-hint" style={{ marginTop: 0, marginBottom: 4 }}>Filters (optioneel)</p>
+      <div className="chip-group" style={{ marginBottom: 16 }}>
+        <button
+          type="button"
+          className={`chip${homeOnly ? " active" : ""}`}
+          onClick={() => setHomeOnly((v) => !v)}
+        >
+          🏠 Ook thuis
+        </button>
+        <button
+          type="button"
+          className={`chip${hyroxOnly ? " active" : ""}`}
+          onClick={() => setHyroxOnly((v) => !v)}
+        >
+          🔥 Hyrox-stijl
+        </button>
+      </div>
+
       {error && <p className="error-text">{error}</p>}
-      {items.length === 0 && !error && (
-        <p className="status-text">Geen workouts gevonden voor deze categorie.</p>
+      {filteredItems.length === 0 && !error && (
+        <p className="status-text">Geen workouts gevonden voor deze categorie of filters.</p>
       )}
 
-      {items.map((item) => {
+      {filteredItems.map((item) => {
         const itemType = itemTypeFor(item);
         const isFavorite = favoriteKeys.has(`${itemType}:${item.id}`);
         return (
