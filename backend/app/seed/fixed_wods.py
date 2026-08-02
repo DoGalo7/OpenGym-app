@@ -115,7 +115,10 @@ FIXED_WODS = [
         "structure": "50-40-30-20-10 voor tijd\nDouble-unders\nSit-ups",
         "time_cap_minutes": None,
         "training_type": "FOR_TIME",
-        "duration_minutes": 10,
+        # 150 reps per oefening is een flinke hoeveelheid volume voor een niet-elite sporter
+        # (vooral double-unders lopen vaak op als je ze nog aan het leren bent) - 10 min was
+        # aan de krappe kant als realistische totaaltijd-inschatting.
+        "duration_minutes": 15,
         "rounds_override": "1",
         "rep_scheme_override": "aflopend 50-40-30-20-10",
         "movements": [

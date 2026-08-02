@@ -86,6 +86,22 @@ PREDEFINED_WODS = [
             {"exercise_name": "Air Squat", "reps": 15},
         ],
     },
+    # --- Reisvriendelijke WOD's (3) - geïnspireerd op crossfit.com/essentials/travel-workouts-
+    # stay-fit-this-summer (alleen het format/de opzet, geen letterlijke overname - zelfde aanpak
+    # als de rest van dit bestand: "based on well-established programming patterns", zie boven).
+    # Puur bodyweight, dus overal te doen, geen apparatuur nodig.
+    {
+        "name": "Overal Fit",
+        "training_type": "AMRAP",
+        "description": "Korte, overal-te-doen AMRAP - geen apparatuur nodig, ideaal op reis of thuis.",
+        "duration_minutes": 10,
+        "level": "beginner",
+        "movements": [
+            {"exercise_name": "Air Squat", "reps": 10},
+            {"exercise_name": "Burpee", "reps": 10},
+            {"exercise_name": "Push-up", "reps": 10},
+        ],
+    },
     # --- Long Hyrox-style AMRAPs (10) - user-supplied, 45 min multi-station chippers.
     # A few movements without a direct equivalent are substituted with the closest existing
     # exercise: Sandbag Carry -> DB/KB Farmers Carry (documented stand-in, see exercises.py),
@@ -493,6 +509,74 @@ PREDEFINED_WODS = [
         "movements": [
             {"exercise_name": "Goblet Squat", "reps": 15},
             {"exercise_name": "Row", "distance_meters": 250},
+        ],
+    },
+    # --- Reisvriendelijke WOD's, vervolg (2, FOR_TIME) - zie de AMRAP-sectie hierboven voor de
+    # bron/aanpak-toelichting.
+    {
+        "name": "Thuis Chipper",
+        "training_type": "FOR_TIME",
+        "description": "Aflopende chipper zonder apparatuur - overal te doen, ook op reis.",
+        "duration_minutes": 18,
+        "level": "intermediate",
+        "rounds_override": "1",
+        "rep_scheme_override": "aflopend 60-50-40-30-20",
+        "movements": [
+            {"exercise_name": "Sit-up", "reps": 60},
+            {"exercise_name": "Walking Lunge", "reps": 50},
+            {"exercise_name": "Push-up", "reps": 40},
+            {"exercise_name": "Bodyweight Good Morning", "reps": 30},
+            {"exercise_name": "Burpee", "reps": 20},
+        ],
+    },
+    {
+        "name": "Hardloop & Burpees",
+        "training_type": "FOR_TIME",
+        "description": "3 ronden hardlopen en burpee broad jumps - simpel op te bouwen, overal en altijd te doen zolang je buiten kunt hardlopen.",
+        "duration_minutes": 15,
+        "level": "intermediate",
+        "rounds_override": "3",
+        "rep_scheme_override": "flat",
+        "movements": [
+            {"exercise_name": "Burpee Broad Jump", "reps": 20},
+            {"exercise_name": "Running", "distance_meters": 400},
+        ],
+    },
+    # --- Buddy WODs, vervolg (2, FOR_TIME) - geïnspireerd op echte partner-WOD's van
+    # outdoormusclefit.com/partner-crossfit-workouts (format/opzet, geen letterlijke overname -
+    # zelfde aanpak als de rest van dit bestand). "Buffalo 10" introduceert een 4e partnerformaat
+    # naast I-Go-You-Go/split-reps/synchro: station-rotatie, waarbij je samen door dezelfde
+    # oefeningen roteert (na elke oefening van plek wisselen) i.p.v. samen te werken op 1 oefening.
+    {
+        "name": "Buffalo 10",
+        "training_type": "FOR_TIME",
+        "description": "Station-rotatie: na elke oefening wissel je met je buddy van plek. Het hardloopstuk doe je samen.",
+        "duration_minutes": 30,
+        "level": "intermediate",
+        "rounds_override": "10",
+        "rep_scheme_override": "flat",
+        "is_buddy": True,
+        "movements": [
+            {"exercise_name": "Deadlift", "reps": 5},
+            {"exercise_name": "Push-up", "reps": 14},
+            {"exercise_name": "Double Unders", "reps": 22},
+            {"exercise_name": "Running", "distance_meters": 400},
+        ],
+    },
+    {
+        "name": "Pulse",
+        "training_type": "FOR_TIME",
+        "description": "Synchro: de burpees doe je gelijktijdig met je buddy - een rep telt pas als jullie gelijk zijn. De rest van de ronde en het hardloopstuk doe je om de beurt.",
+        "duration_minutes": 25,
+        "level": "advanced",
+        "rounds_override": "6",
+        "rep_scheme_override": "flat",
+        "is_buddy": True,
+        "movements": [
+            {"exercise_name": "Burpee", "reps": 12},
+            {"exercise_name": "KB Swing Russian", "reps": 16},
+            {"exercise_name": "Wall Ball Shot", "reps": 20},
+            {"exercise_name": "Running", "distance_meters": 400},
         ],
     },
 ]

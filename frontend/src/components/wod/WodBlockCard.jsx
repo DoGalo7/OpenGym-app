@@ -5,7 +5,10 @@ const BLOCK_LABELS = { warmup: "Warming-up", main: "Workout", cardio: "Cardio" }
 function blockSummaryRest(block) {
   const parts = [];
   if (block.training_type && block.training_type !== "STRETCH") parts.push(block.training_type.replace("_", " "));
-  if (typeof block.rounds === "number") parts.push(`${block.rounds} ronden`);
+  // "1 ronden" naast een aflopende ladder (bijv. Annie's "50-40-30-20-10") oogt tegenstrijdig -
+  // rounds is dan alleen intern een teller, geen zinvolle info voor de sporter. Vanaf 2 ronden
+  // (bijv. Fran's 21-15-9 in 3 "ronden") is het wel relevant om te tonen.
+  if (typeof block.rounds === "number" && block.rounds > 1) parts.push(`${block.rounds} ronden`);
   if (block.rep_scheme && block.rep_scheme !== "flat") parts.push(block.rep_scheme);
   return parts.join(" · ");
 }
