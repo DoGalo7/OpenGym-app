@@ -51,11 +51,19 @@ export function useProfileState() {
       localStorage.setItem(STORAGE_KEY, data.user_id);
       setProfile(data);
       setNeedsSetup(false);
+      // Only set right after a fresh recovery code was generated (see ProfileRead.recovery_code
+      // on the backend) - the caller shows it once, then calls dismissRecoveryCode.
+      return data.recovery_code ?? null;
     } catch (err) {
       setError(err.message);
+      return null;
     } finally {
       setLoading(false);
     }
+  }, []);
+
+  const dismissRecoveryCode = useCallback(() => {
+    setProfile((prev) => (prev ? { ...prev, recovery_code: null } : prev));
   }, []);
 
   const logout = useCallback(() => {
@@ -70,5 +78,5 @@ export function useProfileState() {
     setProfile(data);
   }, [profile]);
 
-  return { profile, loading, needsSetup, error, completeSetup, logout, refreshProfile, setProfile };
+  return { profile, loading, needsSetup, error, completeSetup, logout, refreshProfile, setProfile, dismissRecoveryCode };
 }

@@ -4,7 +4,7 @@ from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from app import models, schemas
-from app.security import hash_password, verify_password
+from app.security import generate_recovery_code, hash_password, verify_password
 
 
 # --- Profiles ---
@@ -33,35 +33,65 @@ def get_profile_by_name(db: Session, name: str) -> models.UserProfile | None:
     return matches[0]
 
 
-def login_or_create_profile(db: Session, data: schemas.ProfileLogin) -> models.UserProfile:
+def login_or_create_profile(db: Session, data: schemas.ProfileLogin) -> tuple[models.UserProfile, str | None]:
     """Logs into an existing profile by name+password, claims a legacy (pre-password)
     profile with the given password, or creates a brand new one - the one login/signup
     flow the frontend's name+password screen drives. Raises ValueError on a wrong password
-    (existing profile, different user_id already too - not the one on this device)."""
+    (existing profile, different user_id already too - not the one on this device).
+
+    Returns (profile, recovery_code) - recovery_code is the plaintext of a freshly generated
+    recovery code whenever password_hash was just newly set (new profile, legacy claim, or
+    first password on this device), None on a normal login where nothing changed."""
     profile = get_profile_by_user_id(db, data.user_id)
     if profile:
         # Same device/browser that already owns this profile - no password re-check needed,
         # but keep the name and a first-time password in sync.
         if profile.password_hash is None:
             profile.password_hash = hash_password(data.password)
+            recovery_code = generate_recovery_code()
+            profile.recovery_code_hash = hash_password(recovery_code)
             db.commit()
             db.refresh(profile)
-        return profile
+            return profile, recovery_code
+        return profile, None
 
     existing_by_name = get_profile_by_name(db, data.name)
     if existing_by_name:
         if existing_by_name.password_hash is None:
             # Legacy profile from before passwords existed - claim it with this password.
             existing_by_name.password_hash = hash_password(data.password)
+            recovery_code = generate_recovery_code()
+            existing_by_name.recovery_code_hash = hash_password(recovery_code)
             db.commit()
             db.refresh(existing_by_name)
-            return existing_by_name
+            return existing_by_name, recovery_code
         if not verify_password(data.password, existing_by_name.password_hash):
             raise ValueError("Onjuiste naam of wachtwoord.")
-        return existing_by_name
+        return existing_by_name, None
 
-    profile = models.UserProfile(user_id=data.user_id, name=data.name, password_hash=hash_password(data.password))
+    recovery_code = generate_recovery_code()
+    profile = models.UserProfile(
+        user_id=data.user_id,
+        name=data.name,
+        password_hash=hash_password(data.password),
+        recovery_code_hash=hash_password(recovery_code),
+    )
     db.add(profile)
+    db.commit()
+    db.refresh(profile)
+    return profile, recovery_code
+
+
+def recover_password(db: Session, data: schemas.ProfileRecover) -> models.UserProfile:
+    """Resets a forgotten password using the one-time-shown recovery code. Raises ValueError
+    on an unknown name, a profile with no recovery code (legacy, never logged in with a
+    password yet), or a wrong code."""
+    profile = get_profile_by_name(db, data.name)
+    if not profile or not profile.recovery_code_hash:
+        raise ValueError("Onbekende naam of geen herstelcode ingesteld voor dit profiel.")
+    if not verify_password(data.recovery_code, profile.recovery_code_hash):
+        raise ValueError("Onjuiste herstelcode.")
+    profile.password_hash = hash_password(data.new_password)
     db.commit()
     db.refresh(profile)
     return profile
@@ -77,7 +107,7 @@ def update_profile(db: Session, profile: models.UserProfile, data: schemas.Profi
     return profile
 
 
-def profile_to_read(profile: models.UserProfile) -> schemas.ProfileRead:
+def profile_to_read(profile: models.UserProfile, recovery_code: str | None = None) -> schemas.ProfileRead:
     return schemas.ProfileRead(
         id=profile.id,
         user_id=profile.user_id,
@@ -87,6 +117,7 @@ def profile_to_read(profile: models.UserProfile) -> schemas.ProfileRead:
         use_profile_level_default=profile.use_profile_level_default,
         home_equipment=json.loads(profile.home_equipment),
         created_at=profile.created_at,
+        recovery_code=recovery_code,
         injuries=[schemas.InjuryRead.model_validate(i) for i in profile.injuries],
         excluded_exercises=[schemas.ExerciseSummary.model_validate(e) for e in profile.excluded_exercises],
         exercise_weights=[

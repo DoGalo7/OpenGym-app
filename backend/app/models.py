@@ -112,6 +112,9 @@ class UserProfile(Base):
     # this feature existed keep working - the first login attempt for such a profile claims
     # it with whatever password is entered (see crud.login_or_create_profile).
     password_hash: Mapped[str | None] = mapped_column(String(160), nullable=True)
+    # PBKDF2 hash of a one-time-shown recovery code (see app/security.py), generated whenever
+    # password_hash is newly set. Lets a user reset a forgotten password without email/SMS.
+    recovery_code_hash: Mapped[str | None] = mapped_column(String(160), nullable=True)
     # None = niveau-filter staat uit (volledige oefeningenpool, geen beperking op niveau).
     level: Mapped[str | None] = mapped_column(String(20), nullable=True, default=None)
     # gym or home - default training location for this profile

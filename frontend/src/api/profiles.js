@@ -4,6 +4,10 @@ export function login(userId, name, password) {
   return post("/profiles/login", { user_id: userId, name, password });
 }
 
+export function recoverPassword(name, recoveryCode, newPassword) {
+  return post("/profiles/recover", { name, recovery_code: recoveryCode, new_password: newPassword });
+}
+
 export function getProfile(userId) {
   return get(`/profiles/${userId}`);
 }

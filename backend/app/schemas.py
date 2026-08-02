@@ -139,6 +139,12 @@ class ProfileLogin(BaseModel):
     password: str = Field(min_length=4, max_length=100)
 
 
+class ProfileRecover(BaseModel):
+    name: str = Field(min_length=1, max_length=80)
+    recovery_code: str = Field(min_length=1, max_length=20)
+    new_password: str = Field(min_length=4, max_length=100)
+
+
 class ProfileUpdate(BaseModel):
     name: str | None = None
     # explicit null clears the level (turns off niveau-filtering)
@@ -157,6 +163,10 @@ class ProfileRead(BaseModel):
     use_profile_level_default: bool
     home_equipment: list[str] = []
     created_at: datetime
+    # Only ever set in the response right after a new recovery code was generated (new
+    # profile, legacy profile claimed, or first password set on this device) - never on a
+    # normal login/GET, since the plaintext code isn't stored anywhere to hand back later.
+    recovery_code: str | None = None
     injuries: list[InjuryRead] = []
     excluded_exercises: list[ExerciseSummary] = []
     exercise_weights: list["ExerciseWeightRead"] = []

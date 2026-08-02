@@ -17,7 +17,16 @@ def _get_profile_or_404(db: Session, user_id: str) -> models.UserProfile:
 @router.post("/login", response_model=schemas.ProfileRead)
 def login(data: schemas.ProfileLogin, db: Session = Depends(get_db)):
     try:
-        return crud.profile_to_read(crud.login_or_create_profile(db, data))
+        profile, recovery_code = crud.login_or_create_profile(db, data)
+        return crud.profile_to_read(profile, recovery_code)
+    except ValueError as e:
+        raise HTTPException(401, str(e))
+
+
+@router.post("/recover", response_model=schemas.ProfileRead)
+def recover(data: schemas.ProfileRecover, db: Session = Depends(get_db)):
+    try:
+        return crud.profile_to_read(crud.recover_password(db, data))
     except ValueError as e:
         raise HTTPException(401, str(e))
 
