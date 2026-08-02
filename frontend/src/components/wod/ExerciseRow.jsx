@@ -92,30 +92,6 @@ export default function ExerciseRow({ exercise, sex, onSwap, onFieldChange, onMo
         </div>
       </div>
       <div className="exercise-actions">
-        {(onMoveUp || onMoveDown) && (
-          <span style={{ display: "inline-flex", gap: 2 }}>
-            <button
-              type="button"
-              className="btn-icon"
-              onClick={onMoveUp}
-              disabled={!onMoveUp}
-              aria-label={`Verplaats ${exercise.name} naar boven`}
-              style={{ padding: "4px 8px" }}
-            >
-              ▲
-            </button>
-            <button
-              type="button"
-              className="btn-icon"
-              onClick={onMoveDown}
-              disabled={!onMoveDown}
-              aria-label={`Verplaats ${exercise.name} naar beneden`}
-              style={{ padding: "4px 8px" }}
-            >
-              ▼
-            </button>
-          </span>
-        )}
         <a
           className="btn-icon"
           href={explanationUrl(exercise.name)}
@@ -149,6 +125,28 @@ export default function ExerciseRow({ exercise, sex, onSwap, onFieldChange, onMo
               onClose={() => setShowSwap(false)}
             />
           </>
+        )}
+        {(onMoveUp || onMoveDown) && (
+          <span className="reorder-stack">
+            <button
+              type="button"
+              className="btn-icon"
+              onClick={onMoveUp}
+              disabled={!onMoveUp}
+              aria-label={`Verplaats ${exercise.name} naar boven`}
+            >
+              ▲
+            </button>
+            <button
+              type="button"
+              className="btn-icon"
+              onClick={onMoveDown}
+              disabled={!onMoveDown}
+              aria-label={`Verplaats ${exercise.name} naar beneden`}
+            >
+              ▼
+            </button>
+          </span>
         )}
       </div>
     </div>

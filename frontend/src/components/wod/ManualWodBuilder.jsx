@@ -275,27 +275,7 @@ export default function ManualWodBuilder({ profile, location, trainingType, setT
                 )}
               </div>
             </div>
-            <div style={{ display: "flex", gap: 2, flexShrink: 0 }}>
-              <button
-                type="button"
-                className="btn-icon"
-                onClick={() => moveExercise(index, -1)}
-                disabled={index === 0}
-                aria-label={`Verplaats ${label} naar boven`}
-                style={{ padding: "4px 8px" }}
-              >
-                ▲
-              </button>
-              <button
-                type="button"
-                className="btn-icon"
-                onClick={() => moveExercise(index, 1)}
-                disabled={index === picked.length - 1}
-                aria-label={`Verplaats ${label} naar beneden`}
-                style={{ padding: "4px 8px" }}
-              >
-                ▼
-              </button>
+            <div style={{ display: "flex", alignItems: "center", gap: 2, flexShrink: 0 }}>
               <button
                 type="button"
                 className="btn-icon"
@@ -304,6 +284,26 @@ export default function ManualWodBuilder({ profile, location, trainingType, setT
               >
                 ✕
               </button>
+              <span className="reorder-stack">
+                <button
+                  type="button"
+                  className="btn-icon"
+                  onClick={() => moveExercise(index, -1)}
+                  disabled={index === 0}
+                  aria-label={`Verplaats ${label} naar boven`}
+                >
+                  ▲
+                </button>
+                <button
+                  type="button"
+                  className="btn-icon"
+                  onClick={() => moveExercise(index, 1)}
+                  disabled={index === picked.length - 1}
+                  aria-label={`Verplaats ${label} naar beneden`}
+                >
+                  ▼
+                </button>
+              </span>
             </div>
           </div>
         );

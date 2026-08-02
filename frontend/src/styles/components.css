@@ -315,6 +315,23 @@
   position: relative;
 }
 
+/* Volgorde-knoppen (▲▼): een compacte verticale stack in plaats van twee brede knoppen naast
+   elkaar, met een scheidingsrand zodat ze duidelijk een ander soort actie zijn dan Uitleg/Wissel. */
+.reorder-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-left: var(--space-2);
+  margin-left: 2px;
+  border-left: 1px solid var(--color-border);
+}
+
+.reorder-stack .btn-icon {
+  padding: 2px 8px;
+  min-height: 22px;
+  line-height: 1;
+}
+
 .swap-menu {
   position: absolute;
   right: 0;
