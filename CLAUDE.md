@@ -96,7 +96,13 @@ Frontend productie-build: `npm run build` (vanuit `frontend/`). Geen build-stap 
   * `seeder.py` — `run_seed(db)`, idempotent, draait bij elke opstart.
   * `sync.py` — `sync_exercises_from_source()`, een expliciet **niet-geïmplementeerde** placeholder voor de "dagelijkse online sync" uit de productspec. Er wordt in deze versie niet live het internet doorzocht; zie de docstring in dit bestand voor het bedoelde ontwerp wanneer dit wél gebouwd wordt.
 
-**Bekende beperking in de seed-data**: sommige combinaties (bijv. "schouders" als enige spiergroep + beginnersniveau) hebben een te dunne oefeningenpool — soms maar 1 hoofdoefening en geen enkele warming-up-optie. Dit is functioneel correct gedrag gegeven de filters, maar levert een mager resultaat op. Uitbreiden van de seed-data dekking staat open als vervolgtaak (zie de taken­lijst van deze sessie).
+**Seed-data dekking (2026-08-02)**: elke combinatie van spiergroep × niveau × locatie heeft nu
+minstens 3 hoofd-oefeningen en 4 warming-up-oefeningen beschikbaar, ook bij locatie=thuis zonder
+eigen apparatuur (voorheen konden sommige combinaties, vooral thuis, terugvallen op maar 1-2
+oefeningen). Geverifieerd met een meetscript dat `wod_generator._to_main_pool` nabootst per
+combinatie — zie sessie-geschiedenis. Mocht dit in de toekomst weer te dun worden (bijv. na het
+toevoegen van een nieuwe blessure-conditie die veel oefeningen uitsluit), herhaal die meting voor
+je nieuwe oefeningen toevoegt.
 
 **Frontend** (`frontend/src/`):
 
