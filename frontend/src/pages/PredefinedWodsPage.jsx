@@ -4,7 +4,6 @@ import { useNavigate } from "react-router-dom";
 import { addFavorite, listFavorites, removeFavorite } from "../api/favorites";
 import { listSharedWods, loadSharedWod } from "../api/sharedWods";
 import { listFixedWods, listPredefinedWods, loadFixedWod, loadPredefinedWod } from "../api/wods";
-import CollapsibleSection from "../components/shared/CollapsibleSection";
 import { useProfile } from "../context/ProfileContext";
 
 const CATEGORIES = [
@@ -159,52 +158,46 @@ export default function PredefinedWodsPage() {
     (item) => (!homeOnly || item.homeFriendly) && (!hyroxOnly || item.isHyrox) && (!buddyOnly || item.isBuddy)
   );
 
-  const activeCategoryLabel = CATEGORIES.find((c) => c.value === category)?.label ?? "Alle";
-  const activeFilterCount = [homeOnly, hyroxOnly, buddyOnly].filter(Boolean).length;
-  const filterSummary = `${activeCategoryLabel}${activeFilterCount > 0 ? ` · +${activeFilterCount} filter${activeFilterCount > 1 ? "s" : ""}` : ""}`;
-
   return (
     <div>
       <h1>Ideeën</h1>
 
-      <CollapsibleSection title="Filters" hint={filterSummary}>
-        <div className="chip-group" style={{ marginBottom: 12 }}>
-          {CATEGORIES.map((c) => (
-            <button
-              key={c.value}
-              type="button"
-              className={`chip${category === c.value ? " active" : ""}`}
-              onClick={() => setCategory(c.value)}
-            >
-              {c.label}
-            </button>
-          ))}
-        </div>
+      <div className="chip-group chip-group--scroll" style={{ marginBottom: 8 }}>
+        {CATEGORIES.map((c) => (
+          <button
+            key={c.value}
+            type="button"
+            className={`chip chip--sm${category === c.value ? " active" : ""}`}
+            onClick={() => setCategory(c.value)}
+          >
+            {c.label}
+          </button>
+        ))}
+      </div>
 
-        <div className="chip-group">
+      <div className="chip-group chip-group--sm" style={{ marginBottom: 16 }}>
           <button
             type="button"
-            className={`chip${homeOnly ? " active" : ""}`}
+            className={`chip chip--sm${homeOnly ? " active" : ""}`}
             onClick={() => setHomeOnly((v) => !v)}
           >
             🏠 Ook thuis
           </button>
           <button
             type="button"
-            className={`chip${hyroxOnly ? " active" : ""}`}
+            className={`chip chip--sm${hyroxOnly ? " active" : ""}`}
             onClick={() => setHyroxOnly((v) => !v)}
           >
             🔥 Hyrox-stijl
           </button>
           <button
             type="button"
-            className={`chip${buddyOnly ? " active" : ""}`}
+            className={`chip chip--sm${buddyOnly ? " active" : ""}`}
             onClick={() => setBuddyOnly((v) => !v)}
           >
             🤝 Buddy WOD
           </button>
         </div>
-      </CollapsibleSection>
 
       {error && <p className="error-text">{error}</p>}
       {filteredItems.length === 0 && !error && (

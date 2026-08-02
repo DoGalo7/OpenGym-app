@@ -102,6 +102,30 @@
   color: #fff;
 }
 
+/* Compacte variant voor plekken met veel chips tegelijk (bijv. Ideeën) - kleiner dan de
+   44px-duimvriendelijke standaard, maar met genoeg ruimte ertussen (chip-group's gap) om
+   verkeerd tikken te voorkomen. */
+.chip--sm {
+  padding: 5px 10px;
+  min-height: 32px;
+  font-size: 13px;
+}
+
+/* Eén scrollbare rij i.p.v. wrappen over meerdere regels - voor een lange rij losse keuzes
+   (bijv. Ideeën's 8 categorieën) neemt dit veel minder verticale ruimte in dan wrappen, en
+   blijft alles met een swipe bereikbaar in plaats van weggestopt achter een tik. */
+.chip-group--scroll {
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 2px;
+}
+
+.chip-group--scroll .chip {
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
 .field {
   margin-bottom: var(--space-4);
 }
