@@ -13,7 +13,7 @@ function weightText(exercise, sex) {
   return `${m ?? f} kg (RX)`;
 }
 
-export default function ExerciseRow({ exercise, sex, onSwap, onFieldChange, readOnly = false }) {
+export default function ExerciseRow({ exercise, sex, onSwap, onFieldChange, onMoveUp, onMoveDown, readOnly = false }) {
   const [showSwap, setShowSwap] = useState(false);
 
   const showsWeight =
@@ -92,6 +92,30 @@ export default function ExerciseRow({ exercise, sex, onSwap, onFieldChange, read
         </div>
       </div>
       <div className="exercise-actions">
+        {(onMoveUp || onMoveDown) && (
+          <span style={{ display: "inline-flex", gap: 2 }}>
+            <button
+              type="button"
+              className="btn-icon"
+              onClick={onMoveUp}
+              disabled={!onMoveUp}
+              aria-label={`Verplaats ${exercise.name} naar boven`}
+              style={{ padding: "4px 8px" }}
+            >
+              ▲
+            </button>
+            <button
+              type="button"
+              className="btn-icon"
+              onClick={onMoveDown}
+              disabled={!onMoveDown}
+              aria-label={`Verplaats ${exercise.name} naar beneden`}
+              style={{ padding: "4px 8px" }}
+            >
+              ▼
+            </button>
+          </span>
+        )}
         <a
           className="btn-icon"
           href={explanationUrl(exercise.name)}

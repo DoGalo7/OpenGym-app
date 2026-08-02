@@ -93,6 +93,16 @@ export default function ManualWodBuilder({ profile, location, trainingType, setT
     setPicked((prev) => prev.map((p) => (p.entryId === entryId ? { ...p, [field]: value } : p)));
   };
 
+  const moveExercise = (index, direction) => {
+    setPicked((prev) => {
+      const targetIndex = index + direction;
+      if (targetIndex < 0 || targetIndex >= prev.length) return prev;
+      const next = [...prev];
+      [next[index], next[targetIndex]] = [next[targetIndex], next[index]];
+      return next;
+    });
+  };
+
   const canBuild = picked.length > 0;
 
   const handleBuild = () => {
@@ -265,14 +275,36 @@ export default function ManualWodBuilder({ profile, location, trainingType, setT
                 )}
               </div>
             </div>
-            <button
-              type="button"
-              className="btn-icon"
-              onClick={() => removeExercise(p.entryId)}
-              aria-label={`Verwijder ${label}`}
-            >
-              ✕
-            </button>
+            <div style={{ display: "flex", gap: 2, flexShrink: 0 }}>
+              <button
+                type="button"
+                className="btn-icon"
+                onClick={() => moveExercise(index, -1)}
+                disabled={index === 0}
+                aria-label={`Verplaats ${label} naar boven`}
+                style={{ padding: "4px 8px" }}
+              >
+                ▲
+              </button>
+              <button
+                type="button"
+                className="btn-icon"
+                onClick={() => moveExercise(index, 1)}
+                disabled={index === picked.length - 1}
+                aria-label={`Verplaats ${label} naar beneden`}
+                style={{ padding: "4px 8px" }}
+              >
+                ▼
+              </button>
+              <button
+                type="button"
+                className="btn-icon"
+                onClick={() => removeExercise(p.entryId)}
+                aria-label={`Verwijder ${label}`}
+              >
+                ✕
+              </button>
+            </div>
           </div>
         );
       })}

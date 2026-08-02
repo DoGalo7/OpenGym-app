@@ -11,7 +11,7 @@ function blockSummaryRest(block) {
 }
 
 export default function WodBlockCard({
-  block, sex, onSwapExercise, onExerciseFieldChange, onDurationChange, readOnly = false,
+  block, sex, onSwapExercise, onExerciseFieldChange, onMoveExercise, onDurationChange, readOnly = false,
 }) {
   const rest = blockSummaryRest(block);
   const heading = block.training_type === "STRETCH" ? "Stretch/Cooldown" : BLOCK_LABELS[block.block_type] ?? block.block_type;
@@ -46,6 +46,12 @@ export default function WodBlockCard({
           readOnly={readOnly}
           onSwap={readOnly ? undefined : (alternative) => onSwapExercise(index, alternative)}
           onFieldChange={readOnly ? undefined : (field, value) => onExerciseFieldChange(index, field, value)}
+          onMoveUp={readOnly || !onMoveExercise || index === 0 ? undefined : () => onMoveExercise(index, -1)}
+          onMoveDown={
+            readOnly || !onMoveExercise || index === block.exercises.length - 1
+              ? undefined
+              : () => onMoveExercise(index, 1)
+          }
         />
       ))}
     </div>

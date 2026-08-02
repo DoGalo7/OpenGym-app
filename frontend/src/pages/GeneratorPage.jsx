@@ -307,6 +307,20 @@ export default function GeneratorPage() {
     }));
   };
 
+  const handleMoveExercise = (blockIndex, exerciseIndex, direction) => {
+    setWod((prev) => ({
+      ...prev,
+      blocks: prev.blocks.map((block, bi) => {
+        if (bi !== blockIndex) return block;
+        const targetIndex = exerciseIndex + direction;
+        if (targetIndex < 0 || targetIndex >= block.exercises.length) return block;
+        const exercises = [...block.exercises];
+        [exercises[exerciseIndex], exercises[targetIndex]] = [exercises[targetIndex], exercises[exerciseIndex]];
+        return { ...block, exercises };
+      }),
+    }));
+  };
+
   const handleBlockDurationChange = (blockIndex, minutes) => {
     setWod((prev) => {
       const blocks = prev.blocks.map((block, bi) =>
@@ -688,6 +702,9 @@ export default function GeneratorPage() {
               }
               onExerciseFieldChange={(exerciseIndex, field, value) =>
                 handleExerciseFieldChange(blockIndex, exerciseIndex, field, value)
+              }
+              onMoveExercise={(exerciseIndex, direction) =>
+                handleMoveExercise(blockIndex, exerciseIndex, direction)
               }
               onDurationChange={(minutes) => handleBlockDurationChange(blockIndex, minutes)}
             />
