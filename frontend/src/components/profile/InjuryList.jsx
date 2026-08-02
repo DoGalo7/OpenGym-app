@@ -84,21 +84,7 @@ export default function InjuryList({ injuries, onAdd, onRemove }) {
           />
         </div>
         <div className="field">
-          <label htmlFor="injury-muscle-group">Spiergroep ontzien (optioneel)</label>
-          <select
-            id="injury-muscle-group"
-            value={muscleGroup}
-            onChange={(event) => setMuscleGroup(event.target.value)}
-          >
-            {MUSCLE_GROUPS.map((group) => (
-              <option key={group.value} value={group.value}>
-                {group.label}
-              </option>
-            ))}
-          </select>
-        </div>
-        <div className="field">
-          <label htmlFor="injury-condition">Bekende beperking (optioneel)</label>
+          <label htmlFor="injury-condition">Om welke blessure gaat het? (optioneel)</label>
           <select
             id="injury-condition"
             value={conditionKey}
@@ -111,7 +97,26 @@ export default function InjuryList({ injuries, onAdd, onRemove }) {
             ))}
           </select>
           <p className="field-hint" style={{ marginBottom: 0 }}>
-            Past de workout aan met oefeningen die hierbij vaak afgeraden worden.
+            Staat je blessure hierbij (bijv. nek, schouder, knie)? Kies hem dan — de app sluit
+            automatisch de oefeningen uit die hiervoor vaak worden afgeraden.
+          </p>
+        </div>
+        <div className="field">
+          <label htmlFor="injury-muscle-group">Of: sluit een hele spiergroep uit (optioneel)</label>
+          <select
+            id="injury-muscle-group"
+            value={muscleGroup}
+            onChange={(event) => setMuscleGroup(event.target.value)}
+          >
+            {MUSCLE_GROUPS.map((group) => (
+              <option key={group.value} value={group.value}>
+                {group.label}
+              </option>
+            ))}
+          </select>
+          <p className="field-hint" style={{ marginBottom: 0 }}>
+            Alleen nodig als je blessure niet in de lijst hierboven staat — sluit dan de hele
+            spiergroep uit in plaats van specifieke oefeningen.
           </p>
         </div>
         <button type="submit" className="btn btn-secondary" disabled={saving}>
