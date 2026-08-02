@@ -6,7 +6,7 @@ const MUSCLE_GROUPS = [
   { value: "benen", label: "Benen" },
   { value: "billen", label: "Billen" },
   { value: "buik", label: "Buik" },
-  { value: "volledig_lichaam", label: "Volledig lichaam" },
+  { value: "volledig_lichaam", label: "Geen voorkeur" },
 ];
 
 export default function MuscleGroupPicker({ selected, onChange }) {
@@ -14,7 +14,8 @@ export default function MuscleGroupPicker({ selected, onChange }) {
     if (selected.includes(value)) {
       onChange(selected.filter((v) => v !== value));
     } else if (value === "volledig_lichaam") {
-      // Volledig lichaam sluit specifieke spiergroepen uit (en andersom) — combineren is verwarrend.
+      // "Geen voorkeur" (waarde: volledig_lichaam) sluit specifieke spiergroepen uit (en
+      // andersom) — combineren is verwarrend.
       onChange(["volledig_lichaam"]);
     } else {
       onChange([...selected.filter((v) => v !== "volledig_lichaam"), value]);
