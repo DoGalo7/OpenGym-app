@@ -411,6 +411,65 @@ export default function GeneratorPage() {
     }
   };
 
+  const handleRemoveExercise = (blockIndex, exerciseIndex) => {
+    setWod((prev) => {
+      const blocks = prev.blocks.map((b, i) =>
+        i === blockIndex ? { ...b, exercises: b.exercises.filter((_, idx) => idx !== exerciseIndex) } : b
+      );
+      return { ...prev, blocks };
+    });
+  };
+
+  const handleAddExerciseToBlock = (blockIndex, exercise) => {
+    const block = wod.blocks[blockIndex];
+    const saved = (profile.exercise_weights ?? []).find((w) => w.exercise_id === exercise.id);
+    let fields;
+    if (block.block_type === "warmup") {
+      fields = { reps: 10, duration_seconds: null, distance_meters: null, calories: null };
+    } else if (block.training_type === "STRETCH") {
+      fields = { reps: null, duration_seconds: STRETCH_HOLD_SECONDS, distance_meters: null, calories: null };
+    } else if (exercise.is_cardio) {
+      fields =
+        exercise.cardio_type === "assault_bike"
+          ? { reps: null, duration_seconds: null, distance_meters: null, calories: 15 }
+          : { reps: null, duration_seconds: null, distance_meters: 500, calories: null };
+    } else {
+      fields = { reps: 10, duration_seconds: null, distance_meters: null, calories: null };
+    }
+    const newExercise = {
+      exercise_id: exercise.id,
+      name: exercise.name,
+      muscle_group: exercise.muscle_group,
+      category: exercise.category,
+      ...fields,
+      cardio_type: exercise.is_cardio ? exercise.cardio_type : null,
+      own_weight_kg: saved?.weight_kg ?? null,
+      suggested_weight_male_kg: exercise.rx_weight_male_kg,
+      suggested_weight_female_kg: exercise.rx_weight_female_kg,
+      alternatives: [],
+    };
+    setWod((prev) => {
+      const blocks = prev.blocks.map((b, i) => (i === blockIndex ? { ...b, exercises: [...b.exercises, newExercise] } : b));
+      return { ...prev, blocks };
+    });
+  };
+
+  // Mirrors ManualWodBuilder's homeAllowed + browse-list filtering, so exercises offered here
+  // stay consistent with what the location/equipment/block type would otherwise allow.
+  const buildAddExerciseFilter = (block) => (e) => {
+    const homeEquipment = new Set(profile.home_equipment ?? []);
+    const homeAllowed =
+      location !== "home" ||
+      !e.requires_gym ||
+      (e.equipment_tag && homeEquipment.has(e.equipment_tag)) ||
+      (e.is_cardio && e.cardio_type && homeEquipment.has(e.cardio_type));
+    if (!homeAllowed) return false;
+    if (block.block_type === "warmup") return e.category === "bodyweight" || e.category === "gymnastics";
+    if (block.training_type === "STRETCH") return e.category === "stretching";
+    if (block.block_type === "cardio") return Boolean(e.is_cardio);
+    return !e.warmup_only && e.category !== "stretching";
+  };
+
   const handleSaveResult = (result) =>
     createHistory({ user_id: profile.user_id, source: "generated", wod_json: wod, result });
 
@@ -813,6 +872,9 @@ export default function GeneratorPage() {
               onMoveExercise={(exerciseIndex, direction) =>
                 handleMoveExercise(blockIndex, exerciseIndex, direction)
               }
+              onRemoveExercise={(exerciseIndex) => handleRemoveExercise(blockIndex, exerciseIndex)}
+              onAddExercise={(exercise) => handleAddExerciseToBlock(blockIndex, exercise)}
+              addExerciseFilter={buildAddExerciseFilter(block)}
               onDurationChange={(minutes) => handleBlockDurationChange(blockIndex, minutes)}
             />
           ))}

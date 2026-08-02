@@ -1,3 +1,4 @@
+import AddExercisePicker from "./AddExercisePicker";
 import ExerciseRow from "./ExerciseRow";
 
 const BLOCK_LABELS = { warmup: "Warming-up", main: "Workout", cardio: "Cardio" };
@@ -14,7 +15,8 @@ function blockSummaryRest(block) {
 }
 
 export default function WodBlockCard({
-  block, sex, onSwapExercise, onExerciseFieldChange, onMoveExercise, onDurationChange, readOnly = false,
+  block, sex, onSwapExercise, onExerciseFieldChange, onMoveExercise, onDurationChange,
+  onRemoveExercise, onAddExercise, addExerciseFilter, readOnly = false,
 }) {
   const rest = blockSummaryRest(block);
   const heading = block.training_type === "STRETCH" ? "Stretch & Core" : BLOCK_LABELS[block.block_type] ?? block.block_type;
@@ -55,8 +57,10 @@ export default function WodBlockCard({
               ? undefined
               : () => onMoveExercise(index, 1)
           }
+          onRemove={readOnly || !onRemoveExercise ? undefined : () => onRemoveExercise(index)}
         />
       ))}
+      {!readOnly && onAddExercise && <AddExercisePicker filterFn={addExerciseFilter} onAdd={onAddExercise} />}
     </div>
   );
 }

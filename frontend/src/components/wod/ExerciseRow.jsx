@@ -13,7 +13,9 @@ export function weightText(exercise, sex) {
   return `${m ?? f} kg (RX)`;
 }
 
-export default function ExerciseRow({ exercise, sex, onSwap, onFieldChange, onMoveUp, onMoveDown, readOnly = false }) {
+export default function ExerciseRow({
+  exercise, sex, onSwap, onFieldChange, onMoveUp, onMoveDown, onRemove, readOnly = false,
+}) {
   const [showSwap, setShowSwap] = useState(false);
 
   const showsWeight =
@@ -151,6 +153,16 @@ export default function ExerciseRow({ exercise, sex, onSwap, onFieldChange, onMo
               onClose={() => setShowSwap(false)}
             />
           </>
+        )}
+        {onRemove && (
+          <button
+            type="button"
+            className="btn-icon"
+            onClick={onRemove}
+            aria-label={`Verwijder ${exercise.name}`}
+          >
+            − Verwijder
+          </button>
         )}
         {(onMoveUp || onMoveDown) && (
           <span className="reorder-stack">
