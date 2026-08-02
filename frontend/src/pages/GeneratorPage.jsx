@@ -373,6 +373,43 @@ export default function GeneratorPage() {
     }
   };
 
+  const [addingWarmupExercise, setAddingWarmupExercise] = useState(false);
+
+  const handleAddWarmupExercise = async (warmupBlockIndex) => {
+    const mainBlock = wod.blocks.find((b) => b.block_type === "main");
+    const warmupBlock = wod.blocks[warmupBlockIndex];
+    const muscleGroupsForWarmup = [...new Set(warmupBlock.exercises.map((e) => e.muscle_group))];
+    const excludeIds = wod.blocks.flatMap((b) => b.exercises.map((e) => e.exercise_id));
+    setAddingWarmupExercise(true);
+    setWarmupError(null);
+    try {
+      const extra = await generateWarmup({
+        user_id: profile.user_id,
+        muscle_groups: muscleGroupsForWarmup.length ? muscleGroupsForWarmup : [...new Set(mainBlock.exercises.map((e) => e.muscle_group))],
+        location,
+        warmup_minutes: Number(warmupBlock.duration_minutes) || 8,
+        warmup_exercise_count: 1,
+        exclude_exercise_ids: excludeIds,
+        temporary_injury_muscle_group: tempInjuryMuscleGroup || undefined,
+        override_injury_muscle_groups: confirmedOverrideGroups,
+      });
+      if (extra.exercises.length === 0) {
+        setWarmupError("Geen extra warming-up oefening meer beschikbaar voor deze spiergroepen.");
+        return;
+      }
+      setWod((prev) => {
+        const blocks = prev.blocks.map((b, i) =>
+          i === warmupBlockIndex ? { ...b, exercises: [...b.exercises, ...extra.exercises] } : b
+        );
+        return { ...prev, blocks };
+      });
+    } catch (err) {
+      setWarmupError(err.message);
+    } finally {
+      setAddingWarmupExercise(false);
+    }
+  };
+
   const handleSaveResult = (result) =>
     createHistory({ user_id: profile.user_id, source: "generated", wod_json: wod, result });
 
@@ -740,6 +777,20 @@ export default function GeneratorPage() {
               onDurationChange={(minutes) => handleBlockDurationChange(blockIndex, minutes)}
             />
           ))}
+          {wod.blocks.map((block, blockIndex) =>
+            block.block_type === "warmup" ? (
+              <button
+                key={`add-warmup-exercise-${blockIndex}`}
+                type="button"
+                className="btn btn-secondary"
+                style={{ width: "100%", marginTop: -8, marginBottom: 12 }}
+                onClick={() => handleAddWarmupExercise(blockIndex)}
+                disabled={addingWarmupExercise}
+              >
+                {addingWarmupExercise ? "Bezig..." : "+ Oefening toevoegen aan warming-up"}
+              </button>
+            ) : null
+          )}
           <button
             type="button"
             className="btn btn-primary"
