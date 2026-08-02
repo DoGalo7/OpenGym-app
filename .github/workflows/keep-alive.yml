@@ -1,0 +1,36 @@
+name: Keep backend awake
+
+# Render's free tier spins the backend down after ~15 min of inactivity
+# (first request after that takes 30-60s). This pings /health every 10
+# minutes to keep it warm, but only during Dutch daytime hours so we stay
+# well within Render's 750 free instance-hours/month.
+#
+# The cron below fires every 10 minutes all day in UTC; the job itself
+# checks the actual Europe/Amsterdam clock and skips outside 07:00-24:00,
+# so daylight-saving changes don't need to be hand-calculated here.
+#
+# Note: GitHub disables scheduled workflows automatically after 60 days
+# without any repo activity (a push, etc.) - if pings stop unexpectedly,
+# check for that and re-enable the workflow under the Actions tab.
+
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+  workflow_dispatch: {}
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check daytime window (Europe/Amsterdam, 07:00-24:00)
+        id: window
+        run: |
+          hour=$(TZ=Europe/Amsterdam date +%H)
+          if [ "$hour" -ge 7 ]; then
+            echo "in_window=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "in_window=false" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Ping backend health endpoint
+        if: steps.window.outputs.in_window == 'true'
+        run: curl -fsS https://open-gym-app-api.onrender.com/health
