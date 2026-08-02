@@ -28,7 +28,7 @@ const TABATA_REST_SECONDS = 10;
 
 // Turns a WodBlock into a flat list of timed phases to step through. AMRAP is one long
 // phase; EMOM gets one phase per minute cycling through the block's exercises; Tabata
-// alternates werk/rust phases; Stretch/Cooldown uses each exercise's own duration_seconds.
+// alternates werk/rust phases; Stretch & Core uses each exercise's own duration_seconds.
 function buildPhases(block) {
   const exercises = block.exercises ?? [];
   const type = block.training_type;

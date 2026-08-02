@@ -2,15 +2,15 @@ import { Link } from "react-router-dom";
 
 const SECTIONS = [
   {
-    title: "WOD maken - drie manieren",
+    title: "WOD maken - Workout of Stretch & Core",
     items: [
-      "Genereer automatisch: kiest oefeningen op basis van spiergroepen, type training (AMRAP/EMOM/Tabata/For Time), lengte, locatie, niveau en optioneel Hyrox-stijl of cardio.",
-      "Stel zelf samen: zoek oefeningen op, voeg ze toe en vul zelf reps/afstand/calorieën/gewicht in. Type training, lengte en spiergroep-filter werken hetzelfde als bij automatisch genereren.",
-      "Stretch/Cooldown: bouwt een reeks rustige stretches (elk 40 sec, aanpasbaar) voor de gekozen spiergroepen - geen kracht- of conditietraining.",
-      "Elke oefening heeft een wisselknop (alternatief van dezelfde spiergroep/categorie) en een uitleg-link (YouTube-zoekopdracht).",
+      "Twee hoofdkeuzes bovenaan: \"Workout\" (kracht/conditie) of \"Stretch & Core\" (herstel) - los van elkaar, want het zijn twee verschillende soorten sessies, geen varianten van dezelfde.",
+      "Binnen Workout een tweede keuze: Genereer automatisch (kiest oefeningen op basis van spiergroepen, type training AMRAP/EMOM/Tabata/For Time, lengte, locatie, niveau en optioneel Hyrox-stijl of cardio) of Stel zelf samen (zoek oefeningen op, voeg ze toe - ook meerdere keren dezelfde - en vul zelf reps/afstand/calorieën/gewicht in).",
+      "Stretch & Core: bouwt een reeks rustige stretches én core-stabiliteitsoefeningen (plank, dead bug, bird dog, glute bridge hold - elk 40 sec, aanpasbaar) voor de gekozen spiergroepen - geen kracht- of conditietraining.",
+      "Elke oefening heeft een wisselknop (alternatief van dezelfde spiergroep/categorie), volgorde-knoppen (▲▼) om te herschikken, en een uitleg-link (YouTube-zoekopdracht).",
       "Duur per blok en reps/gewicht/seconden per oefening zijn achteraf nog aan te passen, ook nadat de WOD is gemaakt.",
       "Losse \"+ Warming-up toevoegen\"-knop als een workout er nog geen heeft.",
-      "\"Start workout\"-knop opent een timer die meetelt/aftelt passend bij het type training, met piepjes bij rondewissels (AMRAP/EMOM/Tabata/Stretch/For Time).",
+      "\"Start workout\"-knop (onder de oefeningenlijst) opent een timer die meetelt/aftelt passend bij het type training, met piepjes bij rondewissels (AMRAP/EMOM/Tabata/Stretch & Core/For Time) en een schermvergrendeling-blocker zolang hij loopt.",
       "\"Delen met andere sporters\"-knop zet een gemaakte WOD onder Ideeën, zichtbaar voor iedereen.",
     ],
   },

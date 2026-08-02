@@ -1,4 +1,4 @@
-# Curated starter dataset (~105 exercises). Not sourced online - see sync.py for why.
+# Curated starter dataset (~111 exercises). Not sourced online - see sync.py for why.
 # `is_hyrox` tags exercises that fit Hyrox-style training - the official 8 race stations
 # (SkiErg, Sled Push, Sled Pull, Burpee Broad Jumps, Row, Farmers Carry, Sandbag Lunges,
 # Wall Balls, each after a 1km run) plus movements that commonly appear in Hyrox-style gym
@@ -153,7 +153,7 @@ EXERCISES = [
     # outside from home, so this is now an explicit opt-in like the other cardio machines.
     {"name": "Running", "muscle_group": "cardio", "level": "beginner", "category": "cardio", "requires_gym": True, "is_cardio": True, "cardio_type": "run", "is_hyrox": True},
 
-    # --- Stretching (static holds, used by the Stretch/Cooldown-WOD option, not warmup) ---
+    # --- Stretching (static holds, used by the Stretch & Core-WOD option, not warmup) ---
     # level=beginner for all - a static stretch isn't gated by strength level like the rest
     # of the pool, so this keeps them selectable regardless of the profile's niveau.
     {"name": "Shoulder Cross-body Stretch", "muscle_group": "schouders", "level": "beginner", "category": "stretching", "requires_gym": False},
@@ -166,4 +166,15 @@ EXERCISES = [
     {"name": "Cobra Stretch", "muscle_group": "buik", "level": "beginner", "category": "stretching", "requires_gym": False},
     {"name": "Standing Forward Fold", "muscle_group": "volledig_lichaam", "level": "beginner", "category": "stretching", "requires_gym": False},
     {"name": "Reclined Spinal Twist", "muscle_group": "volledig_lichaam", "level": "beginner", "category": "stretching", "requires_gym": False},
+
+    # --- Core-stabiliteit (6, static holds - same category="stretching" pool as above, so
+    # the Stretch & Core-WOD needs no new backend logic: it already builds a duration-based
+    # hold sequence per muscle group from this category). Unlike pure flexibility stretches
+    # these have a real difficulty progression, hence Hollow Body Hold is intermediate.
+    {"name": "Plank Hold", "muscle_group": "buik", "level": "beginner", "category": "stretching", "requires_gym": False},
+    {"name": "Side Plank Hold", "muscle_group": "buik", "level": "beginner", "category": "stretching", "requires_gym": False},
+    {"name": "Dead Bug", "muscle_group": "buik", "level": "beginner", "category": "stretching", "requires_gym": False},
+    {"name": "Bird Dog Hold", "muscle_group": "rug", "level": "beginner", "category": "stretching", "requires_gym": False},
+    {"name": "Glute Bridge Hold", "muscle_group": "billen", "level": "beginner", "category": "stretching", "requires_gym": False},
+    {"name": "Hollow Body Hold", "muscle_group": "buik", "level": "intermediate", "category": "stretching", "requires_gym": False},
 ]

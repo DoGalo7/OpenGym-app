@@ -255,7 +255,7 @@ class WarmupRequest(BaseModel):
 
 
 class StretchWodRequest(BaseModel):
-    """Builds a full Stretch/Cooldown-WOD - static holds (duration_seconds) covering the
+    """Builds a full Stretch & Core-WOD - static holds (duration_seconds) covering the
     requested muscle groups, instead of the usual reps-based metcon."""
     user_id: str = Field(min_length=1, max_length=64)
     muscle_groups: list[MuscleGroup] = Field(min_length=1)

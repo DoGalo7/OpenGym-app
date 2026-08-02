@@ -14,7 +14,7 @@ export default function WodBlockCard({
   block, sex, onSwapExercise, onExerciseFieldChange, onMoveExercise, onDurationChange, readOnly = false,
 }) {
   const rest = blockSummaryRest(block);
-  const heading = block.training_type === "STRETCH" ? "Stretch/Cooldown" : BLOCK_LABELS[block.block_type] ?? block.block_type;
+  const heading = block.training_type === "STRETCH" ? "Stretch & Core" : BLOCK_LABELS[block.block_type] ?? block.block_type;
 
   return (
     <div className="card">

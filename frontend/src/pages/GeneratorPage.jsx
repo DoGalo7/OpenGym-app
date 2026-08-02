@@ -95,6 +95,12 @@ export default function GeneratorPage() {
   const [showInjuryModal, setShowInjuryModal] = useState(false);
   const [pendingAction, setPendingAction] = useState("generate");
 
+  // Two-tier mode picker: `purpose` is the primary choice (a real workout vs. Stretch & Core),
+  // `mode` only matters within purpose="workout" (automatisch genereren vs. zelf samenstellen).
+  // Was one flat 3-way toggle - once Stretch/Cooldown joined it, 3 equally-weighted buttons felt
+  // cluttered and buried the auto/handmatig choice at the same visual level as an unrelated
+  // "different kind of session entirely" choice.
+  const [purpose, setPurpose] = useState("workout");
   const [mode, setMode] = useState("generate");
   const [wod, setWod] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -424,14 +430,42 @@ export default function GeneratorPage() {
       </div>
 
       <div className="mode-toggle">
+        <button type="button" className={purpose === "workout" ? "active" : ""} onClick={() => setPurpose("workout")}>
+          🏋 Workout
+        </button>
+        <button type="button" className={purpose === "stretch" ? "active" : ""} onClick={() => setPurpose("stretch")}>
+          🧘 Stretch &amp; Core
+        </button>
+      </div>
+
+      {purpose === "stretch" ? (
+        <div className="card">
+          <h3>Stretch &amp; Core-WOD</h3>
+          <p className="field-hint" style={{ marginTop: 0 }}>
+            Een reeks rustige stretches en core-stabiliteitsoefeningen ({STRETCH_HOLD_SECONDS} sec
+            per oefening) voor de gekozen spiergroepen. Geen kracht- of conditietraining, alleen
+            mobiliteit, stabiliteit en ontspanning.
+          </p>
+          <div className="field">
+            <label>Spiergroepen</label>
+            <MuscleGroupPicker selected={muscleGroups} onChange={setMuscleGroups} />
+          </div>
+          <button type="button" className="btn btn-primary" onClick={handleGenerateStretch} disabled={muscleGroups.length === 0 || loading}>
+            {loading ? "Bezig met samenstellen..." : "Maak Stretch & Core-WOD"}
+          </button>
+          {muscleGroups.length === 0 && (
+            <p className="field-hint" style={{ marginTop: 8 }}>Kies minstens één spiergroep om te starten.</p>
+          )}
+          {error && <p className="error-text">{error}</p>}
+        </div>
+      ) : (
+      <>
+      <div className="mode-toggle mode-toggle--sub">
         <button type="button" className={mode === "generate" ? "active" : ""} onClick={() => setMode("generate")}>
           Genereer automatisch
         </button>
         <button type="button" className={mode === "manual" ? "active" : ""} onClick={() => setMode("manual")}>
           Stel zelf samen
-        </button>
-        <button type="button" className={mode === "stretch" ? "active" : ""} onClick={() => setMode("stretch")}>
-          Stretch/Cooldown
         </button>
       </div>
 
@@ -443,25 +477,6 @@ export default function GeneratorPage() {
           setTrainingType={setTrainingType}
           onBuild={(built) => setWod(built)}
         />
-      ) : mode === "stretch" ? (
-        <div className="card">
-          <h3>Stretch/Cooldown-WOD</h3>
-          <p className="field-hint" style={{ marginTop: 0 }}>
-            Een reeks rustige stretches ({STRETCH_HOLD_SECONDS} sec per stretch) voor de gekozen
-            spiergroepen. Geen kracht- of conditietraining, alleen mobiliteit en ontspanning.
-          </p>
-          <div className="field">
-            <label>Spiergroepen</label>
-            <MuscleGroupPicker selected={muscleGroups} onChange={setMuscleGroups} />
-          </div>
-          <button type="button" className="btn btn-primary" onClick={handleGenerateStretch} disabled={muscleGroups.length === 0 || loading}>
-            {loading ? "Bezig met samenstellen..." : "Maak stretch-WOD"}
-          </button>
-          {muscleGroups.length === 0 && (
-            <p className="field-hint" style={{ marginTop: 8 }}>Kies minstens één spiergroep om te starten.</p>
-          )}
-          {error && <p className="error-text">{error}</p>}
-        </div>
       ) : (
       <form className="card" onSubmit={handleSubmit}>
         <h3>Workout-opbouw</h3>
@@ -651,6 +666,8 @@ export default function GeneratorPage() {
         )}
         {error && <p className="error-text">{error}</p>}
       </form>
+      )}
+      </>
       )}
 
       {showInjuryModal && (

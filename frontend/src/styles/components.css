@@ -153,6 +153,24 @@
   color: #fff;
 }
 
+/* Secondary/nested toggle (e.g. Automatisch/Zelf samenstellen inside "Workout") - visually
+   subordinate to the primary mode-toggle above it via smaller sizing, not a full restyle. */
+.mode-toggle--sub button {
+  padding: 8px;
+  min-height: 40px;
+  font-weight: 600;
+  font-size: 14px;
+  border-width: 1px;
+  border-color: var(--color-border);
+  color: var(--color-text-muted);
+}
+
+.mode-toggle--sub button.active {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  background: var(--color-surface);
+}
+
 .modal-backdrop {
   position: fixed;
   inset: 0;

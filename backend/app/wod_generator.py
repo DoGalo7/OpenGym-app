@@ -119,7 +119,7 @@ STRETCH_HOLD_SECONDS = 40
 
 
 def build_stretch_wod(db: Session, profile: UserProfile, request) -> GeneratedWod:
-    """Builds a full Stretch/Cooldown-WOD (see schemas.StretchWodRequest) - a sequence of
+    """Builds a full Stretch & Core-WOD (see schemas.StretchWodRequest) - a sequence of
     static holds (category=stretching) covering the requested muscle groups, instead of the
     usual reps-based metcon block."""
     all_exercises = db.query(Exercise).all()
