@@ -1,4 +1,4 @@
-# Curated starter dataset (~144 exercises). Not sourced online - see sync.py for why.
+# Curated starter dataset (~145 exercises). Not sourced online - see sync.py for why.
 # `is_hyrox` tags exercises that fit Hyrox-style training - the official 8 race stations
 # (SkiErg, Sled Push, Sled Pull, Burpee Broad Jumps, Row, Farmers Carry, Sandbag Lunges,
 # Wall Balls, each after a 1km run) plus movements that commonly appear in Hyrox-style gym
@@ -142,6 +142,7 @@ EXERCISES = [
     {"name": "Pike Hold", "muscle_group": "schouders", "level": "beginner", "category": "bodyweight", "requires_gym": False},
     {"name": "Plank Walkout", "muscle_group": "schouders", "level": "beginner", "category": "bodyweight", "requires_gym": False},
     {"name": "Wall Handstand Hold", "muscle_group": "schouders", "level": "intermediate", "category": "bodyweight", "requires_gym": False},
+    {"name": "Plank Up-Down", "muscle_group": "buik", "level": "intermediate", "category": "bodyweight", "requires_gym": False},
 
     # --- Extra warming-up-oefeningen (11) - dynamische mobility-moves, incl. elastiek-oefeningen.
     # Meerdere zijn getagd als "volledig_lichaam" (i.p.v. een specifieke spiergroep) omdat dat de
