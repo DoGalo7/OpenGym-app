@@ -14,7 +14,7 @@ export default function NavBar() {
       {TABS.map((tab) => (
         <NavLink key={tab.to} to={tab.to} end={tab.to === "/"}>
           <span className="nav-icon">{tab.icon}</span>
-          <span>{tab.label}</span>
+          <span className="nav-label">{tab.label}</span>
         </NavLink>
       ))}
     </nav>
