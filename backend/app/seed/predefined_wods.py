@@ -914,4 +914,129 @@ PREDEFINED_WODS = [
             {"exercise_name": "KB Thruster", "reps": 20},
         ],
     },
+
+    # --- Thuis-WOD's, eigen samenstelling (9) - crossfit.com's travel-workouts-artikel had er
+    # zelf maar 9 in totaal (6 daarvan al eerder toegevoegd, zie de "Reisvriendelijke WOD's"-
+    # secties hierboven); dit zijn extra, zelf samengestelde workouts om de thuis-categorie
+    # breder te maken, op dezelfde manier opgebouwd als de rest van dit bestand (bestaande
+    # oefeningen, realistische volumes) maar niet van die bron overgenomen. Alle bewegingen zijn
+    # requires_gym=False, dus deze krijgen automatisch de "Ook thuis"-tag.
+    {
+        "name": "Volledig Lichaam Bodyweight",
+        "training_type": "AMRAP",
+        "description": "Simpele full-body AMRAP zonder apparatuur.",
+        "duration_minutes": 15,
+        "level": "beginner",
+        "movements": [
+            {"exercise_name": "Air Squat", "reps": 15},
+            {"exercise_name": "Push-up", "reps": 10},
+            {"exercise_name": "Sit-up", "reps": 15},
+            {"exercise_name": "Superman", "reps": 10},
+        ],
+    },
+    {
+        "name": "Core Blast Thuis",
+        "training_type": "AMRAP",
+        "description": "Buikspier-AMRAP, geen apparatuur nodig.",
+        "duration_minutes": 12,
+        "level": "intermediate",
+        "movements": [
+            {"exercise_name": "V-up", "reps": 15},
+            {"exercise_name": "Russian Twist", "reps": 20},
+            {"exercise_name": "Sit-up", "reps": 20},
+        ],
+    },
+    {
+        "name": "Beenkracht Zonder Gewicht",
+        "training_type": "FOR_TIME",
+        "description": "Beenwerk met alleen je eigen lichaamsgewicht.",
+        "duration_minutes": 15,
+        "level": "intermediate",
+        "rounds_override": "4",
+        "rep_scheme_override": "flat",
+        "movements": [
+            {"exercise_name": "Walking Lunge", "reps": 20},
+            {"exercise_name": "Reverse Lunge", "reps": 20},
+            {"exercise_name": "Air Squat", "reps": 20},
+        ],
+    },
+    {
+        "name": "Push Pull Thuis",
+        "training_type": "EMOM",
+        "description": "Afwisselend duwen en trekken, elke minuut een andere oefening.",
+        "duration_minutes": 16,
+        "level": "intermediate",
+        "movements": [
+            {"exercise_name": "Push-up", "reps": 12},
+            {"exercise_name": "Superman", "reps": 12},
+            {"exercise_name": "Diamond Push-up", "reps": 8},
+            {"exercise_name": "Bird Dog", "reps": 12},
+        ],
+    },
+    {
+        "name": "Glutes & Core",
+        "training_type": "AMRAP",
+        "description": "Billen en buik, laagdrempelig en zonder apparatuur.",
+        "duration_minutes": 12,
+        "level": "beginner",
+        "movements": [
+            {"exercise_name": "Glute Bridge", "reps": 15},
+            {"exercise_name": "Donkey Kicks", "reps": 12},
+            {"exercise_name": "Fire Hydrants", "reps": 12},
+            {"exercise_name": "Sit-up", "reps": 15},
+        ],
+    },
+    {
+        "name": "Upper Body Bodyweight Chipper",
+        "training_type": "FOR_TIME",
+        "description": "Aflopende chipper voor je bovenlichaam, geen apparatuur nodig.",
+        "duration_minutes": 15,
+        "level": "intermediate",
+        "rounds_override": "1",
+        "rep_scheme_override": "aflopend 40-30-20-10",
+        "movements": [
+            {"exercise_name": "Push-up", "reps": 40},
+            {"exercise_name": "Tricep Dips", "reps": 30},
+            {"exercise_name": "Wide Push-up", "reps": 20},
+            {"exercise_name": "Diamond Push-up", "reps": 10},
+        ],
+    },
+    {
+        "name": "Tabata Thuis",
+        "training_type": "TABATA",
+        "description": "Klassieke Tabata zonder apparatuur - benen en borst.",
+        "duration_minutes": 8,
+        "level": "beginner",
+        "movements": [
+            {"exercise_name": "Air Squat"},
+            {"exercise_name": "Push-up"},
+        ],
+    },
+    {
+        "name": "Handstand Progressie",
+        "training_type": "FOR_TIME",
+        "description": "Gymnastiek-skills combineren met conditie, geen apparatuur nodig.",
+        "duration_minutes": 15,
+        "level": "advanced",
+        "rounds_override": "3",
+        "rep_scheme_override": "flat",
+        "movements": [
+            {"exercise_name": "Handstand Push-up", "reps": 5},
+            {"exercise_name": "Pistol Squat", "reps": 6},
+            {"exercise_name": "Burpee", "reps": 10},
+        ],
+    },
+    {
+        "name": "Ochtend Bodyweight Flow",
+        "training_type": "AMRAP",
+        "description": "Korte, rustige AMRAP om de dag mee te beginnen - geen apparatuur nodig.",
+        "duration_minutes": 10,
+        "level": "beginner",
+        "movements": [
+            {"exercise_name": "Air Squat", "reps": 10},
+            {"exercise_name": "Incline Push-up", "reps": 10},
+            {"exercise_name": "Superman", "reps": 10},
+            {"exercise_name": "Bird Dog", "reps": 10},
+        ],
+    },
 ]
