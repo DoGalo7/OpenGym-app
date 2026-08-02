@@ -31,6 +31,8 @@ export default function HistoryEntryCard({ entry, onUpdate, onDelete }) {
 
   const handleToggleFavorite = () => onUpdate(entry.id, { favorite: !entry.favorite });
 
+  const handleSetRating = (value) => onUpdate(entry.id, { rating: entry.rating === value ? null : value });
+
   const handleDelete = () => {
     if (window.confirm("Deze workout uit je geschiedenis verwijderen? Dit kan niet ongedaan gemaakt worden.")) {
       onDelete(entry.id);
@@ -64,9 +66,33 @@ export default function HistoryEntryCard({ entry, onUpdate, onDelete }) {
 
       {entry.result && <p style={{ marginTop: 8 }}>Resultaat: <strong>{entry.result}</strong></p>}
       {entry.note && <p className="field-hint" style={{ marginTop: 4 }}>Notitie: {entry.note}</p>}
+      {entry.rating && (
+        <p className="field-hint" style={{ marginTop: 4 }} aria-label={`Beoordeling: ${entry.rating} van 5 sterren`}>
+          {"★".repeat(entry.rating)}
+          {"☆".repeat(5 - entry.rating)}
+        </p>
+      )}
 
       {expanded && (
         <div style={{ marginTop: 12 }}>
+          <div className="field">
+            <label>Beoordeling (optioneel)</label>
+            <div style={{ display: "flex", gap: 4 }}>
+              {[1, 2, 3, 4, 5].map((value) => (
+                <button
+                  key={value}
+                  type="button"
+                  className="btn-icon"
+                  onClick={() => handleSetRating(value)}
+                  aria-label={`Geef ${value} van 5 sterren`}
+                  aria-pressed={entry.rating === value}
+                  style={{ fontSize: 22, padding: "0 2px", color: entry.rating >= value ? "var(--color-primary)" : "var(--color-text-muted)" }}
+                >
+                  {entry.rating >= value ? "★" : "☆"}
+                </button>
+              ))}
+            </div>
+          </div>
           {entry.source === "fixed" ? (
             <FixedWodStructure structure={entry.wod_json.structure} />
           ) : (

@@ -187,6 +187,9 @@ class WodHistory(Base):
     # free-text personal note, separate from the result (e.g. "voelde zwaar, RX gehaald")
     note: Mapped[str | None] = mapped_column(Text, nullable=True)
     favorite: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    # personal 1-5 rating of this logged workout (how it felt / would you do it again) -
+    # None until the user rates it, same "optional, edited after the fact" pattern as result/note.
+    rating: Mapped[int | None] = mapped_column(Integer, nullable=True)
 
     profile: Mapped["UserProfile"] = relationship(back_populates="wod_history")
     fixed_wod: Mapped["FixedWod | None"] = relationship()

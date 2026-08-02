@@ -338,6 +338,7 @@ class HistoryUpdate(BaseModel):
     result: str | None = Field(default=None, max_length=100)
     note: str | None = Field(default=None, max_length=500)
     favorite: bool | None = None
+    rating: int | None = Field(default=None, ge=1, le=5)
 
 
 class HistoryRead(BaseModel):
@@ -350,6 +351,7 @@ class HistoryRead(BaseModel):
     result: str | None
     note: str | None = None
     favorite: bool = False
+    rating: int | None = None
 
 
 # --- Favorites (bookmarked library items - fixed/predefined WODs, not logged history) ---

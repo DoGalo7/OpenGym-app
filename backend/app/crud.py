@@ -277,6 +277,7 @@ def history_to_read(entry: models.WodHistory) -> schemas.HistoryRead:
         result=entry.result,
         note=entry.note,
         favorite=entry.favorite,
+        rating=entry.rating,
     )
 
 
