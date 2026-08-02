@@ -400,13 +400,6 @@ export default function GeneratorPage() {
           </div>
         </div>
 
-        {(mode === "generate" || mode === "stretch") && (
-          <div className="field">
-            <label>Spiergroepen</label>
-            <MuscleGroupPicker selected={muscleGroups} onChange={setMuscleGroups} />
-          </div>
-        )}
-
         <div className="field" style={{ marginBottom: 0 }}>
           <label htmlFor="location">Locatie</label>
           <select id="location" value={location} onChange={(event) => setLocation(event.target.value)}>
@@ -443,6 +436,10 @@ export default function GeneratorPage() {
             Een reeks rustige stretches ({STRETCH_HOLD_SECONDS} sec per stretch) voor de gekozen
             spiergroepen. Geen kracht- of conditietraining, alleen mobiliteit en ontspanning.
           </p>
+          <div className="field">
+            <label>Spiergroepen</label>
+            <MuscleGroupPicker selected={muscleGroups} onChange={setMuscleGroups} />
+          </div>
           <button type="button" className="btn btn-primary" onClick={handleGenerateStretch} disabled={muscleGroups.length === 0 || loading}>
             {loading ? "Bezig met samenstellen..." : "Maak stretch-WOD"}
           </button>
@@ -471,6 +468,11 @@ export default function GeneratorPage() {
         )}
 
         <TrainingTypeSelect value={trainingType} onChange={setTrainingType} />
+
+        <div className="field">
+          <label>Spiergroepen</label>
+          <MuscleGroupPicker selected={muscleGroups} onChange={setMuscleGroups} />
+        </div>
 
         <Toggle checked={includeCardio} onChange={setIncludeCardio} label="Combineren met cardio" />
         {includeCardio && (
