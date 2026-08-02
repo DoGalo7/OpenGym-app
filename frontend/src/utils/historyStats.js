@@ -28,6 +28,18 @@ export function buildWeeklyBuckets(entries, weeksCount) {
   }));
 }
 
+// Aantal opeenvolgende weken (incl. deze week) met minstens 1 workout, terugtellend vanaf nu.
+// `weeks` is buildWeeklyBuckets()'s output, dus al oplopend gesorteerd (oudste eerst, huidige
+// week laatste) - we lopen van achteren naar voren tot de eerste lege week.
+export function currentStreakWeeks(weeks) {
+  let streak = 0;
+  for (let i = weeks.length - 1; i >= 0; i--) {
+    if (weeks[i].count === 0) break;
+    streak += 1;
+  }
+  return streak;
+}
+
 // A "generated" entry's wod_json is the full GeneratedWod shape (blocks -> exercises); a
 // "fixed" entry's wod_json is just {name, structure, time_cap_minutes} - no muscle group data.
 function mainBlockOf(entry) {

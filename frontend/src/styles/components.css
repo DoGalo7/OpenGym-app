@@ -512,12 +512,16 @@
 
 .stat-row {
   display: flex;
+  flex-wrap: wrap;
   gap: var(--space-3);
   margin-bottom: var(--space-4);
 }
 
 .stat-tile {
-  flex: 1;
+  /* Vier tegels (was drie) - basis-breedte iets onder 50% zodat ze op smalle telefoons
+     netjes 2x2 wrappen in plaats van vier keer uit te knijpen op één regel. */
+  flex: 1 1 calc(50% - var(--space-3) / 2);
+  min-width: 120px;
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius);

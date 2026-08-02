@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { addFavorite, listFavorites, removeFavorite } from "../api/favorites";
 import { listSharedWods, loadSharedWod } from "../api/sharedWods";
 import { listFixedWods, listPredefinedWods, loadFixedWod, loadPredefinedWod } from "../api/wods";
+import CollapsibleSection from "../components/shared/CollapsibleSection";
 import { useProfile } from "../context/ProfileContext";
 
 const CATEGORIES = [
@@ -158,51 +159,52 @@ export default function PredefinedWodsPage() {
     (item) => (!homeOnly || item.homeFriendly) && (!hyroxOnly || item.isHyrox) && (!buddyOnly || item.isBuddy)
   );
 
+  const activeCategoryLabel = CATEGORIES.find((c) => c.value === category)?.label ?? "Alle";
+  const activeFilterCount = [homeOnly, hyroxOnly, buddyOnly].filter(Boolean).length;
+  const filterSummary = `${activeCategoryLabel}${activeFilterCount > 0 ? ` · +${activeFilterCount} filter${activeFilterCount > 1 ? "s" : ""}` : ""}`;
+
   return (
     <div>
       <h1>Ideeën</h1>
-      <p className="field-hint">
-        Kies een type training en selecteer een workout. Bij AMRAP/EMOM/Tabata/Anders kom je terug
-        in je WOD-menu om nog aan te passen; bij Benchmark zie je de vaste workout.
-      </p>
 
-      <div className="chip-group" style={{ marginBottom: 12 }}>
-        {CATEGORIES.map((c) => (
+      <CollapsibleSection title="Filters" hint={filterSummary}>
+        <div className="chip-group" style={{ marginBottom: 12 }}>
+          {CATEGORIES.map((c) => (
+            <button
+              key={c.value}
+              type="button"
+              className={`chip${category === c.value ? " active" : ""}`}
+              onClick={() => setCategory(c.value)}
+            >
+              {c.label}
+            </button>
+          ))}
+        </div>
+
+        <div className="chip-group">
           <button
-            key={c.value}
             type="button"
-            className={`chip${category === c.value ? " active" : ""}`}
-            onClick={() => setCategory(c.value)}
+            className={`chip${homeOnly ? " active" : ""}`}
+            onClick={() => setHomeOnly((v) => !v)}
           >
-            {c.label}
+            🏠 Ook thuis
           </button>
-        ))}
-      </div>
-
-      <p className="field-hint" style={{ marginTop: 0, marginBottom: 4 }}>Filters (optioneel)</p>
-      <div className="chip-group" style={{ marginBottom: 16 }}>
-        <button
-          type="button"
-          className={`chip${homeOnly ? " active" : ""}`}
-          onClick={() => setHomeOnly((v) => !v)}
-        >
-          🏠 Ook thuis
-        </button>
-        <button
-          type="button"
-          className={`chip${hyroxOnly ? " active" : ""}`}
-          onClick={() => setHyroxOnly((v) => !v)}
-        >
-          🔥 Hyrox-stijl
-        </button>
-        <button
-          type="button"
-          className={`chip${buddyOnly ? " active" : ""}`}
-          onClick={() => setBuddyOnly((v) => !v)}
-        >
-          🤝 Buddy WOD
-        </button>
-      </div>
+          <button
+            type="button"
+            className={`chip${hyroxOnly ? " active" : ""}`}
+            onClick={() => setHyroxOnly((v) => !v)}
+          >
+            🔥 Hyrox-stijl
+          </button>
+          <button
+            type="button"
+            className={`chip${buddyOnly ? " active" : ""}`}
+            onClick={() => setBuddyOnly((v) => !v)}
+          >
+            🤝 Buddy WOD
+          </button>
+        </div>
+      </CollapsibleSection>
 
       {error && <p className="error-text">{error}</p>}
       {filteredItems.length === 0 && !error && (
