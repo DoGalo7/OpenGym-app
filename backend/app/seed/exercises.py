@@ -1,4 +1,4 @@
-# Curated starter dataset (~111 exercises). Not sourced online - see sync.py for why.
+# Curated starter dataset (~141 exercises). Not sourced online - see sync.py for why.
 # `is_hyrox` tags exercises that fit Hyrox-style training - the official 8 race stations
 # (SkiErg, Sled Push, Sled Pull, Burpee Broad Jumps, Row, Farmers Carry, Sandbag Lunges,
 # Wall Balls, each after a 1km run) plus movements that commonly appear in Hyrox-style gym
@@ -32,6 +32,16 @@ EXERCISES = [
     {"name": "Barbell Hip Thrust", "muscle_group": "billen", "level": "intermediate", "category": "barbell", "requires_gym": True, "equipment_tag": "barbell", "rx_weight_male_kg": 50, "rx_weight_female_kg": 35},
     {"name": "Barbell Overhead Carry", "muscle_group": "volledig_lichaam", "level": "advanced", "category": "barbell", "requires_gym": True, "equipment_tag": "barbell", "rx_weight_male_kg": 30, "rx_weight_female_kg": 20},
 
+    # --- Extra barbell/Olympic-lifting bewegingen (6) - toegevoegd n.a.v. een "top 100
+    # CrossFit-oefeningen" vergelijking; de eerdere set had alleen Power Clean/Hang Power
+    # Snatch/Push Jerk, geen van de klassieke squat-varianten van clean/snatch/jerk.
+    {"name": "Overhead Squat", "muscle_group": "benen", "level": "advanced", "category": "barbell", "requires_gym": True, "equipment_tag": "barbell", "rx_weight_male_kg": 43, "rx_weight_female_kg": 30},
+    {"name": "Squat Clean", "muscle_group": "volledig_lichaam", "level": "advanced", "category": "barbell", "requires_gym": True, "equipment_tag": "barbell", "rx_weight_male_kg": 60, "rx_weight_female_kg": 40},
+    {"name": "Hang Power Clean", "muscle_group": "volledig_lichaam", "level": "advanced", "category": "barbell", "requires_gym": True, "equipment_tag": "barbell", "rx_weight_male_kg": 55, "rx_weight_female_kg": 38},
+    {"name": "Clean and Jerk", "muscle_group": "volledig_lichaam", "level": "advanced", "category": "barbell", "requires_gym": True, "equipment_tag": "barbell", "rx_weight_male_kg": 61, "rx_weight_female_kg": 43},
+    {"name": "Squat Snatch", "muscle_group": "volledig_lichaam", "level": "advanced", "category": "barbell", "requires_gym": True, "equipment_tag": "barbell", "rx_weight_male_kg": 43, "rx_weight_female_kg": 30, "base_movement": "snatch"},
+    {"name": "Split Jerk", "muscle_group": "schouders", "level": "advanced", "category": "barbell", "requires_gym": True, "equipment_tag": "barbell", "rx_weight_male_kg": 52, "rx_weight_female_kg": 36},
+
     # --- Dumbbell (14, requires_gym=True, equipment_tag=dumbbell) ---
     # Previously requires_gym=False (always available at home) - wrong: not everyone owns
     # dumbbells, so this is now gated behind the "Dumbbells" home-equipment checkbox like barbell.
@@ -49,6 +59,8 @@ EXERCISES = [
     {"name": "DB Farmers Carry", "muscle_group": "volledig_lichaam", "level": "beginner", "category": "dumbbell", "requires_gym": True, "equipment_tag": "dumbbell", "rx_weight_male_kg": 24, "rx_weight_female_kg": 16, "is_hyrox": True, "base_movement": "farmers_carry"},
     {"name": "DB Lateral Raise", "muscle_group": "schouders", "level": "beginner", "category": "dumbbell", "requires_gym": True, "equipment_tag": "dumbbell", "rx_weight_male_kg": 8, "rx_weight_female_kg": 5},
     {"name": "DB Bicep Curl", "muscle_group": "armen", "level": "beginner", "category": "dumbbell", "requires_gym": True, "equipment_tag": "dumbbell", "rx_weight_male_kg": 12, "rx_weight_female_kg": 8},
+    {"name": "DB Clean", "muscle_group": "volledig_lichaam", "level": "intermediate", "category": "dumbbell", "requires_gym": True, "equipment_tag": "dumbbell", "rx_weight_male_kg": 22, "rx_weight_female_kg": 15},
+    {"name": "Devil Press", "muscle_group": "volledig_lichaam", "level": "advanced", "category": "dumbbell", "requires_gym": True, "equipment_tag": "dumbbell", "rx_weight_male_kg": 22, "rx_weight_female_kg": 15},
 
     # --- Kettlebell (7, requires_gym=True, equipment_tag=kettlebell) ---
     # Same fix as dumbbells above - was requires_gym=False, always available at home regardless
@@ -60,6 +72,7 @@ EXERCISES = [
     {"name": "KB Snatch", "muscle_group": "schouders", "level": "advanced", "category": "kettlebell", "requires_gym": True, "equipment_tag": "kettlebell", "rx_weight_male_kg": 20, "rx_weight_female_kg": 12, "base_movement": "snatch"},
     {"name": "Turkish Get-Up", "muscle_group": "volledig_lichaam", "level": "advanced", "category": "kettlebell", "requires_gym": True, "equipment_tag": "kettlebell", "rx_weight_male_kg": 16, "rx_weight_female_kg": 10},
     {"name": "KB Farmers Carry", "muscle_group": "volledig_lichaam", "level": "intermediate", "category": "kettlebell", "requires_gym": True, "equipment_tag": "kettlebell", "rx_weight_male_kg": 20, "rx_weight_female_kg": 12, "is_hyrox": True, "base_movement": "farmers_carry"},
+    {"name": "KB Thruster", "muscle_group": "volledig_lichaam", "level": "intermediate", "category": "kettlebell", "requires_gym": True, "equipment_tag": "kettlebell", "rx_weight_male_kg": 20, "rx_weight_female_kg": 12, "base_movement": "thruster"},
 
     # --- Rack (7, requires_gym=True, equipment_tag=pull_up_bar - bodyweight pull-up rig movements) ---
     {"name": "Ring Row", "muscle_group": "rug", "level": "beginner", "category": "rack", "requires_gym": True, "equipment_tag": "pull_up_bar", "is_hyrox": True},
@@ -69,6 +82,9 @@ EXERCISES = [
     {"name": "Ring Dip", "muscle_group": "armen", "level": "intermediate", "category": "rack", "requires_gym": True, "equipment_tag": "pull_up_bar"},
     {"name": "Toes-to-Bar", "muscle_group": "buik", "level": "advanced", "category": "rack", "requires_gym": True, "equipment_tag": "pull_up_bar"},
     {"name": "Bar Muscle-up", "muscle_group": "rug", "level": "advanced", "category": "rack", "requires_gym": True, "equipment_tag": "pull_up_bar"},
+    {"name": "Chest-to-Bar Pull-up", "muscle_group": "rug", "level": "advanced", "category": "rack", "requires_gym": True, "equipment_tag": "pull_up_bar"},
+    {"name": "Ring Muscle-up", "muscle_group": "rug", "level": "advanced", "category": "rack", "requires_gym": True, "equipment_tag": "pull_up_bar"},
+    {"name": "Knees-to-Elbow", "muscle_group": "buik", "level": "intermediate", "category": "rack", "requires_gym": True, "equipment_tag": "pull_up_bar"},
 
     # --- Bodyweight (10, requires_gym=False, no weight) ---
     {"name": "Air Squat", "muscle_group": "benen", "level": "beginner", "category": "bodyweight", "requires_gym": False, "is_hyrox": True},
@@ -97,6 +113,7 @@ EXERCISES = [
     {"name": "Reverse Snow Angels", "muscle_group": "rug", "level": "intermediate", "category": "bodyweight", "requires_gym": False, "warmup_only": True},
     {"name": "Hollow Hold", "muscle_group": "buik", "level": "intermediate", "category": "bodyweight", "requires_gym": False},
     {"name": "Russian Twist", "muscle_group": "buik", "level": "beginner", "category": "bodyweight", "requires_gym": False},
+    {"name": "V-up", "muscle_group": "buik", "level": "beginner", "category": "bodyweight", "requires_gym": False},
 
     # --- Extra thuis-vriendelijke oefeningen (11) - main-pool bodyweight, requires_gym=False.
     # measure_pools.py (zie sessie-geschiedenis) liet zien dat rug/armen/benen/billen/borst thuis
@@ -144,6 +161,11 @@ EXERCISES = [
     {"name": "L-Sit", "muscle_group": "buik", "level": "advanced", "category": "gymnastics", "requires_gym": True},
     {"name": "Sled Push", "muscle_group": "volledig_lichaam", "level": "beginner", "category": "gymnastics", "requires_gym": True, "rx_weight_male_kg": 50, "rx_weight_female_kg": 30, "is_hyrox": True},
     {"name": "Sled Pull", "muscle_group": "volledig_lichaam", "level": "beginner", "category": "gymnastics", "requires_gym": True, "rx_weight_male_kg": 50, "rx_weight_female_kg": 30, "is_hyrox": True},
+    {"name": "Wall Walk", "muscle_group": "schouders", "level": "advanced", "category": "gymnastics", "requires_gym": False},
+    {"name": "Box Jump Over", "muscle_group": "benen", "level": "intermediate", "category": "gymnastics", "requires_gym": True},
+    {"name": "Burpee Box Jump Over", "muscle_group": "volledig_lichaam", "level": "intermediate", "category": "gymnastics", "requires_gym": True, "base_movement": "burpee"},
+    {"name": "Medicine Ball Slam", "muscle_group": "volledig_lichaam", "level": "beginner", "category": "gymnastics", "requires_gym": True},
+    {"name": "GHD Sit-up", "muscle_group": "buik", "level": "advanced", "category": "gymnastics", "requires_gym": True},
 
     # --- Cardio (4, is_cardio=True, no weight - unlocked at home via cardio_type, not equipment_tag) ---
     {"name": "Assault Bike", "muscle_group": "cardio", "level": "beginner", "category": "cardio", "requires_gym": True, "is_cardio": True, "cardio_type": "assault_bike", "is_hyrox": True},

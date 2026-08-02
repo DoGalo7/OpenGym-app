@@ -44,6 +44,13 @@ class Exercise(Base):
     # Mobility/activation drills (inchworm, high knees, ...) that are only ever appropriate for
     # the warm-up block, never selected for the main WOD block.
     warmup_only: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    # True for exercises inserted by sync.sync_exercises_from_source() that haven't been
+    # reviewed yet - excluded from every WOD-generation pool (see wod_generator.py) until an
+    # admin approves them via /admin/oefeningen. The external source has no notion of our
+    # niveau/RX-gewicht scale, so those fields are guessed conservatively on insert and MUST be
+    # human-checked before the exercise is safe to hand out (this app's injury/conditie safety
+    # logic is gated on `level` being trustworthy).
+    pending_review: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
 
 
 class FixedWod(Base):

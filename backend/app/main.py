@@ -39,6 +39,7 @@ def on_startup():
     ensure_column("predefined_wods", "is_buddy", "BOOLEAN NOT NULL DEFAULT FALSE")
     ensure_column("wod_history", "rating", "INTEGER")
     ensure_column("user_profiles", "recovery_code_hash", "VARCHAR(160)")
+    ensure_column("exercises", "pending_review", "BOOLEAN NOT NULL DEFAULT FALSE")
     db = session_local()
     try:
         run_seed(db)
