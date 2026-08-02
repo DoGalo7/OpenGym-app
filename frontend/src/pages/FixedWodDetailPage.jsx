@@ -6,6 +6,7 @@ import { createHistory } from "../api/history";
 import { getFixedWod } from "../api/wods";
 import ConfirmModal from "../components/shared/ConfirmModal";
 import FixedWodStructure from "../components/wod/FixedWodStructure";
+import SaveResultForm from "../components/wod/SaveResultForm";
 import { useProfile } from "../context/ProfileContext";
 import { useInjuryDisclaimer } from "../hooks/useInjuryDisclaimer";
 
@@ -15,7 +16,6 @@ export default function FixedWodDetailPage() {
   const { profile } = useProfile();
   const [wod, setWod] = useState(null);
   const [error, setError] = useState(null);
-  const [logged, setLogged] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
   const injuryDisclaimer = useInjuryDisclaimer(profile);
 
@@ -28,19 +28,14 @@ export default function FixedWodDetailPage() {
       .catch(() => {});
   }, [id, profile.user_id]);
 
-  const handleLog = async () => {
-    try {
-      await createHistory({
-        user_id: profile.user_id,
-        source: "fixed",
-        fixed_wod_id: wod.id,
-        wod_json: { name: wod.name, structure: wod.structure, time_cap_minutes: wod.time_cap_minutes },
-      });
-      setLogged(true);
-    } catch (err) {
-      setError(err.message);
-    }
-  };
+  const handleSaveResult = (result) =>
+    createHistory({
+      user_id: profile.user_id,
+      source: "fixed",
+      fixed_wod_id: wod.id,
+      wod_json: { name: wod.name, structure: wod.structure, time_cap_minutes: wod.time_cap_minutes },
+      result,
+    });
 
   const toggleFavorite = async () => {
     const next = !isFavorite;
@@ -93,13 +88,7 @@ export default function FixedWodDetailPage() {
         )}
       </div>
 
-      {logged ? (
-        <p className="status-text">Toegevoegd aan je geschiedenis.</p>
-      ) : (
-        <button type="button" className="btn btn-primary" onClick={handleLog}>
-          Dit ga ik doen
-        </button>
-      )}
+      <SaveResultForm onSave={handleSaveResult} />
     </div>
   );
 }
