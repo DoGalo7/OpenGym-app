@@ -1,3 +1,4 @@
+import datetime
 import json
 
 from sqlalchemy import func
@@ -254,6 +255,46 @@ def accept_friendship(db: Session, profile: models.UserProfile, friendship_id: i
     db.commit()
     db.refresh(friendship)
     return friendship
+
+
+def get_accepted_friends(db: Session, profile: models.UserProfile) -> list[models.UserProfile]:
+    outgoing = db.query(models.Friendship).filter_by(profile_id=profile.id, status="accepted").all()
+    incoming = db.query(models.Friendship).filter_by(friend_profile_id=profile.id, status="accepted").all()
+    friend_ids = {f.friend_profile_id for f in outgoing} | {f.profile_id for f in incoming}
+    if not friend_ids:
+        return []
+    return db.query(models.UserProfile).filter(models.UserProfile.id.in_(friend_ids)).all()
+
+
+def get_friends_activity(db: Session, profile: models.UserProfile, days: int) -> list[schemas.FriendActivityEntry]:
+    """"Wat deden mijn vrienden deze week" - only ever looks at *accepted* friendships (a
+    pending request doesn't grant visibility into someone's history), and only returns a
+    lightweight summary (name/date/result/rating), never the full wod_json blocks."""
+    friends = get_accepted_friends(db, profile)
+    if not friends:
+        return []
+    since = datetime.datetime.utcnow() - datetime.timedelta(days=days)
+    friend_ids = [f.id for f in friends]
+    friend_names = {f.id: f.name for f in friends}
+    entries = (
+        db.query(models.WodHistory)
+        .filter(models.WodHistory.profile_id.in_(friend_ids), models.WodHistory.created_at >= since)
+        .order_by(models.WodHistory.created_at.desc())
+        .all()
+    )
+    results = []
+    for entry in entries:
+        wod_data = json.loads(entry.wod_json)
+        wod_name = wod_data.get("name") if entry.source == "fixed" else "Zelf samengestelde WOD"
+        results.append(schemas.FriendActivityEntry(
+            friend_name=friend_names[entry.profile_id],
+            wod_name=wod_name or "WOD",
+            source=entry.source,
+            created_at=entry.created_at,
+            result=entry.result,
+            rating=entry.rating,
+        ))
+    return results
 
 
 # --- History ---

@@ -210,6 +210,15 @@ class FriendshipRead(BaseModel):
     direction: Literal["outgoing", "incoming"]
 
 
+class FriendActivityEntry(BaseModel):
+    friend_name: str
+    wod_name: str
+    source: str
+    created_at: datetime
+    result: str | None
+    rating: int | None
+
+
 # --- WOD generation ---
 
 

@@ -94,6 +94,12 @@ def list_friends(user_id: str, db: Session = Depends(get_db)):
     return crud.list_friendships(db, profile)
 
 
+@router.get("/{user_id}/friends/activity", response_model=list[schemas.FriendActivityEntry])
+def friends_activity(user_id: str, days: int = 7, db: Session = Depends(get_db)):
+    profile = _get_profile_or_404(db, user_id)
+    return crud.get_friends_activity(db, profile, days)
+
+
 @router.post("/{user_id}/friends", response_model=schemas.FriendshipRead)
 def request_friend(user_id: str, data: schemas.FriendRequestCreate, db: Session = Depends(get_db)):
     profile = _get_profile_or_404(db, user_id)

@@ -1,13 +1,31 @@
 import { useEffect, useState } from "react";
 
-import { acceptFriend, listFriends, requestFriend } from "../../api/profiles";
+import { acceptFriend, getFriendsActivity, listFriends, requestFriend } from "../../api/profiles";
+
+function formatActivityDate(isoString) {
+  return new Date(isoString).toLocaleDateString("nl-NL", { weekday: "short", day: "numeric", month: "short" });
+}
 
 export default function FriendsSection({ userId }) {
   const [friends, setFriends] = useState([]);
+  const [activity, setActivity] = useState([]);
   const [friendUserId, setFriendUserId] = useState("");
   const [error, setError] = useState(null);
   const [saving, setSaving] = useState(false);
   const [copied, setCopied] = useState(false);
+
+  const hasAcceptedFriend = friends.some((f) => f.status === "accepted");
+
+  useEffect(() => {
+    if (!hasAcceptedFriend) {
+      setActivity([]);
+      return;
+    }
+    getFriendsActivity(userId).then(setActivity).catch(() => {});
+    // hasAcceptedFriend only flips true/false when the friends list itself changes, so this
+    // effectively re-runs whenever `friends` does - no need to list it separately.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userId, hasAcceptedFriend]);
 
   const handleCopyOwnId = async () => {
     try {
@@ -49,7 +67,10 @@ export default function FriendsSection({ userId }) {
   return (
     <div className="card">
       <h3>Vrienden</h3>
-      <p className="field-hint">Meer functionaliteit (workouts delen) volgt later.</p>
+      <p className="field-hint">
+        Zie hieronder wat je bevriende sporters deze week deden. Rechtstreeks een WOD delen met
+        specifieke vrienden volgt later.
+      </p>
 
       <div className="field">
         <label>Jouw gebruikers-id (deel dit met een vriend)</label>
@@ -84,6 +105,28 @@ export default function FriendsSection({ userId }) {
           )}
         </div>
       ))}
+
+      {hasAcceptedFriend && (
+        <div style={{ marginTop: 16 }}>
+          <h3 style={{ marginBottom: 4 }}>Wat deden je vrienden deze week</h3>
+          {activity.length === 0 && (
+            <p className="field-hint">Nog geen workouts van je vrienden deze week.</p>
+          )}
+          {activity.map((entry, index) => (
+            <div key={index} className="exercise-row">
+              <div className="exercise-main">
+                <div className="exercise-name">{entry.friend_name} — {entry.wod_name}</div>
+                <div className="exercise-meta">
+                  {formatActivityDate(entry.created_at)}
+                  {entry.result && ` · ${entry.result}`}
+                  {entry.rating && ` · ${"★".repeat(entry.rating)}`}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
       <form onSubmit={handleAdd} style={{ marginTop: 12 }}>
         <div className="field">
           <label htmlFor="friend-user-id">Vriend toevoegen (gebruikers-id)</label>

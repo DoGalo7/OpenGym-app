@@ -51,3 +51,7 @@ export function requestFriend(userId, friendUserId) {
 export function acceptFriend(userId, friendshipId) {
   return patch(`/profiles/${userId}/friends/${friendshipId}`, { status: "accepted" });
 }
+
+export function getFriendsActivity(userId, days = 7) {
+  return get(`/profiles/${userId}/friends/activity?days=${days}`);
+}
