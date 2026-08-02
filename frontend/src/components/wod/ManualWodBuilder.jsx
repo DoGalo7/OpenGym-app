@@ -69,6 +69,7 @@ export default function ManualWodBuilder({ profile, location, trainingType, setT
   const options = allExercises.filter(
     (e) =>
       !e.warmup_only &&
+      e.category !== "stretching" &&
       !pickedIds.has(e.id) &&
       homeAllowed(e) &&
       (filterGroups.length === 0 || filterGroups.includes(e.muscle_group)) &&

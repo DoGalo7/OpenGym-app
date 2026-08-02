@@ -212,6 +212,7 @@ def generate_wod(db: Session, profile: UserProfile, request: WodGenerateRequest)
             e for e in exercises
             if not e.is_cardio
             and not e.warmup_only
+            and e.category != "stretching"
             and e.muscle_group in pool_groups
             and (effective_level is None or LEVEL_RANK[e.level] <= LEVEL_RANK[effective_level])
             and (not request.hyrox_style or e.is_hyrox)

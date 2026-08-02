@@ -1,4 +1,4 @@
-# Curated starter dataset (~93 exercises). Not sourced online - see sync.py for why.
+# Curated starter dataset (~105 exercises). Not sourced online - see sync.py for why.
 # `is_hyrox` tags exercises that fit Hyrox-style training - the official 8 race stations
 # (SkiErg, Sled Push, Sled Pull, Burpee Broad Jumps, Row, Farmers Carry, Sandbag Lunges,
 # Wall Balls, each after a 1km run) plus movements that commonly appear in Hyrox-style gym
@@ -97,6 +97,23 @@ EXERCISES = [
     {"name": "Reverse Snow Angels", "muscle_group": "rug", "level": "intermediate", "category": "bodyweight", "requires_gym": False, "warmup_only": True},
     {"name": "Hollow Hold", "muscle_group": "buik", "level": "intermediate", "category": "bodyweight", "requires_gym": False},
     {"name": "Russian Twist", "muscle_group": "buik", "level": "beginner", "category": "bodyweight", "requires_gym": False},
+
+    # --- Extra thuis-vriendelijke oefeningen (11) - main-pool bodyweight, requires_gym=False.
+    # measure_pools.py (zie sessie-geschiedenis) liet zien dat rug/armen/benen/billen/borst thuis
+    # zonder eigen apparatuur soms maar 2, of bij rug/armen zelfs op elk niveau maar 2, hoofd-
+    # oefeningen overhielden. Deze vullen elke dunne combinatie aan tot minstens 3-4 opties.
+    {"name": "Bodyweight Good Morning", "muscle_group": "rug", "level": "beginner", "category": "bodyweight", "requires_gym": False},
+    {"name": "Prone Y-Raise", "muscle_group": "rug", "level": "intermediate", "category": "bodyweight", "requires_gym": False},
+    {"name": "Superman Hold", "muscle_group": "rug", "level": "advanced", "category": "bodyweight", "requires_gym": False},
+    {"name": "Isometric Push-up Hold", "muscle_group": "armen", "level": "beginner", "category": "bodyweight", "requires_gym": False},
+    {"name": "Wall Push-up", "muscle_group": "armen", "level": "beginner", "category": "bodyweight", "requires_gym": False},
+    {"name": "Pseudo Planche Push-up", "muscle_group": "armen", "level": "advanced", "category": "bodyweight", "requires_gym": False},
+    {"name": "Wall Sit", "muscle_group": "benen", "level": "beginner", "category": "bodyweight", "requires_gym": False},
+    {"name": "Reverse Lunge", "muscle_group": "benen", "level": "beginner", "category": "bodyweight", "requires_gym": False, "is_hyrox": True},
+    {"name": "Donkey Kicks", "muscle_group": "billen", "level": "beginner", "category": "bodyweight", "requires_gym": False},
+    {"name": "Curtsy Lunge", "muscle_group": "billen", "level": "intermediate", "category": "bodyweight", "requires_gym": False},
+    {"name": "Wide Push-up", "muscle_group": "borst", "level": "beginner", "category": "bodyweight", "requires_gym": False},
+    {"name": "Archer Push-up", "muscle_group": "borst", "level": "advanced", "category": "bodyweight", "requires_gym": False},
 
     # --- Extra warming-up-oefeningen (11) - dynamische mobility-moves, incl. elastiek-oefeningen.
     # Meerdere zijn getagd als "volledig_lichaam" (i.p.v. een specifieke spiergroep) omdat dat de
