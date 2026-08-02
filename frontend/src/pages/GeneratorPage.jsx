@@ -667,20 +667,6 @@ export default function GeneratorPage() {
               ↺ Opnieuw samenstellen
             </button>
           </div>
-          <button
-            type="button"
-            className="btn btn-primary"
-            style={{ width: "100%", marginBottom: 12 }}
-            onClick={() => setShowTimer(true)}
-          >
-            ⏱ Start workout
-          </button>
-          {showTimer && (
-            <WorkoutTimer
-              block={wod.blocks.find((b) => b.block_type === "main")}
-              onClose={() => setShowTimer(false)}
-            />
-          )}
           {!hasWarmup && (
             <div className="card" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
               <p className="field-hint" style={{ margin: 0 }}>Nog geen warming-up bij deze workout.</p>
@@ -704,6 +690,20 @@ export default function GeneratorPage() {
               onDurationChange={(minutes) => handleBlockDurationChange(blockIndex, minutes)}
             />
           ))}
+          <button
+            type="button"
+            className="btn btn-primary"
+            style={{ width: "100%", marginBottom: 12 }}
+            onClick={() => setShowTimer(true)}
+          >
+            ⏱ Start workout
+          </button>
+          {showTimer && (
+            <WorkoutTimer
+              block={wod.blocks.find((b) => b.block_type === "main")}
+              onClose={() => setShowTimer(false)}
+            />
+          )}
           <SaveResultForm onSave={handleSaveResult} />
           <ShareWodForm onShare={handleShareWod} />
         </div>
