@@ -259,14 +259,12 @@ export default function PredefinedWodsPage() {
               {" · "}
               {item.meta}
             </p>
-            <ul className="idea-movement-list" style={{ marginTop: 8 }}>
+            <p style={{ marginTop: 8, marginBottom: 4 }}>{item.description}</p>
+            <ul className="idea-movement-list">
               {item.lines.map((line, i) => (
                 <li key={i}>{line}</li>
               ))}
             </ul>
-            {item.description && (
-              <p className="field-hint" style={{ marginTop: 6, marginBottom: 0 }}>{item.description}</p>
-            )}
             {loadingId === item.id && <p className="field-hint" style={{ marginTop: 4 }}>Laden...</p>}
           </div>
         );

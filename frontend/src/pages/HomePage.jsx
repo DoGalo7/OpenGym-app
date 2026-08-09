@@ -132,7 +132,7 @@ export default function HomePage() {
           </p>
           <p style={{ marginTop: 8, marginBottom: 4 }}>{featured.description}</p>
           <ul className="idea-movement-list">
-            {featured.movements.slice(0, 3).map((m, i) => (
+            {featured.movements.map((m, i) => (
               <li key={i}>{formatMovement(m)}</li>
             ))}
           </ul>
