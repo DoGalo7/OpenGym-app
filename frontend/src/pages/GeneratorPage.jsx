@@ -67,6 +67,13 @@ function repsFor(category, effectiveLevel) {
   return Math.max(1, Math.ceil(base * multiplier));
 }
 
+// Per-profiel opgeslagen concept-WOD, zodat een ongelukje (wegklikken, tab sluiten, app
+// afgesloten door iOS) de workout niet meteen kwijtraakt - hersteld bij terugkomst op deze
+// pagina, tot de gebruiker 'm opslaat/deelt of expliciet op "Opnieuw samenstellen" klikt.
+function draftKeyFor(userId) {
+  return `open_gym_wod_draft:${userId}`;
+}
+
 export default function GeneratorPage() {
   const { profile } = useProfile();
   const routerLocation = useLocation();
@@ -105,23 +112,53 @@ export default function GeneratorPage() {
   const [purpose, setPurpose] = useState("workout");
   const [mode, setMode] = useState("generate");
   const [wod, setWod] = useState(null);
+  const [previousWod, setPreviousWod] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [showTimer, setShowTimer] = useState(false);
   const [cardioWarningDismissed, setCardioWarningDismissed] = useState(false);
   const injuryDisclaimer = useInjuryDisclaimer(profile);
+  const draftKey = draftKeyFor(profile.user_id);
 
-  useEffect(() => {
-    const loaded = routerLocation.state?.loadedWod;
-    if (!loaded) return;
+  const applyLoadedWod = (loaded) => {
     setWod(loaded);
     setLength(loaded.total_duration_minutes);
     const mainBlock = loaded.blocks.find((b) => b.block_type === "main");
     if (mainBlock?.training_type) setTrainingType(mainBlock.training_type);
-    navigate(routerLocation.pathname, { replace: true, state: null });
-    // Only run once on mount, when arriving from "Voorgedefinieerde workouts".
+  };
+
+  // Used whenever a brand-new WOD replaces whatever was showing (generate/stretch/handmatig
+  // samengesteld) - stashes the outgoing one so "↺ Vorige WOD terugzetten" can bring it back if
+  // the new one wasn't actually what the user wanted.
+  const replaceWod = (next) => {
+    setPreviousWod(wod ?? null);
+    setWod(next);
+  };
+
+  useEffect(() => {
+    const loaded = routerLocation.state?.loadedWod;
+    if (loaded) {
+      applyLoadedWod(loaded);
+      navigate(routerLocation.pathname, { replace: true, state: null });
+      return;
+    }
+    // Geen expliciete WOD om te laden - herstel een eerder concept dat nog openstond, zodat
+    // wegklikken/tab sluiten/de app afsluiten de workout niet gewoon laat verdwijnen.
+    const raw = localStorage.getItem(draftKey);
+    if (!raw) return;
+    try {
+      applyLoadedWod(JSON.parse(raw));
+    } catch {
+      localStorage.removeItem(draftKey);
+    }
+    // Only run once on mount, when arriving from "Voorgedefinieerde workouts" or with a
+    // leftover draft.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    if (wod) localStorage.setItem(draftKey, JSON.stringify(wod));
+  }, [wod, draftKey]);
 
   useEffect(() => {
     if (wod) resultRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -160,7 +197,7 @@ export default function GeneratorPage() {
         temporary_injury_muscle_group: tempInjuryMuscleGroup || undefined,
         override_injury_muscle_groups: overrideGroups,
       });
-      setWod(result);
+      replaceWod(result);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -181,7 +218,7 @@ export default function GeneratorPage() {
         override_injury_muscle_groups: overrideGroups,
         exercise_count: stretchExerciseCount ? Number(stretchExerciseCount) : undefined,
       });
-      setWod(result);
+      replaceWod(result);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -471,7 +508,12 @@ export default function GeneratorPage() {
   };
 
   const handleSaveResult = (result) =>
-    createHistory({ user_id: profile.user_id, source: "generated", wod_json: wod, result });
+    createHistory({ user_id: profile.user_id, source: "generated", wod_json: wod, result }).then((saved) => {
+      // Eenmaal gelogd is dit geen "concept" meer - anders zou de volgende keer dat de
+      // gebruiker WOD maken opent dezelfde, al afgeronde workout weer terugkomen.
+      localStorage.removeItem(draftKey);
+      return saved;
+    });
 
   const handleShareWod = (name, recipientUserId) => shareWod(profile.user_id, name, wod, recipientUserId);
 
@@ -610,7 +652,7 @@ export default function GeneratorPage() {
           location={location}
           trainingType={trainingType}
           setTrainingType={setTrainingType}
-          onBuild={(built) => setWod(built)}
+          onBuild={(built) => replaceWod(built)}
         />
       ) : (
       <form className="card" onSubmit={handleSubmit}>
@@ -829,12 +871,29 @@ export default function GeneratorPage() {
               className="btn-icon"
               onClick={() => {
                 setWod(null);
+                setPreviousWod(null);
+                localStorage.removeItem(draftKey);
                 window.scrollTo({ top: 0, behavior: "smooth" });
               }}
             >
               ↺ Opnieuw samenstellen
             </button>
           </div>
+          {previousWod && (
+            <div className="card" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, marginBottom: 12 }}>
+              <p className="field-hint" style={{ margin: 0 }}>Je vorige WOD is vervangen door deze.</p>
+              <button
+                type="button"
+                className="btn btn-secondary"
+                onClick={() => {
+                  setWod(previousWod);
+                  setPreviousWod(null);
+                }}
+              >
+                ↺ Vorige WOD terugzetten
+              </button>
+            </div>
+          )}
           <div className="card" style={{ marginBottom: 12 }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
               <h3 style={{ margin: 0 }}>In het kort</h3>
