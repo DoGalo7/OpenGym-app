@@ -112,6 +112,8 @@ class PredefinedWodSummary(BaseModel):
     # Direct passthrough of PredefinedWod.is_buddy (not derived, unlike home_friendly/is_hyrox
     # above) - a partner-WOD format isn't something the movement list alone tells you.
     is_buddy: bool = False
+    # Direct passthrough of PredefinedWod.is_power - curated tag, same reasoning as is_buddy.
+    is_power: bool = False
 
 
 # --- Injuries ---

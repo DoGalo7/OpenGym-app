@@ -113,6 +113,11 @@ class PredefinedWod(Base):
     # format is explained in `description`). The movements/reps listed are the workout's
     # total; the description tells the two partners how to divide it.
     is_buddy: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    # True for a curated "Power" WOD (strength-focused, muscle-group-tied, usually shorter
+    # than a generic AMRAP) - an explicit tag like is_buddy, not derived like is_hyrox/
+    # home_friendly, since "Power" is about programming intent rather than which specific
+    # exercises appear (the same movements show up across every category).
+    is_power: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
 
     movements: Mapped[list["PredefinedWodMovement"]] = relationship(
         back_populates="predefined_wod", cascade="all, delete-orphan",

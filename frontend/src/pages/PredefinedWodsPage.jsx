@@ -36,6 +36,7 @@ function toPredefinedItem(w) {
     homeFriendly: w.home_friendly,
     isHyrox: w.is_hyrox,
     isBuddy: w.is_buddy,
+    isPower: w.is_power,
   };
 }
 
@@ -78,6 +79,7 @@ export default function PredefinedWodsPage() {
   const [homeOnly, setHomeOnly] = useState(false);
   const [hyroxOnly, setHyroxOnly] = useState(false);
   const [buddyOnly, setBuddyOnly] = useState(false);
+  const [powerOnly, setPowerOnly] = useState(false);
   const [items, setItems] = useState([]);
   const [favoriteKeys, setFavoriteKeys] = useState(new Set());
   const [error, setError] = useState(null);
@@ -158,7 +160,11 @@ export default function PredefinedWodsPage() {
   };
 
   const filteredItems = items.filter(
-    (item) => (!homeOnly || item.homeFriendly) && (!hyroxOnly || item.isHyrox) && (!buddyOnly || item.isBuddy)
+    (item) =>
+      (!homeOnly || item.homeFriendly) &&
+      (!hyroxOnly || item.isHyrox) &&
+      (!buddyOnly || item.isBuddy) &&
+      (!powerOnly || item.isPower)
   );
 
   return (
@@ -200,6 +206,13 @@ export default function PredefinedWodsPage() {
               onClick={() => setBuddyOnly((v) => !v)}
             >
               🤝 Buddy WOD
+            </button>
+            <button
+              type="button"
+              className={`chip chip--sm${powerOnly ? " active" : ""}`}
+              onClick={() => setPowerOnly((v) => !v)}
+            >
+              💪 Power
             </button>
           </div>
       </div>
