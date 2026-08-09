@@ -61,6 +61,9 @@ EXERCISES = [
     {"name": "DB Bicep Curl", "muscle_group": "armen", "level": "beginner", "category": "dumbbell", "requires_gym": True, "equipment_tag": "dumbbell", "rx_weight_male_kg": 12, "rx_weight_female_kg": 8},
     {"name": "DB Clean", "muscle_group": "volledig_lichaam", "level": "intermediate", "category": "dumbbell", "requires_gym": True, "equipment_tag": "dumbbell", "rx_weight_male_kg": 22, "rx_weight_female_kg": 15},
     {"name": "Devil Press", "muscle_group": "volledig_lichaam", "level": "advanced", "category": "dumbbell", "requires_gym": True, "equipment_tag": "dumbbell", "rx_weight_male_kg": 22, "rx_weight_female_kg": 15},
+    # Added for the For Time chipper batch below - plank-position alternating row, distinct
+    # from DB Bent-over Row/DB Single-Arm Row (no existing exercise covers it).
+    {"name": "DB Renegade Row", "muscle_group": "rug", "level": "intermediate", "category": "dumbbell", "requires_gym": True, "equipment_tag": "dumbbell", "rx_weight_male_kg": 22, "rx_weight_female_kg": 14},
 
     # --- Kettlebell (7, requires_gym=True, equipment_tag=kettlebell) ---
     # Same fix as dumbbells above - was requires_gym=False, always available at home regardless

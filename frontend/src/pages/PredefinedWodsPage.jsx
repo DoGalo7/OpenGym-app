@@ -11,7 +11,7 @@ const CATEGORIES = [
   { value: "AMRAP", label: "AMRAP" },
   { value: "EMOM", label: "EMOM" },
   { value: "TABATA", label: "Tabata" },
-  { value: "FOR_TIME", label: "Anders" },
+  { value: "FOR_TIME", label: "For Time" },
   { value: "BENCHMARK", label: "Benchmark" },
   { value: "SHARED", label: "Gedeeld door sporters" },
   { value: "FAVORIETEN", label: "Mijn favorieten" },
@@ -29,7 +29,7 @@ function toPredefinedItem(w) {
     kind: "predefined",
     id: w.id,
     name: w.name,
-    badgeLabel: w.training_type === "FOR_TIME" ? "Anders" : w.training_type,
+    badgeLabel: w.training_type === "FOR_TIME" ? "For Time" : w.training_type,
     meta: `${w.duration_minutes} min · ${LEVEL_LABELS[w.level] ?? w.level}`,
     description: w.description,
     lines: w.movements.map(formatMovement),
@@ -61,7 +61,7 @@ function toSharedItem(w) {
     kind: "shared",
     id: w.id,
     name: w.name,
-    badgeLabel: w.training_type === "FOR_TIME" ? "Anders" : w.training_type,
+    badgeLabel: w.training_type === "FOR_TIME" ? "For Time" : w.training_type,
     meta: w.recipient_name
       ? `${w.duration_minutes} min · Naar jou gestuurd door ${w.shared_by_name}`
       : `${w.duration_minutes} min · Gedeeld door ${w.shared_by_name}`,

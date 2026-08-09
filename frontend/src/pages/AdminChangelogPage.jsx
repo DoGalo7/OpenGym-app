@@ -41,7 +41,7 @@ const SECTIONS = [
   {
     title: "Ideeën",
     items: [
-      "Categorieën: AMRAP, EMOM, Tabata, Anders, Benchmark (vaste WOD's zoals Murph en de Girls-WOD's), Gedeeld door sporters, Mijn favorieten. Categorie- en filterknoppen blijven vastgezet bovenaan zichtbaar tijdens het scrollen.",
+      "Categorieën: AMRAP, EMOM, Tabata, For Time (incl. een reeks chippers), Benchmark (vaste WOD's zoals Murph en de Girls-WOD's), Gedeeld door sporters, Mijn favorieten. Categorie- en filterknoppen blijven vastgezet bovenaan zichtbaar tijdens het scrollen.",
       "Elke kaart toont in één oogopslag type, duur/niveau en de oefeningen. Hartje om te bewaren als favoriet.",
       "Gedeeld door sporters bevat zowel workouts die voor iedereen gedeeld zijn als workouts die een vriend(in) rechtstreeks naar jou heeft gestuurd (herkenbaar aan 🎁 Voor jou) - die laatste zie alleen jij.",
       "Een idee laden vult WOD maken automatisch in, met tijd/spiergroepen aanpasbaar; bij Benchmark zie je de vaste workout-structuur.",

@@ -127,7 +127,7 @@ export default function HomePage() {
           <p className="badge" style={{ margin: 0 }}>💡 WOD van de dag</p>
           <h3 style={{ marginBottom: 4 }}>{featured.name}</h3>
           <p className="field-hint" style={{ marginTop: 0 }}>
-            {featured.training_type === "FOR_TIME" ? "Anders" : featured.training_type} · {featured.duration_minutes} min ·{" "}
+            {featured.training_type === "FOR_TIME" ? "For Time" : featured.training_type} · {featured.duration_minutes} min ·{" "}
             {{ beginner: "Beginner", intermediate: "Gemiddeld", advanced: "Gevorderd" }[featured.level] ?? featured.level}
           </p>
           <p style={{ marginTop: 8, marginBottom: 4 }}>{featured.description}</p>
