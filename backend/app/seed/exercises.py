@@ -46,6 +46,9 @@ EXERCISES = [
     # Previously requires_gym=False (always available at home) - wrong: not everyone owns
     # dumbbells, so this is now gated behind the "Dumbbells" home-equipment checkbox like barbell.
     {"name": "DB Shoulder Press", "muscle_group": "schouders", "level": "beginner", "category": "dumbbell", "requires_gym": True, "equipment_tag": "dumbbell", "rx_weight_male_kg": 20, "rx_weight_female_kg": 12},
+    # Added for the "extra AMRAPs" batch - leg-drive assisted, distinct from the strict
+    # DB Shoulder Press above (also stands in for "Dumbbell Shoulder to Overhead").
+    {"name": "DB Push Press", "muscle_group": "schouders", "level": "intermediate", "category": "dumbbell", "requires_gym": True, "equipment_tag": "dumbbell", "rx_weight_male_kg": 22, "rx_weight_female_kg": 14},
     {"name": "DB Bench Press", "muscle_group": "borst", "level": "beginner", "category": "dumbbell", "requires_gym": True, "equipment_tag": "dumbbell", "rx_weight_male_kg": 22, "rx_weight_female_kg": 14},
     {"name": "DB Chest Fly", "muscle_group": "borst", "level": "beginner", "category": "dumbbell", "requires_gym": True, "equipment_tag": "dumbbell", "rx_weight_male_kg": 12, "rx_weight_female_kg": 8},
     {"name": "DB Bent-over Row", "muscle_group": "rug", "level": "beginner", "category": "dumbbell", "requires_gym": True, "equipment_tag": "dumbbell", "rx_weight_male_kg": 22, "rx_weight_female_kg": 14},
